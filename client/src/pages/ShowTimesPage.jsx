@@ -21,20 +21,20 @@ export default function ShowTimes() {
 
 return (
     <div>
-    <h2>Finnkino Näytösajat</h2>
+    <h2>Finnkino Show Times</h2>
     <select value={selectedArea} onChange={(e) => setSelectedArea(e.target.value)}>
-        <option value="">Valitse alue</option>
+        <option value="">Choose area</option>
         {areas.map(a => (
         <option key={a.id} value={a.id}>{a.name}</option>
         ))}
     </select>
     <input
         type="text"
-         placeholder="Päivämäärä (dd.mm.yyyy)"
+         placeholder="Date (dd.mm.yyyy)"
         value={date}
         onChange={(e) => setDate(e.target.value)}
     />
-    <button onClick={handleSearch}>Hae</button>
+    <button onClick={handleSearch}>Search</button>
 
     <ul>
         {shows.map((s, i) => (
