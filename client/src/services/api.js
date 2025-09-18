@@ -1,10 +1,28 @@
-import axios from "axios";
+import axios from "axios"
 
-const API = axios.create({ baseURL: "http://localhost:3001" })
+const api = axios.create({
+  baseURL: "http://localhost:3000/api/finnkino", 
+})
 
-export const fetchAreas = () => API.get("/finnkino/areas")
-export const fetchSchedule = (area, date) =>
-  API.get("/finnkino/schedule", { params: { area, date } })
-export const fetchMovies = () => {
-
+// Hae teatterialueet
+export const fetchAreas = async () => {
+  const res = await api.get("/theatres")
+  return res.data.theatreAreas // backend palauttaa theatreAreas
 }
+
+// Hae aikataulut
+export const fetchSchedule = async (area, date) => {
+  const params = {}
+  if (area) params.area = area
+  if (date) params.dt = date
+
+  const res = await api.get("/schedule", { params })
+  return res.data.schedule 
+}
+
+export const fetchMovies = async () => {
+  const res = await api.get("/events") 
+  return res.data.events
+}
+
+export default api

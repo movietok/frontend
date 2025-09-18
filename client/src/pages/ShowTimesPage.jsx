@@ -1,48 +1,143 @@
-import { useState, useEffect } from "react"
-import { fetchAreas, fetchSchedule } from "../services/api"
+import { useState } from "react"
+import { useShowTimes } from "../hooks/useShowTimes"
+import { getCurrentDate, parseFinnkinoDate } from "../helpers/dateUtils"
+import "../styles/ShowTimes.css"
 
-export default function ShowTimes() {
-    // Tilat teatterialueille, valitulle alueelle, päivämäärälle ja näytöksille
-    const [areas, setAreas] = useState([])
-    const [selectedArea, setSelectedArea] = useState("")
-    const [date, setDate] = useState("")
-    const [shows, setShows] = useState([])
+export default function ShowTimesPage() {
+  const [selectedArea, setSelectedArea] = useState("")
+  const [date, setDate] = useState(getCurrentDate())
+  const { areas, shows, loading, getSchedule } = useShowTimes()
 
-    // Haetaan teatterialueet kun komponentti latautuu
-    useEffect(() => {
-        fetchAreas().then(res => setAreas(res.data))
-    }, [])
-
-    // Hae-nappi hakee aikataulun valitulle alueelle ja päivälle
-    const handleSearch = async () => {
-        const res = await fetchSchedule(selectedArea, date)
-        setShows(res.data)
+  const handleSearch = () => {
+    if (selectedArea && date) {
+      getSchedule(selectedArea, date)
     }
+  }
 
-return (
-    <div>
-    <h2>Finnkino Show Times</h2>
-    <select value={selectedArea} onChange={(e) => setSelectedArea(e.target.value)}>
-        <option value="">Choose area</option>
-        {areas.map(a => (
-        <option key={a.id} value={a.id}>{a.name}</option>
-        ))}
-    </select>
-    <input
-        type="text"
-         placeholder="Date (dd.mm.yyyy)"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-    />
-    <button onClick={handleSearch}>Search</button>
+  const uniqueShows = Array.isArray(shows)
+    ? shows
+        .filter((show, index, self) =>
+          index === self.findIndex(s =>
+            s.title === show.title &&
+            s.start === show.start &&
+            s.theatre === show.theatre
+          )
+        )
+        .sort((a, b) => {
+          const dateA = parseFinnkinoDate(a.start)
+          const dateB = parseFinnkinoDate(b.start)
+          return (dateA?.getTime() || 0) - (dateB?.getTime() || 0)
+        })
+    : []
 
-    <ul>
-        {shows.map((s, i) => (
-        <li key={i}>
-            🎬 {s.title} – {s.start} @ {s.theatre}
-        </li>
-        ))}
-    </ul>
+  return (
+    <div className="showtimes-container">
+      <header className="showtimes-header">
+        <h1>FinnKino Show Times</h1>
+        <h2>___________________________________________________________</h2>
+      </header>
+
+      <section className="filters-section">
+        <div className="filter-group">
+          <label htmlFor="area">Teatterialue</label>
+          <select
+            id="area"
+            value={selectedArea}
+            onChange={(e) => setSelectedArea(e.target.value)}
+          >
+            <option value="">Valitse alue</option>
+            {areas.map(a => (
+              <option key={a.id} value={a.id}>{a.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="filter-group">
+          <label htmlFor="date">Päivämäärä</label>
+          <input
+            id="date"
+            type="text"
+            placeholder="dd.mm.yyyy"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+        </div>
+
+        <button
+          className="search-button"
+          onClick={handleSearch}
+          disabled={loading || !selectedArea || !date}
+        >
+          {loading ? "Haetaan..." : "Hae näytösaikoja"}
+        </button>
+      </section>
+
+      <section className="showtimes-list">
+        {uniqueShows.length === 0 && !loading ? (
+          <div className="empty-message">
+            Valitse alue ja päivämäärä sekä paina "Hae näytösaikoja"
+          </div>
+        ) : (
+          uniqueShows.map((show, index) => {
+            const parsed = parseFinnkinoDate(show.start)
+            const timeText = parsed
+              ? parsed.toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" })
+              : "Aika tuntematon"
+
+            const ratingText =
+              typeof show.rating === "string"
+                ? show.rating
+                : show.rating?.name || "Ei arvostelua"
+
+            return (
+              <div key={index} className="showtime-item">
+                <div className="movie-poster-placeholder">🎬</div>
+                <div className="movie-info">
+                  <h3 className="movie-title">{show.title}</h3>
+                  <p className="movie-details">
+                    {show.language || "Suomi"} • {ratingText}
+                  </p>
+                </div>
+                <div className="showtime-details">
+                  <p className="showtime-time">{timeText}</p>
+                  <p className="showtime-theater">{show.theatre}</p>
+                </div>
+              </div>
+            )
+          })
+        )}
+
+        {loading && (
+          <div className="loading-message">Ladataan näytösaikoja...</div>
+        )}
+      </section>
+
+      <section className="quick-dates">
+        <p className="quick-label">Pikavalinnat:</p>
+        <div className="quick-buttons">
+          {[0, 1, 2, 3, 4].map(days => {
+            const futureDate = new Date()
+            futureDate.setDate(futureDate.getDate() + days)
+            const day = String(futureDate.getDate()).padStart(2, "0")
+            const month = String(futureDate.getMonth() + 1).padStart(2, "0")
+            const year = futureDate.getFullYear()
+            const dateStr = `${day}.${month}.${year}`
+
+            return (
+              <button
+                key={days}
+                onClick={() => {
+                  setDate(dateStr)
+                  setTimeout(handleSearch, 100)
+                }}
+                className={date === dateStr ? "active" : ""}
+              >
+                {days === 0 ? "Tänään" : days === 1 ? "Huomenna" : dateStr}
+              </button>
+            )
+          })}
+        </div>
+      </section>
     </div>
-    )
+  )
 }
