@@ -1,0 +1,168 @@
+/* Aseta tumma teema kuten kuvassa */
+body {
+  background-color: #0f0f0f;
+  color: #ffffff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Pääsäiliö */
+.showtimes-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Otsikko */
+.showtimes-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.showtimes-header h1 {
+  color: #335355; /* Netflix-punainen */
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.showtimes-header h2 {
+  color: #cccccc;
+  font-size: 1.2rem;
+  font-weight: 300;
+}
+
+/* Suodatinosio */
+.filters-section {
+  background: #1a1a1a;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-group label {
+  margin-bottom: 0.5rem;
+  color: #cccccc;
+  font-weight: 500;
+}
+
+.filter-group select,
+.filter-group input {
+  padding: 0.75rem;
+  border: 1px solid #335355;
+  border-radius: 4px;
+  background: #2a2a2a;
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.search-button {
+  background: #335355;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  align-self: end;
+}
+
+.search-button:hover {
+  background: #f40612;
+}
+
+/* Näytöslista */
+.showtimes-list {
+  background: #1a1a1a;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.showtime-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid #333;
+  align-items: center;
+}
+
+.showtime-item:last-child {
+  border-bottom: none;
+}
+
+.showtime-item:hover {
+  background: #335355;
+}
+
+.movie-poster {
+  width: 80px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.movie-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.movie-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.movie-details {
+  color: #cccccc;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.showtime-details {
+  text-align: right;
+}
+
+.showtime-time {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #335355;
+  margin: 0;
+}
+
+.showtime-theater {
+  color: #cccccc;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Responsiivisuus */
+@media (max-width: 768px) {
+  .showtime-item {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  
+  .movie-poster {
+    margin: 0 auto;
+  }
+  
+  .showtime-details {
+    text-align: center;
+  }
+  
+  .filters-section {
+    grid-template-columns: 1fr;
+  }
+}
