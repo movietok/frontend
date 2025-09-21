@@ -102,8 +102,8 @@ export default function Navbar() {
         <Link to="/groups" style={navLinkStyle}>
           Groups
         </Link>
-        <Link to="/reviews" style={navLinkStyle}>
-          Reviews
+        <Link to="/browse" style={navLinkStyle}>
+          Browse
         </Link>
 
         {!isLoggedIn ? (

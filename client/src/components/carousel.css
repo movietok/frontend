@@ -1,0 +1,112 @@
+/* ====================
+   Generic Carousel
+==================== */
+.carousel-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 0 40px;
+}
+
+/* Left gradient */
+.carousel-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 100%;
+  background: linear-gradient(to right, #0f0f0f, transparent);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.carousel-container.at-start::before {
+  opacity: 0;
+}
+
+/* Right gradient */
+.carousel-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40px;
+  height: 100%;
+  background: linear-gradient(to left, #0f0f0f, transparent);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.carousel-container.at-end::after {
+  opacity: 0;
+}
+
+.carousel-slider {
+  position: relative;
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 0.75rem;
+  padding: 1rem 0;
+  scroll-snap-type: x mandatory;
+}
+
+.carousel-card-wrapper {
+  flex: 0 0 auto;
+  scroll-snap-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+}
+
+.carousel-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(15, 15, 15, 0.7);
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 50%;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+  z-index: 4;
+}
+
+.carousel-btn.left {
+  left: 0;
+}
+.carousel-btn.right {
+  right: 0;
+}
+
+.carousel-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: rgba(50, 50, 50, 0.5);
+  box-shadow: none;
+}
+
+/* Empty room size */
+:root {
+  --carousel-edge-space: 5px;
+}
+
+/* Add spacers at both ends of the slider track */
+.carousel-slider::before,
+.carousel-slider::after {
+  content: "";
+  flex: 0 0 var(--carousel-edge-space);
+}
