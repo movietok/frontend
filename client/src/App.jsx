@@ -24,8 +24,10 @@ function App() {
             flex: 1,
             maxWidth: "1280px",
             margin: "0 auto",
-            paddingTop: "70px",
-            padding: "2rem",
+            paddingTop: "80px", // Lisää tilaa Navbarille
+            paddingLeft: "2rem",
+            paddingRight: "2rem", 
+            paddingBottom: "2rem",
             textAlign: "center",
           }}
         >
