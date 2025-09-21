@@ -1,0 +1,53 @@
+name: Deploy to Development
+
+on:
+  push:
+    branches: [ develop, dev ]
+  workflow_dispatch:
+    inputs:
+      deploy_target:
+        description: 'Deploy Target'
+        required: true
+        default: 'frontend'
+        type: choice
+        options:
+        - frontend
+        - backend
+        - both
+
+jobs:
+  deploy-dev-frontend:
+    name: Deploy Frontend (Dev)
+    runs-on: self-hosted
+    if: contains(github.ref, 'develop') || contains(github.ref, 'dev') || (github.event_name == 'workflow_dispatch' && (github.event.inputs.deploy_target == 'frontend' || github.event.inputs.deploy_target == 'both'))
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+
+      - name: Deploy Frontend to Dev
+        run: |
+          echo "Deploying frontend to development environment..."
+          # Use development environment variables
+          export NODE_ENV=development
+          /home/deployer/scripts/deploy-frontend.sh
+
+  deploy-dev-backend:
+    name: Deploy Backend (Dev)  
+    runs-on: self-hosted
+    if: contains(github.ref, 'develop') || contains(github.ref, 'dev') || (github.event_name == 'workflow_dispatch' && (github.event.inputs.deploy_target == 'backend' || github.event.inputs.deploy_target == 'both'))
+    steps:
+      - name: Deploy Backend to Dev
+        run: |
+          echo "Deploying backend to development environment..."
+          # Modify the backend script to use dev branch
+          sed -i 's/origin main/origin develop/g' /home/deployer/scripts/deploy-backend.sh || true
+          /home/deployer/scripts/deploy-backend.sh
+          # Restore original script
+          sed -i 's/origin develop/origin main/g' /home/deployer/scripts/deploy-backend.sh || true

@@ -1,0 +1,71 @@
+name: Health Check & Monitoring
+
+on:
+  schedule:
+    # Run every 30 minutes
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    name: System Health Check
+    runs-on: self-hosted
+    steps:
+      - name: Check System Status
+        run: |
+          echo "=== System Health Check $(date) ==="
+          /home/deployer/scripts/status.sh
+
+      - name: Check Frontend Health
+        run: |
+          echo "=== Frontend Health Check ==="
+          if curl -f -s -o /dev/null -w "%{http_code}" http://${{ secrets.DEPLOY_HOST }}/ | grep -q "200"; then
+            echo "✅ Frontend is healthy (HTTP 200)"
+          else
+            echo "❌ Frontend health check failed"
+            exit 1
+          fi
+
+      - name: Check Backend Health
+        run: |
+          echo "=== Backend Health Check ==="
+          # Try multiple endpoints
+          if curl -f -s -o /dev/null http://${{ secrets.DEPLOY_HOST }}/api/health; then
+            echo "✅ Backend API is healthy"
+          elif curl -f -s -o /dev/null http://${{ secrets.DEPLOY_HOST }}/api/; then
+            echo "✅ Backend API is responding"
+          else
+            echo "❌ Backend API health check failed"
+            # Don't exit with error for API, just log
+          fi
+
+      - name: Check Disk Space
+        run: |
+          echo "=== Disk Space Check ==="
+          df -h
+          # Alert if disk usage is over 80%
+          if df -h | awk '$5 ~ /^[8-9][0-9]%|^100%/ {print $5, $6}' | grep -q .; then
+            echo "⚠️  High disk usage detected!"
+            df -h | awk '$5 ~ /^[8-9][0-9]%|^100%/ {print "WARNING: " $5 " used on " $6}'
+          else
+            echo "✅ Disk usage is normal"
+          fi
+
+      - name: Check Memory Usage
+        run: |
+          echo "=== Memory Usage Check ==="
+          free -h
+          # Get memory usage percentage
+          MEMORY_USAGE=$(free | grep Mem | awk '{printf "%.0f", $3/$2 * 100.0}')
+          echo "Memory usage: ${MEMORY_USAGE}%"
+          if [ "$MEMORY_USAGE" -gt 85 ]; then
+            echo "⚠️  High memory usage: ${MEMORY_USAGE}%"
+          else
+            echo "✅ Memory usage is normal: ${MEMORY_USAGE}%"
+          fi
+
+      - name: Show Recent Logs
+        if: failure()
+        run: |
+          echo "=== Recent Logs (Due to failure) ==="
+          /home/deployer/scripts/show-logs.sh

@@ -1,0 +1,117 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      deploy_frontend:
+        description: 'Deploy Frontend'
+        required: false
+        default: 'true'
+        type: boolean
+      deploy_backend:
+        description: 'Deploy Backend'
+        required: false
+        default: 'true'
+        type: boolean
+
+jobs:
+  deploy-frontend:
+    name: Deploy Frontend
+    runs-on: self-hosted
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+
+      - name: Deploy Frontend
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_frontend == 'true')
+        run: |
+          echo "Deploying frontend..."
+          /home/deployer/scripts/deploy-frontend.sh
+        env:
+          NODE_ENV: production
+
+      - name: Check Frontend Status
+        run: |
+          echo "Checking frontend deployment status..."
+          if [ -d "/var/www/movietok" ] && [ "$(ls -A /var/www/movietok)" ]; then
+            echo "✅ Frontend deployment successful - files found in /var/www/movietok"
+            ls -la /var/www/movietok
+          else
+            echo "❌ Frontend deployment failed - no files found"
+            exit 1
+          fi
+
+  deploy-backend:
+    name: Deploy Backend
+    runs-on: self-hosted
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout Backend Repository
+        run: |
+          echo "Backend will be deployed via script that handles its own git operations"
+          echo "Current working directory: $(pwd)"
+
+      - name: Deploy Backend
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_backend == 'true')
+        run: |
+          echo "Deploying backend..."
+          /home/deployer/scripts/deploy-backend.sh
+
+      - name: Check Backend Status
+        run: |
+          echo "Checking backend deployment status..."
+          /home/deployer/scripts/status.sh
+
+  health-check:
+    name: Health Check
+    runs-on: self-hosted
+    needs: [deploy-frontend, deploy-backend]
+    if: always() && (needs.deploy-frontend.result == 'success' || needs.deploy-backend.result == 'success')
+    steps:
+      - name: Wait for Services
+        run: |
+          echo "Waiting for services to start..."
+          sleep 10
+
+      - name: Check Application Health
+        run: |
+          echo "=== System Status ==="
+          /home/deployer/scripts/status.sh
+          
+          echo ""
+          echo "=== Recent Logs ==="
+          /home/deployer/scripts/show-logs.sh
+
+      - name: Test Frontend Endpoint
+        run: |
+          echo "Testing frontend availability..."
+          if curl -f -s http://${{ secrets.DEPLOY_HOST }}/ > /dev/null; then
+            echo "✅ Frontend is responding"
+          else
+            echo "⚠️  Frontend not responding"
+          fi
+
+      - name: Test Backend API Endpoint
+        run: |
+          echo "Testing backend API availability..."
+          if curl -f -s http://${{ secrets.DEPLOY_HOST }}/api/health > /dev/null; then
+            echo "✅ Backend API is responding"
+          elif curl -f -s http://${{ secrets.DEPLOY_HOST }}/api/ > /dev/null; then
+            echo "✅ Backend API is responding (fallback check)"
+          else
+            echo "⚠️  Backend API not responding"
+          fi
