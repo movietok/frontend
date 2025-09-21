@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import { authAPI } from "../services/api"
 import "../styles/Signup.css"
 
 export default function SignUp() {
@@ -13,21 +14,17 @@ export default function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const res = await fetch("http://localhost:3000/api/v1/users/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      })
+      const res = await authAPI.post("/register", form)
 
-      const data = await res.json()
-      if (res.ok) {
+      if (res.status === 200 || res.status === 201) {
         alert("Account created successfully!")
         navigate("/login")
       } else {
-        alert(data.message || "Registration failed")
+        alert(res.data?.message || "Registration failed")
       }
     } catch (err) {
-      alert("Something went wrong")
+      const errorMessage = err.response?.data?.message || "Something went wrong"
+      alert(errorMessage)
     }
   }
 
