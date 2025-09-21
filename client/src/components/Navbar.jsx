@@ -18,10 +18,16 @@ export default function Navbar() {
 
   const handleSearch = (e) => {
     e.preventDefault()
+    console.log("Search submitted:", query) // Debug log
     if (query.trim()) {
       navigate(`/search?q=${encodeURIComponent(query)}`)
       setQuery("")
     }
+  }
+
+  const handleInputChange = (e) => {
+    console.log("Input changed:", e.target.value) // Debug log
+    setQuery(e.target.value)
   }
 
   const handleLogout = () => {
@@ -56,7 +62,7 @@ export default function Navbar() {
       </Link>
 
       {/* Search Bar */}
-      <form onSubmit={handleSearch} style={{ position: "relative" }}>
+      <form onSubmit={handleSearch} style={{ position: "relative", zIndex: 1001 }}>
         <div
           style={{
             display: "flex",
@@ -73,20 +79,31 @@ export default function Navbar() {
           <img
             src={searchIcon}
             alt="Search"
-            style={{ width: "20px", marginRight: "8px" }}
+            style={{ 
+              width: "20px", 
+              marginRight: "8px",
+              pointerEvents: "none" // Estää kuvan häiritsemästä inputia
+            }}
           />
           <input
             type="text"
             placeholder="Search movies..."
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={handleInputChange}
+            onClick={() => console.log("Input clicked!")}
+            onFocus={() => console.log("Input focused!")}
             style={{
               flex: 1,
               border: "none",
               outline: "none",
               fontSize: "1rem",
               backgroundColor: "transparent",
+              color: "#000",
+              pointerEvents: "auto", // Varmistaa että input on klikattavissa
+              cursor: "text",
+              minWidth: "100px"
             }}
+            autoComplete="off"
           />
         </div>
       </form>

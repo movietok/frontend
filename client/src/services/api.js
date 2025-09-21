@@ -33,4 +33,12 @@ export const fetchMovies = async () => {
   return res.data.events
 }
 
+// Hae elokuvia hakusanalla
+export const searchMovies = async (query) => {
+  const res = await api.get("/search", { 
+    params: { query: query }
+  })
+  return res.data
+}
+
 export default api
