@@ -1,7 +1,15 @@
 import axios from "axios"
 
+// Get base URL from environment variables
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api"
+
 const api = axios.create({
-  baseURL: "http://localhost:3000/api/finnkino", 
+  baseURL: `${API_BASE_URL}/finnkino`, 
+})
+
+// Create a separate instance for user authentication endpoints
+export const authAPI = axios.create({
+  baseURL: `${API_BASE_URL}/v1/users`,
 })
 
 // Hae teatterialueet
