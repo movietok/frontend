@@ -9,7 +9,8 @@ import Footer from "./components/Footer"
 import SearchResultsPage from "./pages/SearchResultsPage"
 import ShowTimesPage from "./pages/ShowTimesPage"
 import LoginPage from "./pages/LoginPage"
-import SignUpPage from "./pages/SignupPage"
+import SignupPage from "./pages/SignupPage"
+import ReviewsPage from "./pages/ReviewsPage"
 
 function App() {
   return (
@@ -32,7 +33,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/homepage" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/signup" element={<SignupPage />} />
             <Route path="/search" element={<SearchResultsPage />} />
             <Route path="/schedule" element={<ShowTimesPage />} />
             <Route path="/reviews" element={<ReviewsPage />} />

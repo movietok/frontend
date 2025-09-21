@@ -1,6 +1,6 @@
 import React from "react"
 import { Link } from "react-router-dom"
-import Carousel from "../carousel"
+import Carousel from "../Carousel"
 
 function RecentReviews({ reviews }) {
   return (

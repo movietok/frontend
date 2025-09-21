@@ -1,5 +1,5 @@
 import React from "react"
-import Carousel from "../carousel"
+import Carousel from "../Carousel"
 
 function PopularMovies({ movies }) {
   return (
