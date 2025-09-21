@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
-import "../styles/homepage.css"
-import logo from "../Images/Movietoklogo.png"
+import "../styles/homePage.css"
+import logo from "../images/Movietoklogo.png"
 
 import PopularMovies from "../components/homepage/PopularMovies"
 import NowPlayingMovies from "../components/homepage/NowPlayingMovies"
