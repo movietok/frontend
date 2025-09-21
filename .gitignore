@@ -137,3 +137,6 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Deployment and setup scripts with sensitive information
+.github/validate-setup.sh

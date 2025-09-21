@@ -1,0 +1,65 @@
+name: Rollback Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Service to rollback'
+        required: true
+        type: choice
+        options:
+        - frontend
+        - backend
+        - both
+      confirm:
+        description: 'Type "ROLLBACK" to confirm'
+        required: true
+        type: string
+
+jobs:
+  rollback:
+    name: Rollback Service
+    runs-on: self-hosted
+    if: github.event.inputs.confirm == 'ROLLBACK'
+    steps:
+      - name: Validate Input
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "ROLLBACK" ]; then
+            echo "❌ Rollback not confirmed. Please type 'ROLLBACK' to proceed."
+            exit 1
+          fi
+
+      - name: Rollback Frontend
+        if: github.event.inputs.service == 'frontend' || github.event.inputs.service == 'both'
+        run: |
+          echo "Rolling back frontend..."
+          # Create a simple rollback by restoring from backup
+          if [ -d "/var/www/movietok.backup" ]; then
+            sudo rm -rf /var/www/movietok/*
+            sudo cp -r /var/www/movietok.backup/* /var/www/movietok/
+            sudo chown -R www-data:www-data /var/www/movietok
+            echo "✅ Frontend rollback completed"
+          else
+            echo "⚠️  No frontend backup found"
+          fi
+
+      - name: Rollback Backend
+        if: github.event.inputs.service == 'backend' || github.event.inputs.service == 'both'
+        run: |
+          echo "Rolling back backend..."
+          # Stop current backend
+          pm2 stop movietok-backend || true
+          
+          # Switch to previous version if git history exists
+          cd /home/deployer/apps/movietok/backend
+          git log --oneline -5
+          echo "To rollback manually, run: git reset --hard HEAD~1"
+          
+          # For now, just restart the current version
+          pm2 start movietok-backend || pm2 restart movietok-backend
+          echo "✅ Backend service restarted"
+
+      - name: Post-Rollback Status
+        run: |
+          echo "=== Post-Rollback Status ==="
+          /home/deployer/scripts/status.sh
