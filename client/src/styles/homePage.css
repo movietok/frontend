@@ -1,0 +1,375 @@
+/* Page base */
+.homepage-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #0f0f0f;
+  color: #ffffff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.homepage-main {
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* ====================
+   Logo
+==================== */
+.logo-container {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.homepage-logo {
+  max-width: 90px;
+  height: auto;
+}
+
+/* ====================
+   Section headers
+==================== */
+.section-header {
+  text-align: center;
+  margin: 2rem 0 1.5rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 3px solid transparent;
+}
+
+.section-header h2 {
+  font-size: 2rem;
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #f0f0f0;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+}
+
+.section-header p {
+  color: #aaa;
+  font-size: 1rem;
+  font-weight: 300;
+  margin: 0;
+}
+
+/* Accents */
+.popular-movies .section-header { border-bottom-color: #5cd6d6; }
+.popular-movies .section-header h2 { text-shadow: 0 0 8px rgba(92,214,214,0.7); }
+
+.in-theaters .section-header { border-bottom-color: #66b3ff; }
+.in-theaters .section-header h2 { text-shadow: 0 0 8px rgba(102,179,255,0.7); }
+
+.recent-reviews .section-header { border-bottom-color: #9980ff; }
+.recent-reviews .section-header h2 { text-shadow: 0 0 8px rgba(153,128,255,0.7); }
+
+.popular-groups .section-header { border-bottom-color: #c299ff; }
+.popular-groups .section-header h2 { text-shadow: 0 0 8px rgba(194,153,255,0.7); }
+
+.most-active-users .section-header { border-bottom-color: #ff99cc; }
+.most-active-users .section-header h2 { text-shadow: 0 0 8px rgba(255,153,204,0.7); }
+
+.popular-users .section-header { border-bottom-color: #ff80b3; }
+.popular-users .section-header h2 { text-shadow: 0 0 8px rgba(255,128,179,0.7); }
+
+/* ====================
+   Movie Cards
+==================== */
+.movie-card {
+  position: relative;
+  width: 200px;
+  height: 300px;
+  background: #222;
+  border: 1px solid #444;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.movie-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Overlay */
+.movie-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 15, 15, 0.85);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  text-align: center;
+  padding: 1rem;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.movie-card:hover {
+  position: relative;
+  z-index: 3;
+}
+.movie-card:hover .movie-overlay {
+  opacity: 1;
+}
+
+/* Title + rating */
+.movie-overlay h4 {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.movie-overlay p {
+  margin: 0.3rem 0 1rem;
+  font-size: 0.9rem;
+  color: #ddd;
+}
+
+/* Bookmark button */
+.bookmark-btn {
+  pointer-events: auto;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 0.3rem 0.6rem;
+  background: #5cd6d6;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #0f0f0f;
+  transition: background 0.2s ease;
+}
+.bookmark-btn:hover {
+  background: #33aaaa;
+}
+
+/* ====================
+   Review Cards
+==================== */
+.review-card {
+  width: 280px;
+  height: 220px;
+  background: #262626;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.review-card h3 {
+  margin: 0 0 0.5rem 0;
+  color: #ffffff;
+}
+.review-card p {
+  margin: 0.3rem 0;
+  color: #cccccc;
+  font-size: 0.9rem;
+}
+
+.review-text {
+  flex: 1;
+  color: #ccc;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.review-btn {
+  align-self: flex-start;
+  padding: 0.4rem 0.8rem;
+  background: #335355;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  text-decoration: none;
+}
+.review-btn:hover {
+  background: #00cccc;
+}
+
+/* ====================
+   Group Cards
+==================== */
+.group-card {
+  width: 220px;
+  height: 160px;
+  background: #2d2d2d;
+  border: 1px solid #555;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  text-decoration: none;
+  color: inherit;
+}
+.group-card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+  border-bottom: 2px solid #c299ff;
+  display: inline-block;
+  padding-bottom: 0.15rem;
+}
+.group-card p {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: #bbbbbb;
+  margin: 0;
+}
+
+/* ====================
+   User Cards
+==================== */
+.user-card {
+  width: 200px;
+  height: 140px;
+  background: #303030;
+  border: 1px solid #555;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+.user-card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 0 6px rgba(255,128,179,0.6);
+}
+.user-card p {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: #bbbbbb;
+  margin: 0;
+}
+.group-card,
+.user-card {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ====================
+   Pastel Hover Glows
+==================== */
+.popular-movies .movie-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(92,214,214,0.5);
+  border-color: #5cd6d6;
+}
+.popular-movies .carousel-btn:hover {
+  background: #5cd6d6;
+  box-shadow: 0 0 12px rgba(92,214,214,0.6);
+}
+
+.in-theaters .movie-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(102,179,255,0.5);
+  border-color: #66b3ff;
+}
+.in-theaters .carousel-btn:hover {
+  background: #66b3ff;
+  box-shadow: 0 0 12px rgba(102,179,255,0.6);
+}
+
+.recent-reviews .review-card:hover {
+  background: #333;
+  transform: translateY(-4px);
+  box-shadow: 0 6px 15px rgba(153,128,255,0.4);
+}
+.recent-reviews .carousel-btn:hover {
+  background: #9980ff;
+  box-shadow: 0 0 12px rgba(153,128,255,0.6);
+}
+
+.popular-groups .group-card:hover {
+  background: #383838;
+  transform: translateY(-4px);
+  box-shadow: 0 6px 15px rgba(194,153,255,0.4);
+}
+.popular-groups .carousel-btn:hover {
+  background: #c299ff;
+  box-shadow: 0 0 12px rgba(194,153,255,0.6);
+}
+
+.most-active-users .user-card:hover {
+  background: #3a3a3a;
+  transform: translateY(-4px);
+  box-shadow: 0 6px 15px rgba(255,153,204,0.4);
+}
+.most-active-users .carousel-btn:hover {
+  background: #ff99cc;
+  box-shadow: 0 0 12px rgba(255,153,204,0.6);
+}
+
+.popular-users .user-card:hover {
+  background: #3a3a3a;
+  transform: translateY(-4px);
+  box-shadow: 0 6px 15px rgba(255,128,179,0.4);
+}
+.popular-users .carousel-btn:hover {
+  background: #ff80b3;
+  box-shadow: 0 0 12px rgba(255,128,179,0.6);
+}
+
+/* ====================
+   Responsiveness
+==================== */
+@media (max-width: 1024px) {
+  .review-card {
+    width: 220px;
+    height: auto;
+  }
+  .group-card {
+    width: 180px;
+    height: auto;
+  }
+  .user-card {
+    width: 160px;
+    height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .movie-card {
+    width: 150px;
+    height: 220px;
+  }
+  .review-card,
+  .group-card,
+  .user-card {
+    width: 100%;
+    height: auto;
+  }
+  .carousel-btn.left {
+    left: 0;
+  }
+  .carousel-btn.right {
+    right: 0;
+  }
+}
