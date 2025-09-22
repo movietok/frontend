@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
+import { authAPI } from "../services/api"
 import "../styles/Login.css"
 
 export default function Login() {
@@ -15,23 +16,19 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const res = await fetch("http://localhost:3000/api/v1/users/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      })
+      const res = await authAPI.post("/login", form)
 
-      const data = await res.json()
-      if (res.ok) {
-        login(data.token)
-        localStorage.setItem("token", data.token) // save JWT
-        alert("Login successful!")
+      if (res.status === 200) {
+        login(res.data.token)
+        localStorage.setItem("token", res.data.token) // save JWT
+        //alert("Login successful!")
         navigate("/")
       } else {
-        alert(data.message || "Login failed")
+        alert(res.data?.message || "Login failed")
       }
     } catch (err) {
-      alert("Something went wrong")
+      const errorMessage = err.response?.data?.message || "Something went wrong"
+      alert(errorMessage)
     }
   }
 

@@ -3,18 +3,13 @@ import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import searchIcon from "../images/searchimage.png"
 import movieTokLogo from "../images/Movietoklogo.png"
+import "../styles/navbar.css"
 
 export default function Navbar() {
   const [query, setQuery] = useState("")
   const [menuOpen, setMenuOpen] = useState(false)
   const { isLoggedIn, logout } = useAuth()
   const navigate = useNavigate()
-
-  const navLinkStyle = {
-    color: "#fff",
-    textDecoration: "none",
-    fontWeight: "500",
-  }
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -24,148 +19,54 @@ export default function Navbar() {
     }
   }
 
+  const handleInputChange = (e) => {
+    setQuery(e.target.value)
+  }
+
   const handleLogout = () => {
     logout()
     navigate("/")
   }
 
   return (
-    <header
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        width: "100%",
-        height: "65px",
-        zIndex: 1000,
-        backgroundColor: "#335355",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "0 2rem",
-        boxSizing: "border-box",
-      }}
-    >
+    <header className="navbar-header">
       <Link to="/homepage" style={{ display: "flex", alignItems: "center" }}>
-        <img
-          src={movieTokLogo}
-          alt="MovieTok logo"
-          style={{ height: "65px", marginRight: "1rem", paddingLeft: 100 }}
-        />
+        <img src={movieTokLogo} alt="MovieTok logo" className="navbar-logo" />
       </Link>
 
-      {/* Search Bar */}
-      <form onSubmit={handleSearch} style={{ position: "relative" }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            transition: "width 0.3s ease",
-            width: query ? "300px" : "150px",
-            backgroundColor: "#fff",
-            borderRadius: "4px",
-            border: "1px solid #ccc",
-            padding: "0.5rem",
-            overflow: "hidden",
-          }}
-        >
-          <img
-            src={searchIcon}
-            alt="Search"
-            style={{ width: "20px", marginRight: "8px" }}
-          />
+      <form onSubmit={handleSearch} className="search-form">
+        <div className={`search-bar ${query ? "expanded" : "collapsed"}`}>
+          <img src={searchIcon} alt="Search" className="search-icon" />
           <input
             type="text"
             placeholder="Search movies..."
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            style={{
-              flex: 1,
-              border: "none",
-              outline: "none",
-              fontSize: "1rem",
-              backgroundColor: "transparent",
-            }}
+            onChange={handleInputChange}
+            className="search-input"
+            autoComplete="off"
           />
         </div>
       </form>
 
-      {/* Nav links */}
-      <nav style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-        <Link to="/homepage" style={navLinkStyle}>
-          Home
-        </Link>       
-        <Link to="/schedule" style={navLinkStyle}>
-          Show Times
-        </Link>
-        <Link to="/groups" style={navLinkStyle}>
-          Groups
-        </Link>
-        <Link to="/reviews" style={navLinkStyle}>
-          Reviews
-        </Link>
+      <nav className="navbar-nav">
+        <Link to="/homepage" className="navbar-link">Home</Link>
+        <Link to="/schedule" className="navbar-link">Showtimes</Link>
+        <Link to="/groups" className="navbar-link">Groups</Link>
+        <Link to="/browse" className="navbar-link">Browse</Link>
 
         {!isLoggedIn ? (
-          <Link to="/login" style={navLinkStyle}>
-            Login
-          </Link>
+          <Link to="/login" className="navbar-link">Login</Link>
         ) : (
           <>
-            <button
-              onClick={handleLogout}
-              style={{
-                background: "transparent",
-                border: "none",
-                color: "white",
-                fontWeight: "600",
-                cursor: "pointer",
-              }}
-            >
-              Logout
-            </button>
-
-            {/* Burger Menu */}
+            <button onClick={handleLogout} className="logout-button">Logout</button>
             <div style={{ position: "relative" }}>
-              <button
-                onClick={() => setMenuOpen(!menuOpen)}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  color: "white",
-                  fontSize: "1.5rem",
-                  cursor: "pointer",
-                }}
-              >
-                ☰
-              </button>
+              <button onClick={() => setMenuOpen(!menuOpen)} className="burger-button">☰</button>
               {menuOpen && (
-                <div
-                  style={{
-                    position: "absolute",
-                    right: 0,
-                    top: "100%",
-                    background: "#222",
-                    borderRadius: "4px",
-                    padding: "0.5rem",
-                    minWidth: "150px",
-                  }}
-                >
-                  <Link to="/profile" style={navLinkStyle}>
-                    Profile
-                  </Link>
-                  <br />
-                  <Link to="/settings" style={navLinkStyle}>
-                    Settings
-                  </Link>
-                  <br />
-                  <Link to="/favorites" style={navLinkStyle}>
-                    Favorites
-                  </Link>
-                  <br />
-                  <Link to="/delete-account" style={{ ...navLinkStyle, color: "red" }}>
-                    Delete Account
-                  </Link>
+                <div className="burger-menu">
+                  <Link to="/profile" className="navbar-link">Profile</Link><br />
+                  <Link to="/settings" className="navbar-link">Settings</Link><br />
+                  <Link to="/favorites" className="navbar-link">Favorites</Link><br />
+                  <Link to="/delete-account" className="navbar-link delete-link">Delete Account</Link>
                 </div>
               )}
             </div>

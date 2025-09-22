@@ -33,19 +33,19 @@ export default function ShowTimesPage() {
   return (
     <div className="showtimes-container">
       <header className="showtimes-header">
-        <h1>FinnKino Show Times</h1>
+        <h1>FinnKino Showtimes</h1>
         <h2>___________________________________________________________</h2>
       </header>
 
       <section className="filters-section">
         <div className="filter-group">
-          <label htmlFor="area">Teatterialue</label>
+          <label htmlFor="area">Theather area</label>
           <select
             id="area"
             value={selectedArea}
             onChange={(e) => setSelectedArea(e.target.value)}
           >
-            <option value="">Valitse alue</option>
+            <option value="">Choose area...</option>
             {areas.map(a => (
               <option key={a.id} value={a.id}>{a.name}</option>
             ))}
@@ -53,7 +53,7 @@ export default function ShowTimesPage() {
         </div>
 
         <div className="filter-group">
-          <label htmlFor="date">Päivämäärä</label>
+          <label htmlFor="date">Date</label>
           <input
             id="date"
             type="text"
@@ -68,14 +68,14 @@ export default function ShowTimesPage() {
           onClick={handleSearch}
           disabled={loading || !selectedArea || !date}
         >
-          {loading ? "Haetaan..." : "Hae näytösaikoja"}
+          {loading ? "Loading..." : "Search Showtimes"}
         </button>
       </section>
 
       <section className="showtimes-list">
         {uniqueShows.length === 0 && !loading ? (
           <div className="empty-message">
-            Valitse alue ja päivämäärä sekä paina "Hae näytösaikoja"
+            Choose area and date then press "Search Showtimes"
           </div>
         ) : (
           uniqueShows.map((show, index) => {
@@ -108,12 +108,12 @@ export default function ShowTimesPage() {
         )}
 
         {loading && (
-          <div className="loading-message">Ladataan näytösaikoja...</div>
+          <div className="loading-message">Loading showtimes...</div>
         )}
       </section>
 
       <section className="quick-dates">
-        <p className="quick-label">Pikavalinnat:</p>
+        <p className="quick-label">Quick selection:</p>
         <div className="quick-buttons">
           {[0, 1, 2, 3, 4].map(days => {
             const futureDate = new Date()
@@ -132,7 +132,7 @@ export default function ShowTimesPage() {
                 }}
                 className={date === dateStr ? "active" : ""}
               >
-                {days === 0 ? "Tänään" : days === 1 ? "Huomenna" : dateStr}
+                {days === 0 ? "Today" : days === 1 ? "Tomorrow" : dateStr}
               </button>
             )
           })}

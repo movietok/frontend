@@ -9,6 +9,11 @@
 main {
   padding-top: 80px;
 }
+@media (max-width: 480px) {
+  main {
+    padding-top: 60px;
+  }
+}
 
 #root {
   display: flex;
@@ -24,6 +29,13 @@ main {
 .card {
   padding: 2em;
 }
+
+@media (max-width: 480px) {
+  .card {
+    padding: 1em;
+  }
+}
+
 
 .read-the-docs {
   color: #888;

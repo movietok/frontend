@@ -1,0 +1,161 @@
+.search-results-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #0f0f0f;
+  color: #ffffff;
+  min-height: 100vh;
+}
+
+.search-results-page h2 {
+  color: #335355;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.results-info {
+  text-align: center;
+  color: #cccccc;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.error-message {
+  background-color: #ff4444;
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.movies-grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 1fr;
+}
+
+.movie-card {
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  padding: 2rem;
+  border: 1px solid #333;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.movie-card:hover {
+  transform: translateY(-2px);
+  border-color: #335355;
+}
+
+.movie-title {
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.original-title {
+  color: #aaa;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.movie-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  color: #cccccc;
+  font-size: 0.95rem;
+}
+
+.year {
+  background-color: #335355;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.duration, .genres {
+  color: #aaa;
+}
+
+.synopsis {
+  color: #ddd;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.directors, .cast {
+  margin-bottom: 0.75rem;
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.directors strong, .cast strong {
+  color: #335355;
+}
+
+.trailer {
+  margin-top: 1rem;
+}
+
+.trailer-link {
+  display: inline-block;
+  background-color: #335355;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.trailer-link:hover {
+  background-color: #3b6666;
+  color: white;
+}
+
+.no-results {
+  text-align: center;
+  color: #aaa;
+  font-size: 1.1rem;
+  margin-top: 2rem;
+}
+
+/* Loading state */
+.search-results-page p {
+  text-align: center;
+  color: #ccc;
+  font-size: 1.1rem;
+}
+
+/* Responsive design */
+@media (min-width: 768px) {
+  .movies-grid {
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .search-results-page {
+    padding: 1rem;
+  }
+  
+  .movie-card {
+    padding: 1.5rem;
+  }
+  
+  .movie-title {
+    font-size: 1.3rem;
+  }
+  
+  .movie-details {
+    flex-direction: column;
+  }
+}
