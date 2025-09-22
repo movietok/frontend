@@ -21,7 +21,7 @@ export default function Login() {
       if (res.status === 200) {
         login(res.data.token)
         localStorage.setItem("token", res.data.token) // save JWT
-        alert("Login successful!")
+        //alert("Login successful!")
         navigate("/")
       } else {
         alert(res.data?.message || "Login failed")

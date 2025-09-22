@@ -17,7 +17,7 @@ export default function SignUp() {
       const res = await authAPI.post("/register", form)
 
       if (res.status === 200 || res.status === 201) {
-        alert("Account created successfully!")
+        //alert("Account created successfully!")
         navigate("/login")
       } else {
         alert(res.data?.message || "Registration failed")
