@@ -18,6 +18,7 @@ export default function SignUp() {
 
       if (res.status === 200 || res.status === 201) {
         //alert("Account created successfully!")
+
         navigate("/login")
       } else {
         alert(res.data?.message || "Registration failed")

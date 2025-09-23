@@ -13,6 +13,7 @@ export default function Navbar() {
 
   const handleSearch = (e) => {
     e.preventDefault()
+    console.log("Search submitted:", query) // Debug log
     if (query.trim()) {
       navigate(`/search?q=${encodeURIComponent(query)}`)
       setQuery("")
@@ -20,9 +21,10 @@ export default function Navbar() {
   }
 
   const handleInputChange = (e) => {
+
+
     setQuery(e.target.value)
   }
-
   const handleLogout = () => {
     logout()
     navigate("/")
@@ -43,6 +45,7 @@ export default function Navbar() {
             value={query}
             onChange={handleInputChange}
             className="search-input"
+
             autoComplete="off"
           />
         </div>
