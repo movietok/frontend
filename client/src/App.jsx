@@ -39,6 +39,7 @@ function App() {
             <Route path="/search" element={<SearchResultsPage />} />
             <Route path="/schedule" element={<ShowTimesPage />} />
             <Route path="/reviews" element={<ReviewsPage />} />
+            <Route path="/browse" element={<BrowsePage />} />   
             <Route path="/groups" element={<Groups />} />            
           </Routes>
         </main>
