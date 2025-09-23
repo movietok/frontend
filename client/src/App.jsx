@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { AuthProvider } from "./context/AuthContext"
-import GroupPage from "./pages/GroupPage"
+import ProfilePage from "./pages/ProfilePage"
 import Groups from "./pages/Groups"
 import BrowsePage from "./pages/BrowsePage"
 import HomePage from "./pages/HomePage"
@@ -37,6 +37,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/search" element={<SearchResultsPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
             <Route path="/schedule" element={<ShowTimesPage />} />
             <Route path="/reviews" element={<ReviewsPage />} />
             <Route path="/browse" element={<BrowsePage />} />   

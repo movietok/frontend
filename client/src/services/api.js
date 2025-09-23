@@ -12,6 +12,11 @@ export const authAPI = axios.create({
   baseURL: `${API_BASE_URL}/v1/users`,
 })
 
+// hae reviews 
+export const reviewAPI = axios.create({
+  baseURL: `${API_BASE_URL}/v1/reviews`,
+})
+
 // Hae teatterialueet
 export const fetchAreas = async () => {
   const res = await api.get("/theatres")
