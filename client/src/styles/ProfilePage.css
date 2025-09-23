@@ -1,0 +1,232 @@
+.profile-container {
+  width: 80vw;
+  max-width: 1200px;
+  min-width: 280px;
+  margin: 40px auto;
+  background: #181a1b;
+  color: #fff;
+  border-radius: 12px;
+  padding: 32px 40px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.profile-avatar img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #222;
+  margin-right: 32px;
+}
+
+.profile-main {
+  flex: 1;
+}
+
+.profile-username-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.profile-username-row h2 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.edit-profile-btn {
+  background: #3a465a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 18px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+.profile-menu-btn {
+  font-size: 1.5rem;
+  color: #aaa;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+.profile-stats {
+  display: flex;
+  gap: 40px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.stat-number {
+  font-size: 1.3rem;
+  font-weight: bold;
+  display: block;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #aaa;
+  text-align: center;
+}
+
+.profile-tabs {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #222;
+  padding-bottom: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.profile-tabs button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  padding: 8px 0;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.profile-tabs .active {
+  border-bottom: 2px solid #2ecc40;
+  color: #2ecc40;
+}
+
+.profile-search-btn {
+  margin-left: auto;
+  font-size: 1.2rem;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.profile-content {
+  margin-top: 32px;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  color: #aaa;
+  letter-spacing: 1px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.favorite-films-content,
+.my-groups-content,
+.my-reviews-content {
+  color: #fff;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.section-divider {
+  width: 100%;
+  height: 3px;
+  background: #6ee7f7;
+  margin: 24px 0 16px 0;
+  border-radius: 2px;
+  opacity: 0.85;
+  box-shadow: 0 1px 4px rgba(110,231,247,0.12);
+}
+
+.profile-loading,
+.profile-error {
+  text-align: center;
+  margin-top: 80px;
+  font-size: 1.2rem;
+  color: #aaa;
+}
+
+/* Responsive styles */
+@media (max-width: 900px) {
+  .profile-container {
+    width: 95vw;
+    padding: 24px 10px;
+  }
+  .profile-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .profile-avatar img {
+    margin-right: 0;
+    margin-bottom: 16px;
+  }
+  .profile-main {
+    width: 100%;
+  }
+  .profile-username-row {
+    justify-content: center;
+  }
+  .profile-stats {
+    justify-content: center;
+    gap: 24px;
+  }
+  .profile-tabs {
+    gap: 12px;
+    font-size: 0.95rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .profile-container {
+    width: 100vw;
+    padding: 10px 2vw;
+    margin: 0;
+    border-radius: 0;
+  }
+  .profile-header {
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .profile-avatar img {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 12px;
+  }
+  .profile-username-row h2 {
+    font-size: 1.3rem;
+  }
+  .edit-profile-btn {
+    padding: 4px 12px;
+    font-size: 0.9rem;
+  }
+  .profile-stats {
+    gap: 12px;
+    font-size: 0.9rem;
+  }
+  .profile-tabs {
+    gap: 8px;
+    font-size: 0.9rem;
+    padding-bottom: 4px;
+  }
+  .section-title {
+    font-size: 1rem;
+    margin-bottom: 6px;
+  }
+  .section-divider {
+    height: 2px;
+    margin: 16px 0 10px 0;
+  }
+}
