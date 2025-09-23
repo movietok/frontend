@@ -1,0 +1,247 @@
+/* Navbar container */
+.navbar-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 65px;
+  z-index: 1000;
+  background-color: #335355;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+  box-sizing: border-box;
+}
+
+.navbar-logo {
+  height: 65px;
+  margin-right: 1rem;
+  padding-left: 0;
+}
+@media (min-width: 768px) {
+  .navbar-logo {
+    padding-left: 100px;
+  }
+}
+
+
+/* Search bar */
+.search-form {
+  position: relative;
+  z-index: 1001;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  transition: width 0.3s ease;
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  overflow: hidden;
+}
+
+.search-bar.expanded {
+  width: 120%;
+}
+
+.search-bar.collapsed {
+  width: 70%;
+}
+
+@media (max-width: 480px) {
+  .search-bar.expanded,
+  .search-bar.collapsed {
+    width: 100%;
+  }
+}
+
+.search-icon {
+  width: 20px;
+  margin-right: 8px;
+  pointer-events: none;
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  background-color: transparent;
+  color: #000;
+  pointer-events: auto;
+  cursor: text;
+  min-width: 100px;
+}
+
+/* Navigation links */
+.navbar-nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.navbar-link {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* Buttons */
+.logout-button,
+.burger-button {
+  background: transparent;
+  border: none;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.burger-button {
+  font-size: 1.5rem;
+}
+
+/* Burger menu dropdown */
+.burger-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: #222;
+  border-radius: 4px;
+  padding: 0.5rem;
+  min-width: 150px;
+}
+@media (max-width: 768px) {
+  .burger-menu {
+    width: 80%;
+    top: 65px;
+    right: 0;
+    border-radius: 4px 0 0 4px;
+  }
+}
+
+.burger-menu .delete-link {
+  color: red;
+}
+/* Base link/button styles */
+.navbar-link,
+.logout-button,
+.burger-button {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+/* Hover glow effect */
+.navbar-link:hover,
+.logout-button:hover,
+.burger-button:hover {
+  color: #ff4d4d; /* Soft red */
+  text-shadow: 0 0 8px rgba(255, 77, 77, 0.6); /* Reddish glow */
+}
+
+/* Special case for delete link */
+.delete-link:hover {
+  color: #ff1a1a;
+  text-shadow: 0 0 10px rgba(255, 26, 26, 0.8);
+}
+
+/* Burger menu container 
+.burger-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: #222;
+  border-radius: 4px;
+  padding: 0.5rem;
+  min-width: 150px;
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: slideFadeIn 0.3s ease forwards;
+}
+
+ Animation keyframes 
+@keyframes slideFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.burger-menu a {
+  animation: fadeInLink 0.4s ease forwards;
+  opacity: 0;
+}
+
+@keyframes fadeInLink {
+  to {
+    opacity: 1;
+  }
+}
+  */
+
+  /* Burger menu container */
+.burger-menu {
+  position: absolute;
+  top: 65px; /* Just below the navbar */
+  right: 0;
+  width: 16.666%; /* 1/6 of the screen */
+  background: #222;
+  border-radius: 4px 0 0 4px;
+  padding: 1rem;
+  opacity: 0;
+  transform: translateX(100%);
+  animation: slideInFromRight 0.4s ease forwards;
+  box-shadow: -2px 0 10px rgba(255, 77, 77, 0.3);
+}
+
+/* Slide-in animation */
+@keyframes slideInFromRight {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Optional: glow effect on links inside menu */
+.burger-menu a {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.burger-menu a:hover {
+  color: #ff4d4d;
+  text-shadow: 0 0 8px rgba(255, 77, 77, 0.6);
+}
+
+@media (max-width: 480px) {
+  .navbar-header {
+    flex-direction: column;
+    height: auto;
+    padding: 1rem;
+  }
+
+  .navbar-nav {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .search-bar.expanded,
+  .search-bar.collapsed {
+    width: 100%;
+  }
+}
+
+
+
+
+
