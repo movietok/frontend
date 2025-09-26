@@ -1,0 +1,23 @@
+:root {
+  --mt-grid-cols: 4;         /* number of columns */
+  --mt-gap-x: 28px;         
+  --mt-gap-y: 36px;          
+}
+
+.mt-movies-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mt-gap-y) var(--mt-gap-x); 
+  align-items: flex-start;
+}
+
+.mt-movie-tile {
+  flex: 0 0 calc(
+    (100% - (var(--mt-grid-cols) - 1) * var(--mt-gap-x)) / var(--mt-grid-cols)
+  );
+  display: flex;
+}
+
+.mt-movie-tile > .movie-card {
+  width: 100%;
+}
