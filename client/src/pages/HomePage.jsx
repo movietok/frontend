@@ -20,7 +20,7 @@ const mockFinnkino = Array.from({ length: 7 }, (_, i) => ({
 }));
 
 const mockReviews = [
-  { id: 1, movieId: 101, movie: "Inception", userId: 1, user: "Alice", rating: 5, text: "Amazing movie..." },
+  { id: 1, movieId: 27205, movie: "Inception", userId: 1, user: "Alice", rating: 5, text: "Amazing movie..." },
   { id: 2, movieId: 102, movie: "The Matrix", userId: 2, user: "Bob", rating: 4, text: "Classic sci-fi..." },
 ];
 

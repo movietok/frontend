@@ -11,6 +11,7 @@ import ShowTimesPage from "./pages/ShowTimesPage"
 import LoginPage from "./pages/LoginPage"
 import SignupPage from "./pages/SignupPage"
 import ReviewsPage from "./pages/ReviewsPage"
+import MovieDetailsPage from "./pages/MovieDetailsPage";
 
 function App() {
   return (
@@ -40,7 +41,8 @@ function App() {
             <Route path="/schedule" element={<ShowTimesPage />} />
             <Route path="/reviews" element={<ReviewsPage />} />
             <Route path="/browse" element={<BrowsePage />} />   
-            <Route path="/groups" element={<Groups />} />            
+            <Route path="/groups" element={<Groups />} />       
+            <Route path="/movie/:id" element={<MovieDetailsPage />} />     
           </Routes>
         </main>
 
