@@ -25,3 +25,8 @@ export async function getPopularMovies(page = 1) {
   const res = await axios.get(`${API_BASE}/tmdb/popular?page=${page}`);
   return res.data;
 }
+
+export async function getMovieDetails(id) {
+  const res = await axios.get(`${API_BASE}/tmdb/${id}`);
+  return res.data;
+}
