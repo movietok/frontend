@@ -16,7 +16,7 @@ export default function Navbar() {
     e.preventDefault()
     console.log("Search submitted:", query) // Debug log
     if (query.trim()) {
-      navigate(`/search?q=${encodeURIComponent(query)}`)
+      navigate(`/browse?q=${encodeURIComponent(query)}`)
       setQuery("")
     }
   }
