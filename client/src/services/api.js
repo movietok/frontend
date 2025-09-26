@@ -4,7 +4,7 @@ import axios from "axios"
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api"
 
 const api = axios.create({
-  baseURL: `${API_BASE_URL}/finnkino`, 
+  baseURL: `${API_BASE_URL}/`, 
 })
 
 // Create a separate instance for user authentication endpoints
@@ -16,7 +16,6 @@ export const authAPI = axios.create({
 export const reviewAPI = axios.create({
   baseURL: `${API_BASE_URL}/v1/reviews`,
 })
-
 // Hae teatterialueet
 export const fetchAreas = async () => {
   const res = await api.get("/theatres")
@@ -40,7 +39,7 @@ export const fetchMovies = async () => {
 
 // Hae elokuvia hakusanalla
 export const searchMovies = async (query) => {
-  const res = await api.get("/search", { 
+  const res = await api.get("/tmdb/search", { 
     params: { query: query }
   })
   return res.data
