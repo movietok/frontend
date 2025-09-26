@@ -1,5 +1,5 @@
-import React from "react"
-import Carousel from "../Carousel"
+import React from "react";
+import Carousel from "../Carousel";
 
 function PopularMovies({ movies }) {
   return (
@@ -23,7 +23,7 @@ function PopularMovies({ movies }) {
         )}
       />
     </section>
-  )
+  );
 }
 
-export default PopularMovies
+export default PopularMovies;
