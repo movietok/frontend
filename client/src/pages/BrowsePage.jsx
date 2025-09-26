@@ -17,6 +17,7 @@ function BrowsePage() {
   const [loading, setLoading] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [isSearchMode, setIsSearchMode] = useState(false);
+  const [sortBy, setSortBy] = useState('popularity.desc');
   
   const query = searchParams.get("q");
 
@@ -73,14 +74,15 @@ function BrowsePage() {
     
     setLoading(true);
     setMovies([]);
-    discoverMovies({ withGenres: appliedGenres, page })
+    console.log("Calling discoverMovies with:", { withGenres: appliedGenres, page, sortBy });
+    discoverMovies({ withGenres: appliedGenres, page, sortBy })
       .then((data) => {
         setMovies(data?.results || []);
         setTotalPages(data?.totalPages || data?.total_pages || 1);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [appliedGenres, page, isSearchMode]);
+  }, [appliedGenres, page, isSearchMode, sortBy]);
 
   const toggleGenre = (genreId) => {
     console.log("toggleGenre called with:", genreId, "type:", typeof genreId);
@@ -109,6 +111,13 @@ function BrowsePage() {
     setAppliedGenres([]);
   };
 
+  // Reset page when sorting changes
+  const handleSortChange = (newSortBy) => {
+    console.log("Sort changed to:", newSortBy);
+    setPage(1);
+    setSortBy(newSortBy);
+  };
+
   // Sidebar + content 2-col layout, inline to beat globals
   const layoutStyle = {
     display: "grid",
@@ -124,15 +133,39 @@ function BrowsePage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
-      <div style={isSearchMode ? { display: "block" } : layoutStyle}>
-        {/* Sidebar - piilossa hakutilassa */}
-        {!isSearchMode && (
-          <aside style={sidebarStyle}>
+      <div style={layoutStyle}>
+        {/* Sidebar - näkyy aina */}
+        <aside style={sidebarStyle}>
             <GenreSelector
               genres={genres}
               selectedGenres={selectedGenresDraft}
               onToggle={toggleGenre}
             />
+
+            {/* Sort By selector - piilossa hakutilassa */}
+            {!isSearchMode && (
+              <div className="mt-6 space-y-2">
+                <h3 className="text-lg font-semibold text-white">Sort By</h3>
+                <select 
+                  value={sortBy}
+                  onChange={(e) => handleSortChange(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                >
+                  <option value="popularity.desc">Popularity (High to Low)</option>
+                  <option value="popularity.asc">Popularity (Low to High)</option>
+                  <option value="vote_average.desc">Rating (High to Low)</option>
+                  <option value="vote_average.asc">Rating (Low to High)</option>
+                  <option value="vote_count.desc">Vote Count (High to Low)</option>
+                  <option value="vote_count.asc">Vote Count (Low to High)</option>
+                  <option value="primary_release_date.desc">Release Date (Newest)</option>
+                  <option value="primary_release_date.asc">Release Date (Oldest)</option>
+                  <option value="title.asc">Title (A-Z)</option>
+                  <option value="title.desc">Title (Z-A)</option>
+                  <option value="revenue.desc">Revenue (High to Low)</option>
+                  <option value="revenue.asc">Revenue (Low to High)</option>
+                </select>
+              </div>
+            )}
 
             <div className="mt-4 space-y-2">
               <button
@@ -152,7 +185,6 @@ function BrowsePage() {
               </button>
             </div>
           </aside>
-        )}
 
         {/* Movies */}
         <main style={{ minWidth: 0 }}>
