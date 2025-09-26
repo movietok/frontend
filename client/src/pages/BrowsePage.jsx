@@ -54,16 +54,23 @@ function BrowsePage() {
   useEffect(() => {
     getGenres()
       .then((data) => {
+        console.log("Genres data from API:", data); // Debug log
         const normalized = (data.genres || []).map((g) => ({
-          id: String(g.tmdb_id),
+          id: String(g.id), // Korjattu: käytetään g.id eikä g.tmdb_id
           name: g.name,
         }));
+        console.log("Normalized genres:", normalized); // Debug log
         setGenres(normalized);
       })
       .catch(console.error);
   }, []);
 
   useEffect(() => {
+    // Älä hae discover-elokuvia jos ollaan hakutilassa
+    if (isSearchMode) {
+      return;
+    }
+    
     setLoading(true);
     setMovies([]);
     discoverMovies({ withGenres: appliedGenres, page })
@@ -73,13 +80,18 @@ function BrowsePage() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [appliedGenres, page]);
+  }, [appliedGenres, page, isSearchMode]);
 
   const toggleGenre = (genreId) => {
+    console.log("toggleGenre called with:", genreId, "type:", typeof genreId);
     const idStr = String(genreId);
-    setSelectedGenresDraft((prev) =>
-      prev.includes(idStr) ? prev.filter((id) => id !== idStr) : [...prev, idStr]
-    );
+    console.log("idStr:", idStr);
+    setSelectedGenresDraft((prev) => {
+      console.log("Previous selected genres:", prev);
+      const newSelection = prev.includes(idStr) ? prev.filter((id) => id !== idStr) : [...prev, idStr];
+      console.log("New selected genres:", newSelection);
+      return newSelection;
+    });
   };
 
   const applySearch = () => {
