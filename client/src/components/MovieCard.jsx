@@ -1,4 +1,5 @@
 import "../styles/MovieCard.css";
+import { Link } from "react-router-dom";
 
 function MovieCard({ movie }) {
   const dateStr = movie.releaseDate
@@ -10,7 +11,7 @@ function MovieCard({ movie }) {
     : "Unknown";
 
   return (
-    <div className="movie-card">
+    <Link to={`/movie/${movie.id}`} className="movie-card">
       {movie.posterPath ? (
         <img
           src={movie.posterPath}
@@ -22,12 +23,11 @@ function MovieCard({ movie }) {
           No Image
         </div>
       )}
-
-      <div className="movie-info">
-        <h3 className="movie-title">{movie.title}</h3>
-        <p className="movie-date">{dateStr}</p>
+      <div className="movie-overlay">
+        <h4>{movie.title}</h4>
+        <p>{dateStr}</p>
       </div>
-    </div>
+    </Link>
   );
 }
 

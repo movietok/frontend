@@ -53,34 +53,10 @@ function HomePage() {
     // Fetch Popular via discover, change later for another method if wanted (this is the same as Browse default)
     discoverMovies({ page: 1 })
       .then((data) => {
-        const items = Array.isArray(data?.results) ? data.results : [];
-        const normalized = items.slice(0, 20).map((m) => {
-          const rawPoster =
-            m.posterPath || m.poster_path || m.poster || m.posterURL || null;
+  // data.results is already normalized by TMDBService
+  setMovies(Array.isArray(data?.results) ? data.results.slice(0, 20) : []);
+})
 
-          const image = rawPoster
-            ? (rawPoster.startsWith("http")
-                ? rawPoster
-                : `https://image.tmdb.org/t/p/w500${rawPoster}`)
-            : "https://via.placeholder.com/200x300?text=No+Image";
-
-          const score =
-            typeof m.voteAverage === "number"
-              ? m.voteAverage
-              : typeof m.vote_average === "number"
-              ? m.vote_average
-              : null;
-
-          return {
-            id: m.id,
-            title: m.title || m.name,
-            image,
-            rating: score ? score.toFixed(1) : undefined,
-          };
-        });
-
-        setMovies(normalized);
-      })
       .catch(console.error);
 
     // keep mocks for the rest
