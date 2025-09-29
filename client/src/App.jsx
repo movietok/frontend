@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { AuthProvider } from "./context/AuthContext"
-import GroupPage from "./pages/GroupPage"
+import ProfilePage from "./pages/ProfilePage"
 import Groups from "./pages/Groups"
 import BrowsePage from "./pages/BrowsePage"
 import HomePage from "./pages/HomePage"
@@ -11,6 +11,7 @@ import ShowTimesPage from "./pages/ShowTimesPage"
 import LoginPage from "./pages/LoginPage"
 import SignupPage from "./pages/SignupPage"
 import ReviewsPage from "./pages/ReviewsPage"
+import MovieDetailsPage from "./pages/MovieDetailsPage";
 
 function App() {
   return (
@@ -28,7 +29,6 @@ function App() {
             paddingLeft: "2rem",
             paddingRight: "2rem", 
             paddingBottom: "2rem",
-            textAlign: "center",
           }}
         >
           <Routes>
@@ -37,9 +37,12 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/search" element={<SearchResultsPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
             <Route path="/schedule" element={<ShowTimesPage />} />
             <Route path="/reviews" element={<ReviewsPage />} />
-            <Route path="/groups" element={<Groups />} />            
+            <Route path="/browse" element={<BrowsePage />} />   
+            <Route path="/groups" element={<Groups />} />       
+            <Route path="/movie/:id" element={<MovieDetailsPage />} />     
           </Routes>
         </main>
 
@@ -51,43 +54,3 @@ function App() {
 }
 
 export default App
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-import { BrowserRouter, Routes, Route } from "react-router-dom"
-import Navbar from "./components/Navbar"
-//import HomePage from "./pages/HomePage"
-import SearchResultsPage from "./pages/SearchResultsPage";
-import ShowTimesPage from "./pages/ShowTimesPage"
-
-//import { useState } from 'react'
-import './App.css'
-
-function App() {
-
-  return (
-    <BrowserRouter>
-      <Navbar />
-      <main style={{ padding: "1rem" }}>
-        <Routes>
-          <Route path="/search" element={<SearchResultsPage />} />
-          <Route path="/schedule" element={<ShowTimesPage />} />
-        </Routes>
-      </main>
-    </BrowserRouter>
-  )
-}
-
-export default App
-*/

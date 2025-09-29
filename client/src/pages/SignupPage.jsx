@@ -1,10 +1,14 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { authAPI } from "../services/api"
+import UniversalModal from "../components/Popups/UniversalModal"
 import "../styles/Signup.css"
 
 export default function SignUp() {
   const [form, setForm] = useState({ username: "", email: "", password: "" })
+  const [showModal, setShowModal] = useState(false)
+  const [modalTitle, setModalTitle] = useState("")
+  const [modalMessage, setModalMessage] = useState("")
   const navigate = useNavigate()
 
   const handleChange = (e) => {
@@ -15,16 +19,32 @@ export default function SignUp() {
     e.preventDefault()
     try {
       const res = await authAPI.post("/register", form)
-
       if (res.status === 200 || res.status === 201) {
-        //alert("Account created successfully!")
-        navigate("/login")
+        setModalTitle("Account Created!")
+        setModalMessage("Your account was created successfully. Continue to login?")
+        setShowModal(true)
       } else {
-        alert(res.data?.message || "Registration failed")
+        setModalTitle("Registration Failed")
+        setModalMessage(res.data?.message || "Registration failed")
+        setShowModal(true)
       }
     } catch (err) {
       const errorMessage = err.response?.data?.message || "Something went wrong"
-      alert(errorMessage)
+      if (err.response?.status === 409 || errorMessage.toLowerCase().includes("exists")) {
+        setModalTitle("User Already Exists")
+        setModalMessage("An account with this email or username already exists.")
+      } else {
+        setModalTitle("Registration Failed")
+        setModalMessage(errorMessage)
+      }
+      setShowModal(true)
+    }
+  }
+
+  const handleOk = () => {
+    setShowModal(false)
+    if (modalTitle === "Account Created!") {
+      navigate("/login")
     }
   }
 
@@ -67,6 +87,12 @@ export default function SignUp() {
           </Link>
         </p>
       </div>
+      <UniversalModal
+        isOpen={showModal}
+        title={modalTitle}
+        message={modalMessage}
+        onOk={handleOk}
+      />
     </div>
   )
 }
