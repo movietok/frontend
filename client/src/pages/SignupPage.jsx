@@ -23,6 +23,7 @@ export default function SignUp() {
         setModalTitle("Account Created!")
         setModalMessage("Your account was created successfully. Continue to login?")
         setShowModal(true)
+
       } else {
         setModalTitle("Registration Failed")
         setModalMessage(res.data?.message || "Registration failed")

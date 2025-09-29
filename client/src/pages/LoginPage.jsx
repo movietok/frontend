@@ -23,10 +23,11 @@ export default function Login() {
       const res = await authAPI.post("/login", form)
       if (res.status === 200) {
         login(res.data.token)
-        localStorage.setItem("token", res.data.token)
+        localStorage.setItem("token", res.data.token) // save JWT
         setModalTitle("Login Successful!")
         setModalMessage("You have logged in successfully. Continue to homepage?")
         setShowModal(true)
+
       } else {
         setModalTitle("Login Failed")
         setModalMessage(res.data?.message || "Login failed")

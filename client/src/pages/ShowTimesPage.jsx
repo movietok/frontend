@@ -1,31 +1,49 @@
 import { useState } from "react"
-import { useShowTimes } from "../hooks/useShowTimes"
-import { getCurrentDate, parseFinnkinoDate } from "../helpers/dateUtils"
+import { useFinnkinoShowTimes } from "../hooks/useFinnkinoShowTimes"
+import { getCurrentDate } from "../helpers/dateUtils"
 import "../styles/ShowTimes.css"
 
 export default function ShowTimesPage() {
   const [selectedArea, setSelectedArea] = useState("")
   const [date, setDate] = useState(getCurrentDate())
-  const { areas, shows, loading, getSchedule } = useShowTimes()
+  const { areas, shows, loading, error, getSchedule, clearError } = useFinnkinoShowTimes()
 
   const handleSearch = () => {
+    console.log('Search clicked with:', { selectedArea, date })
+    clearError() // Clear any previous errors
+    
     if (selectedArea && date) {
-      getSchedule(selectedArea, date)
+      // Convert date format if needed (dd.mm.yyyy for Finnkino API)
+      const formattedDate = formatDateForFinnkino(date)
+      console.log('Formatted date for API:', formattedDate)
+      getSchedule(selectedArea, formattedDate)
+    } else {
+      alert('Please select both area and date')
     }
+  }
+
+  // Format date for Finnkino API (dd.mm.yyyy)
+  const formatDateForFinnkino = (dateString) => {
+    const date = new Date(dateString)
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const year = date.getFullYear()
+    return `${day}.${month}.${year}`
   }
 
   const uniqueShows = Array.isArray(shows)
     ? shows
         .filter((show, index, self) =>
           index === self.findIndex(s =>
-            s.title === show.title &&
+            (s.originalTitle || s.title) === (show.originalTitle || show.title) &&
             s.start === show.start &&
             s.theatre === show.theatre
           )
         )
         .sort((a, b) => {
-          const dateA = parseFinnkinoDate(a.start)
-          const dateB = parseFinnkinoDate(b.start)
+          // Finnkino API returns ISO format dates in 'start' field
+          const dateA = new Date(a.start)
+          const dateB = new Date(b.start)
           return (dateA?.getTime() || 0) - (dateB?.getTime() || 0)
         })
     : []
@@ -72,16 +90,30 @@ export default function ShowTimesPage() {
         </button>
       </section>
 
+      {/* Error message */}
+      {error && (
+        <section className="error-section">
+          <div className="error-message">
+            <h3>⚠️ Error</h3>
+            <p>{error}</p>
+            <p><strong>Note:</strong> Direct API calls to Finnkino may be blocked by CORS policy. This is expected in browser environments.</p>
+            <button onClick={clearError} className="clear-error-btn">
+              Clear Error
+            </button>
+          </div>
+        </section>
+      )}
+
       <section className="showtimes-list">
-        {uniqueShows.length === 0 && !loading ? (
+        {uniqueShows.length === 0 && !loading && !error ? (
           <div className="empty-message">
             Choose area and date then press "Search Showtimes"
           </div>
         ) : (
           uniqueShows.map((show, index) => {
-            const parsed = parseFinnkinoDate(show.start)
-            const timeText = parsed
-              ? parsed.toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" })
+            const showDate = new Date(show.start)
+            const timeText = !isNaN(showDate.getTime())
+              ? showDate.toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" })
               : "Aika tuntematon"
 
             const ratingText =
@@ -93,9 +125,9 @@ export default function ShowTimesPage() {
               <div key={index} className="showtime-item">
                 <div className="movie-poster-placeholder">🎬</div>
                 <div className="movie-info">
-                  <h3 className="movie-title">{show.title}</h3>
+                  <h3 className="movie-title">{show.originalTitle || show.title}</h3>
                   <p className="movie-details">
-                    {show.language || "Suomi"} • {ratingText}
+                    {show.presentationMethodAndLanguage || show.language || "Suomi"} • {ratingText}
                   </p>
                 </div>
                 <div className="showtime-details">

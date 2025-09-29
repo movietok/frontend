@@ -5,6 +5,7 @@ import searchIcon from "../images/searchimage.png"
 import movieTokLogo from "../images/Movietoklogo.png"
 import ConfirmModal from "./Popups/ConfirmModal"
 import UniversalModal from "./Popups/UniversalModal" 
+
 import "../styles/navbar.css"
 
 export default function Navbar() {
@@ -15,6 +16,7 @@ export default function Navbar() {
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [showDeletedModal, setShowDeletedModal] = useState(false) 
+
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -48,6 +50,7 @@ export default function Navbar() {
       await deleteAccount()
       setIsModalOpen(false)
       setShowDeletedModal(true) // Show deleted modal popup
+
     } catch (err) {
       console.error(err)
       setIsModalOpen(false)
@@ -92,6 +95,7 @@ export default function Navbar() {
             <button onClick={handleLogout} className="logout-button">Logout</button>
             <div style={{ position: "relative" }}>
               <button onClick={() => setMenuOpen(!menuOpen)} className="burger-button">☰</button>
+
               {menuOpen && (
                 <div className="burger-menu" ref={menuRef}>
                   <Link to="/profile" className="navbar-link" onClick={() => setMenuOpen(false)}>Profile</Link><br />
@@ -101,12 +105,12 @@ export default function Navbar() {
                     to="/delete-account"
                     onClick={(e) => {
                       e.preventDefault()
-                      setIsModalOpen(true)
                     }}
                     className="navbar-link delete-link"
                   >
                     Delete Account
                   </Link>
+
                   <ConfirmModal
                     isOpen={isModalOpen}
                     title="Delete Account?"

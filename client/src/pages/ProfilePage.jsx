@@ -22,6 +22,7 @@ export default function ProfilePage() {
     }
   }, [isLoggedIn, navigate])
 
+
   if (loading) return <div className="profile-loading">Loading...</div>
   if (error) return <div className="profile-error">Error loading profile.</div>
   if (!user) return <div className="profile-error">Profile not found.</div>
@@ -167,6 +168,7 @@ export default function ProfilePage() {
             <div>Watchlist content goes here.</div>
           </div>
         )}
+
         <SectionDivider />
       </div>
     </div>
