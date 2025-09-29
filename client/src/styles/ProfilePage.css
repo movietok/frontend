@@ -155,6 +155,36 @@
   color: #aaa;
 }
 
+.profile-tabs button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  padding: 8px 0;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-weight: 500;
+  transition: color 0.2s, text-shadow 0.2s;
+  outline: none; 
+}
+
+.profile-tabs button:hover,
+.profile-tabs button:focus-visible {
+  color: #6ee7f7;
+  text-shadow: 0 0 8px 2px #6ee7f7;
+  outline: none; 
+}
+
+.profile-tabs button:focus {
+  outline: none; 
+}
+
+.profile-user-id {
+  font-size: 1rem;
+  color: #6ee7f7;
+  margin-left: 12px;
+}
+
 /* Responsive styles */
 @media (max-width: 900px) {
   .profile-container {

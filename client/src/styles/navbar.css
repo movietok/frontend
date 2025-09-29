@@ -150,6 +150,40 @@
   text-shadow: 0 0 10px rgba(255, 26, 26, 0.8);
 }
 
+/* Burger menu container 
+.burger-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: #222;
+  border-radius: 4px;
+  padding: 0.5rem;
+  min-width: 150px;
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: slideFadeIn 0.3s ease forwards;
+}
+
+ Animation keyframes 
+@keyframes slideFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.burger-menu a {
+  animation: fadeInLink 0.4s ease forwards;
+  opacity: 0;
+}
+
+@keyframes fadeInLink {
+  to {
+    opacity: 1;
+  }
+}
+  */
+
   /* Burger menu container */
 .burger-menu {
   position: absolute;
@@ -206,3 +240,4 @@
     width: 100%;
   }
 }
+

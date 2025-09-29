@@ -45,4 +45,18 @@ export const searchMovies = async (query) => {
   return res.data
 }
 
+// login validater interceptor 
+[authAPI, reviewAPI, api].forEach(instance => {
+  instance.interceptors.response.use(
+    response => response,
+    error => {
+      if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+        localStorage.removeItem("token")
+        window.location.href = "/login"
+      }
+      return Promise.reject(error)
+    }
+  )
+})
+
 export default api
