@@ -5,6 +5,9 @@ import { searchMovies } from "../services/api";
 import MovieCard from "../components/MovieCard";
 import GenreSelector from "../components/GenreSelector";
 import "../styles/BrowsePage.css"; 
+import FavoriteButton from "../components/buttons/FavoriteButton";
+import { useFavorites } from "../hooks/useFavorites";
+import { useAuth } from "../context/AuthContext";
 
 function BrowsePage() {
   const [searchParams] = useSearchParams();
@@ -18,6 +21,8 @@ function BrowsePage() {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [sortBy, setSortBy] = useState('popularity.desc');
+  const { user } = useAuth();
+  const { favorites: userFavorites } = useFavorites(user?.id, 2);
   
   const query = searchParams.get("q");
 
@@ -207,14 +212,24 @@ function BrowsePage() {
                   <p>Ei tuloksia haulle "{query}"</p>
                 </div>
               ) : (
-                <div className="mt-movies-wrap">
-                  {/* Näytä hakutulokset tai tavallisia elokuvia riippuen tilasta */}
-                  {(isSearchMode ? searchResults : movies).slice(0, 16).map((movie) => (
-                    <div className="mt-movie-tile" key={movie.id}>
-                      <MovieCard movie={movie} />
-                    </div>
-                  ))}
+            <div className="mt-movies-wrap">
+              {(isSearchMode ? searchResults : movies).slice(0, 16).map((movie) => (
+                <div className="mt-movie-tile group" key={movie.id} style={{ position: "relative" }}>
+                  <MovieCard movie={movie} />
+                  <FavoriteButton 
+                    movieId={movie.id} 
+                    type={2} 
+                    initialIsFavorite={userFavorites.some(f => f.movie_id === movie.id)}
+                    movieData={{
+                      title: movie.title || movie.original_title,
+                      original_title: movie.original_title,
+                      release_date: movie.release_date,
+                      poster_path: movie.poster_path
+                    }}
+                  />
                 </div>
+              ))}
+            </div>
               )}
 
               {/* spacer */}

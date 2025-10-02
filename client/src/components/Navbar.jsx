@@ -15,8 +15,8 @@ export default function Navbar() {
   const { isLoggedIn, logout, deleteAccount } = useAuth()
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [showDeletedModal, setShowDeletedModal] = useState(false) 
-
+  const [showDeletedModal, setShowDeletedModal] = useState(false)
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -41,25 +41,17 @@ export default function Navbar() {
   const handleInputChange = (e) => setQuery(e.target.value)
 
   const handleLogout = () => {
+    setShowLogoutModal(true)
+  }
+
+  const confirmLogout = () => {
     logout()
+    setShowLogoutModal(false)
     navigate("/")
   }
 
-  const handleDelete = async () => {
-    try {
-      await deleteAccount()
-      setIsModalOpen(false)
-      setShowDeletedModal(true) // Show deleted modal popup
-
-    } catch (err) {
-      console.error(err)
-      setIsModalOpen(false)
-    }
-  }
-
-  const handleDeletedOk = () => {
-    setShowDeletedModal(false)
-    navigate("/signup", { replace: true })
+  const cancelLogout = () => {
+    setShowLogoutModal(false)
   }
 
   return (
@@ -101,34 +93,19 @@ export default function Navbar() {
                   <Link to="/profile" className="navbar-link" onClick={() => setMenuOpen(false)}>Profile</Link><br />
                   <Link to="/settings" className="navbar-link" onClick={() => setMenuOpen(false)}>Settings</Link><br />
                   <Link to="/favorites" className="navbar-link" onClick={() => setMenuOpen(false)}>Favorites</Link><br />
-                  <Link
-                    to="/delete-account"
-                    onClick={(e) => {
-                      e.preventDefault()
-                    }}
-                    className="navbar-link delete-link"
-                  >
-                    Delete Account
-                  </Link>
-
-                  <ConfirmModal
-                    isOpen={isModalOpen}
-                    title="Delete Account?"
-                    message="Are you sure you want to delete your account? This action cannot be undone."
-                    onConfirm={handleDelete}
-                    onCancel={() => setIsModalOpen(false)}
-                  />
                 </div>
               )}
             </div>
           </>
         )}
       </nav>
+
       <UniversalModal
-        isOpen={showDeletedModal}
-        title="Account Deleted"
-        message="Your account has been deleted successfully."
-        onOk={handleDeletedOk}
+        isOpen={showLogoutModal}
+        title="Logout"
+        message="Are you sure you want to logout?"
+        onOk={confirmLogout}
+        onCancel={cancelLogout}
       />
     </header>
   )

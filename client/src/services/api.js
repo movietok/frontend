@@ -3,7 +3,8 @@ import axios from "axios"
 // Get base URL from environment variables
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api"
 
-const api = axios.create({
+// 🔹 Axios instances for different API domains
+export const api = axios.create({
   baseURL: `${API_BASE_URL}/`, 
 })
 
@@ -12,10 +13,38 @@ export const authAPI = axios.create({
   baseURL: `${API_BASE_URL}/v1/users`,
 })
 
-// hae reviews 
+// Create a separate instance for review endpoints
 export const reviewAPI = axios.create({
   baseURL: `${API_BASE_URL}/v1/reviews`,
 })
+
+// Create a separate instance for favorites endpoints
+export const favoritesAPI = axios.create({
+  baseURL: `${API_BASE_URL}/v1/favorites`,
+});
+
+//  Global login validator interceptor (applied to all instances)
+[authAPI, reviewAPI, api, favoritesAPI].forEach(instance => {
+  instance.interceptors.response.use(
+    response => response,
+    error => {
+      const token = localStorage.getItem("token")
+      const isLoginRequest = error.config?.url?.includes("/login")
+      if (
+        token && // Only if token exists 
+        !isLoginRequest && // Not for login requests
+        error.response &&
+        (error.response.status === 401 || error.response.status === 403)
+      ) {
+        localStorage.removeItem("token")
+        window.location.href = "/login"
+      }
+      return Promise.reject(error)
+    }
+  )
+})
+
+//  Movie & schedule API methods
 // Hae teatterialueet
 export const fetchAreas = async () => {
   const res = await api.get("/theatres")
@@ -32,6 +61,7 @@ export const fetchSchedule = async (area, date) => {
   return res.data.schedule 
 }
 
+// Hae elokuvat
 export const fetchMovies = async () => {
   const res = await api.get("/events") 
   return res.data.events
@@ -44,19 +74,5 @@ export const searchMovies = async (query) => {
   })
   return res.data
 }
-
-// login validater interceptor 
-[authAPI, reviewAPI, api].forEach(instance => {
-  instance.interceptors.response.use(
-    response => response,
-    error => {
-      if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-        localStorage.removeItem("token")
-        window.location.href = "/login"
-      }
-      return Promise.reject(error)
-    }
-  )
-})
 
 export default api

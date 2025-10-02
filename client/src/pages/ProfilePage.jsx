@@ -4,6 +4,9 @@ import { useAuth } from "../context/AuthContext"
 import { useProfile } from "../hooks/useProfile"
 import { useUserReviews } from "../hooks/useUserReviews"
 import "../styles/ProfilePage.css"
+import { useFavorites } from "../hooks/useFavorites"
+import FavoriteGrid from "../components/FavoriteGrid"
+
 
 function SectionDivider() {
   return <div className="section-divider" />
@@ -12,6 +15,7 @@ function SectionDivider() {
 export default function ProfilePage() {
   const { isLoggedIn } = useAuth()
   const { user, loading, error } = useProfile()
+  const { favorites, loading: favoritesLoading, error: favoritesError } = useFavorites(user?.id, 2)
   const { reviews, loading: reviewsLoading, error: reviewsError } = useUserReviews(user?.id)
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("Profile")
@@ -44,8 +48,10 @@ export default function ProfilePage() {
           
           <div className="profile-stats">
             <div>
-              <span className="stat-number">0</span>
-              <span className="stat-label">FILMS</span>
+              <span className="stat-number">
+                {favoritesLoading ? "…" : favorites.length}
+              </span>
+              <span className="stat-label">FAVORITES</span>
             </div>
             <div>
               <span className="stat-number">0</span>
@@ -72,10 +78,10 @@ export default function ProfilePage() {
           Activity
         </button>
         <button
-          className={activeTab === "Films" ? "active" : ""}
-          onClick={() => setActiveTab("Films")}
+          className={activeTab === "Favorites" ? "active" : ""}
+          onClick={() => setActiveTab("Favorites")}
         >
-          Films
+          Favorites
         </button>
         <button
           className={activeTab === "Reviews" ? "active" : ""}
@@ -135,12 +141,24 @@ export default function ProfilePage() {
             <div>Activity content goes here.</div>
           </div>
         )}
-        {activeTab === "Films" && (
+        {activeTab === "Favorites" && (
           <div>
-            <span className="section-title">FILMS</span>
-            <div>Films content goes here.</div>
+            <span className="section-title">FAVORITES</span>
+            <div className="favorites-content">
+              {favoritesLoading && <p>Loading favorites...</p>}
+              {favoritesError && <p>Error loading favorites.</p>}
+              {!favoritesLoading && favorites.length === 0 && <p>No favorite movies yet. ⭐</p>}
+              {!favoritesLoading && favorites.length > 0 && (
+                <FavoriteGrid
+                  favorites={[...favorites]
+                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                    .slice(0, 4)}
+                />
+              )}
+            </div>
           </div>
         )}
+
         {activeTab === "Reviews" && (
           <div>
             <span className="section-title">MY REVIEWS</span>
