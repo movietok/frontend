@@ -20,7 +20,7 @@ export const reviewAPI = axios.create({
 
 // Create a separate instance for favorites endpoints
 export const favoritesAPI = axios.create({
-  baseURL: `${API_BASE_URL}/v1/favorites`,
+  baseURL: `${API_BASE_URL}/favorites`,
 });
 
 //  Global login validator interceptor (applied to all instances)

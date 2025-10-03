@@ -6,7 +6,8 @@ import MovieCard from "../components/MovieCard";
 import GenreSelector from "../components/GenreSelector";
 import "../styles/BrowsePage.css"; 
 import FavoriteButton from "../components/buttons/FavoriteButton";
-import { useFavorites } from "../hooks/useFavorites";
+import WatchlistButton from "../components/buttons/WatchlistButton";
+import { useFavoriteStatuses } from "../hooks/useFavoriteStatuses";
 import { useAuth } from "../context/AuthContext";
 
 function BrowsePage() {
@@ -22,9 +23,13 @@ function BrowsePage() {
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [sortBy, setSortBy] = useState('popularity.desc');
   const { user } = useAuth();
-  const { favorites: userFavorites } = useFavorites(user?.id, 2);
   
   const query = searchParams.get("q");
+
+  // Get movie IDs for status checking
+  const currentMovies = isSearchMode ? searchResults : movies;
+  const movieIds = currentMovies.slice(0, 16).map(movie => movie.id);
+  const { statuses = {}, loading: statusLoading = false, updateStatus } = useFavoriteStatuses(movieIds, user);
 
   // Hae hakutulokset kun query muuttuu
   useEffect(() => {
@@ -213,22 +218,40 @@ function BrowsePage() {
                 </div>
               ) : (
             <div className="mt-movies-wrap">
-              {(isSearchMode ? searchResults : movies).slice(0, 16).map((movie) => (
-                <div className="mt-movie-tile group" key={movie.id} style={{ position: "relative" }}>
-                  <MovieCard movie={movie} />
-                  <FavoriteButton 
-                    movieId={movie.id} 
-                    type={2} 
-                    initialIsFavorite={userFavorites.some(f => f.movie_id === movie.id)}
-                    movieData={{
-                      title: movie.title || movie.original_title,
-                      original_title: movie.original_title,
-                      release_date: movie.release_date,
-                      poster_path: movie.poster_path
-                    }}
-                  />
-                </div>
-              ))}
+              {currentMovies.slice(0, 16).map((movie) => {
+                const movieStatus = (statuses && statuses[movie.id]) || { isFavorite: false, isWatchlist: false };
+                
+                return (
+                  <div className="mt-movie-tile group" key={movie.id} style={{ position: "relative" }}>
+                    <MovieCard movie={movie} />
+                    
+                    {/* Show buttons only after statuses are loaded or for logged out users */}
+                    {(!user || !statusLoading) && (
+                      <>
+                        {/* Favorite Button */}
+                        <FavoriteButton 
+                          movieId={movie.id} 
+                          type={2} 
+                          initialIsFavorite={movieStatus.isFavorite}
+                          disableAutoCheck={true}
+                          onStatusChange={(movieId, isFavorite) => 
+                            updateStatus(movieId, isFavorite, movieStatus.isWatchlist)
+                          }
+                        />
+                        
+                        {/* Watchlist Button */}
+                        <WatchlistButton 
+                          movieId={movie.id}
+                          initialIsWatchlist={movieStatus.isWatchlist}
+                          onStatusChange={(movieId, isWatchlist) => 
+                            updateStatus(movieId, movieStatus.isFavorite, isWatchlist)
+                          }
+                        />
+                      </>
+                    )}
+                  </div>
+                );
+              })}
             </div>
               )}
 

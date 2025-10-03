@@ -18,7 +18,7 @@ export default function FavoriteGrid({ favorites }) {
           <div className="movie-card rounded-xl overflow-hidden shadow-xl transform transition hover:scale-105 hover:shadow-2xl">
             {fav.poster_path ? (
               <img
-                src={`https://image.tmdb.org/t/p/w500${fav.poster_path}`}
+                src={`${fav.poster_path}`}
                 alt={fav.original_title}
                 className="w-full h-auto"
               />

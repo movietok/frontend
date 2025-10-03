@@ -10,14 +10,21 @@ export default function FavoriteButton({
   type = 2,
   groupId = null,
   movieData,
-  initialIsFavorite = false
+  initialIsFavorite = false,
+  disableAutoCheck = false,
+  onStatusChange = null
 }) {
   const { isLoggedIn } = useAuth()
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite)
 
+  // Update state when initialIsFavorite prop changes
+  useEffect(() => {
+    setIsFavorite(initialIsFavorite)
+  }, [initialIsFavorite])
+
 
   useEffect(() => {
-    if (!isLoggedIn || initialIsFavorite) return; 
+    if (!isLoggedIn || initialIsFavorite || disableAutoCheck) return; 
 
     checkFavoriteStatus(movieId)
       .then((res) => {
@@ -29,7 +36,7 @@ export default function FavoriteButton({
         setIsFavorite(isFav);
       })
       .catch(console.error);
-  }, [movieId, isLoggedIn, type, initialIsFavorite]);
+  }, [movieId, isLoggedIn, type, initialIsFavorite, disableAutoCheck]);
 
 
 
@@ -45,10 +52,12 @@ export default function FavoriteButton({
     if (isFavorite) {
       await removeFavorite(movieId, type, groupId)
       setIsFavorite(false)
+      onStatusChange?.(movieId, false)
     } else {
       // FIX IS HERE: Pass movieData as the fourth argument
-      await addFavorite(movieId, type, groupId, movieData)
+      await addFavorite(movieId, type, groupId)
       setIsFavorite(true)
+      onStatusChange?.(movieId, true)
     }
     } catch (err) {
     console.error("Error toggling favorite:", err)
