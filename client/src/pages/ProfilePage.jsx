@@ -15,6 +15,7 @@ function SectionDivider() {
 export default function ProfilePage() {
   const { isLoggedIn } = useAuth()
   const { user, loading, error } = useProfile()
+  const { favorites: watchlist, loading: watchlistLoading, error: watchlistError } = useFavorites(user?.id, 1)
   const { favorites, loading: favoritesLoading, error: favoritesError } = useFavorites(user?.id, 2)
   const { reviews, loading: reviewsLoading, error: reviewsError } = useUserReviews(user?.id)
   const navigate = useNavigate()
@@ -124,7 +125,7 @@ export default function ProfilePage() {
                   <ul>
                     {reviews.map(review => (
                       <li key={review.id}>
-                        <b>Movie:</b> {review.movie_id} &nbsp;
+                        <b>Movie:</b> {review.tmdb_id} &nbsp;
                         <b>Rating:</b> {review.rating} &nbsp;
                         <b>Comment:</b> {review.content}
                       </li>
@@ -170,7 +171,7 @@ export default function ProfilePage() {
                 <ul>
                   {reviews.map(review => (
                     <li key={review.id}>
-                      <b>Movie:</b> {review.movie_id} &nbsp;
+                      <b>Movie:</b> {review.tmdb_id} &nbsp;
                       <b>Rating:</b> {review.rating} &nbsp;
                       <b>Comment:</b> {review.content}
                     </li>
@@ -183,7 +184,19 @@ export default function ProfilePage() {
         {activeTab === "Watchlist" && (
           <div>
             <span className="section-title">WATCHLIST</span>
-            <div>Watchlist content goes here.</div>
+            <div className="watchlist-content">
+              {watchlistLoading && <p>Loading watchlist...</p>}
+              {watchlistError && <p>Error loading watchlist.</p>}
+              {!watchlistLoading && watchlist.length === 0 && <p>No movies in your watchlist yet. 👁</p>}
+              {!watchlistLoading && watchlist.length > 0 && (
+                <FavoriteGrid
+                  favorites={[...watchlist]
+                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                    .slice(0, 4)}
+                  type={1} // ✅ pass type=1 so FavoriteGrid knows it's watchlist
+                />
+              )}
+            </div>
           </div>
         )}
 

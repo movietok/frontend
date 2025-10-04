@@ -1,14 +1,10 @@
 .favorite-button {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
   font-size: 1.6rem;
   background: none;
   border: none;
   cursor: pointer;
   color: white;
   transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
-  z-index: 10;
 }
 
 .favorite-button:hover {
@@ -20,11 +16,9 @@
 .favorite-button.active {
   color: gold;
   text-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
-}
-
-.favorite-button.active {
   animation: pulse 0.6s ease;
 }
+
 
 @keyframes pulse {
   0% { transform: scale(1); }

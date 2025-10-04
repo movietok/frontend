@@ -10,8 +10,8 @@ export default function FavoritesList({ userId, type }) {
   return (
     <div className="favorites-list">
       {favorites.map((fav) => (
-        <div key={fav.movie_id} className="favorite-item">
-          <span>{fav.original_title || `Movie #${fav.movie_id}`}</span>
+        <div key={fav.tmdb_id} className="favorite-item">
+          <span>{fav.original_title || `Movie #${fav.tmdb_id}`}</span>
         </div>
       ))}
     </div>

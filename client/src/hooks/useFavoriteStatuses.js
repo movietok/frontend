@@ -54,11 +54,11 @@ export const useFavoriteStatuses = (movieIds, user) => {
           if (!isMounted) return
           
           // Convert array response to object for easier lookup
-          // Expected response format: [{ movie_id: 123, is_favorite: true, is_watchlist: false }, ...]
+          // Expected response format: [{ tmdb_id: 123, is_favorite: true, is_watchlist: false }, ...]
           const statusMap = {}
           if (Array.isArray(response)) {
             response.forEach(item => {
-              statusMap[item.movie_id] = {
+              statusMap[item.tmdb_id] = {
                 isFavorite: item.is_favorite || false,
                 isWatchlist: item.is_watchlist || false
               }
