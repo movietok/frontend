@@ -1,42 +1,73 @@
 import { createContext, useContext, useState, useEffect } from "react"
-import { deleteAccount as deleteAccountService } from "../services/userService"
-import { useNavigate } from "react-router-dom"
+import { deleteAccount as deleteAccountService, getProfile } from "../services/userService.js"
 
-const AuthContext = createContext()
+export const AuthContext = createContext()
 
 export function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"))
+const [user, setUser] = useState(() => {
+  try {
+    const stored = localStorage.getItem("user")
+    return stored && stored !== "undefined" ? JSON.parse(stored) : null
+  } catch {
+    return null
+  }
+})
 
-  // Update when localStorage changes login/logout
+  // Sync with localStorage on external tab changes
   useEffect(() => {
-    const checkAuth = () => setIsLoggedIn(!!localStorage.getItem("token"))
-    window.addEventListener("storage", checkAuth)
-    return () => window.removeEventListener("storage", checkAuth)
+    const syncAuth = () => {
+      const token = localStorage.getItem("token")
+      const storedUser = localStorage.getItem("user")
+      setIsLoggedIn(!!token)
+      setUser(storedUser ? JSON.parse(storedUser) : null)
+    }
+    window.addEventListener("storage", syncAuth)
+    return () => window.removeEventListener("storage", syncAuth)
   }, [])
 
-  const login = (token) => {
+  // Optional: refresh user from backend on mount
+  useEffect(() => {
+    const token = localStorage.getItem("token")
+    if (token && !user) {
+      getProfile()
+        .then((freshUser) => {
+          setUser(freshUser)
+          localStorage.setItem("user", JSON.stringify(freshUser))
+        })
+        .catch((err) => {
+          console.error("Failed to refresh user profile:", err)
+          logout()
+        })
+    }
+  }, [])
+
+  const login = (token, userData) => {
     localStorage.setItem("token", token)
+    localStorage.setItem("user", JSON.stringify(userData))
     setIsLoggedIn(true)
+    setUser(userData)
   }
 
   const logout = () => {
     localStorage.removeItem("token")
+    localStorage.removeItem("user")
     setIsLoggedIn(false)
+    setUser(null)
   }
 
-  // Delete account Service
   const deleteAccount = async () => {
     try {
-      await deleteAccountService() // api call
+      await deleteAccountService()
       logout()
     } catch (err) {
-      console.error(err)
+      console.error("❌ Failed to delete account:", err)
       alert("Failed to delete account")
     }
   }
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout, deleteAccount }}>
+    <AuthContext.Provider value={{ isLoggedIn, user, login, logout, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   )

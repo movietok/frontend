@@ -1,0 +1,30 @@
+.movie-actions-bar {
+  position: absolute;
+  top: 1rem;
+  right: 5.5rem; 
+  display: flex;
+  gap: 0.1rem;   
+  z-index: 10;
+  align-items: center;
+}
+.movie-actions-bar button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+button:focus,
+button:focus-visible {
+  outline: none;
+}
+
+button svg {
+  outline: none;
+  border: none;
+}
+
+.movie-actions-bar button:active {
+  transform: scale(0.95); /* Optional: press animation */
+}
+

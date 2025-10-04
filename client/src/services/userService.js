@@ -15,6 +15,15 @@ export const deleteAccount = async () => {
   })
 }
 
+  // update profile route
+export const updateProfile = async (data) => {
+  const token = localStorage.getItem("token")
+  const res = await authAPI.put("/profile", data, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  return res.data.user
+}
+
   // Gets users reviews by id
 export const getUserReviews = async (userId) => {
   const token = localStorage.getItem("token")
