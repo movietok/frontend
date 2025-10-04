@@ -134,91 +134,105 @@ export const fetchScheduleDates = async (area = '') => {
   }
 }
 
-// Get schedule for area and date
+// Get schedule for area and date - Direct from Finnkino (no proxy)
 export const fetchFinnkinoSchedule = async (area = '', date = '', eventID = '', nrOfDays = 1) => {
-  try {
-    const url = new URL(`${FINNKINO_BASE_URL}/Schedule/`)
-    
-    if (area) {
-      url.searchParams.append('area', area)
-    }
-    if (date) {
-      url.searchParams.append('dt', date)
-    }
-    if (eventID) {
-      url.searchParams.append('eventID', eventID)
-    }
-    if (nrOfDays) {
-      url.searchParams.append('nrOfDays', nrOfDays.toString())
-    }
-    
-    console.log('Fetching schedule from:', url.toString())
-    
-    const response = await fetch(url.toString(), {
-      method: 'GET',
-      mode: 'cors', // This will likely fail due to CORS
-      headers: {
-        'Accept': 'application/xml, text/xml'
-      }
-    })
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    
-    const xmlText = await response.text()
-    console.log('XML Response:', xmlText.substring(0, 500) + '...')
-    
-    const xmlDoc = parseXML(xmlText)
-    const schedule = parseScheduleXML(xmlDoc)
-    
-    console.log('Parsed schedule:', schedule.length, 'shows')
-    return schedule
-    
-  } catch (error) {
-    console.error('Error fetching Finnkino schedule:', error)
-    throw error
+  const url = new URL(`${FINNKINO_BASE_URL}/Schedule/`)
+  
+  if (area) {
+    url.searchParams.append('area', area)
   }
+  if (date) {
+    url.searchParams.append('dt', date)
+  }
+  if (eventID) {
+    url.searchParams.append('eventID', eventID)
+  }
+  if (nrOfDays) {
+    url.searchParams.append('nrOfDays', nrOfDays.toString())
+  }
+  
+  console.log('🎬 Fetching Finnkino schedule from:', url.toString())
+  
+  const response = await fetch(url.toString(), {
+    method: 'GET',
+    mode: 'cors',
+    headers: {
+      'Accept': 'application/xml, text/xml'
+    }
+  })
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+  
+  const xmlText = await response.text()
+  const xmlDoc = parseXML(xmlText)
+  const schedule = parseScheduleXML(xmlDoc)
+  
+  console.log('✅ Parsed schedule:', schedule.length, 'shows')
+  return schedule
 }
 
-// Fallback function with CORS proxy (if direct call fails)
-export const fetchFinnkinoScheduleWithProxy = async (area = '', date = '', eventID = '', nrOfDays = 1) => {
-  try {
-    // Use a public CORS proxy service
-    const proxyUrl = 'https://api.allorigins.win/raw?url='
-    const targetUrl = new URL(`${FINNKINO_BASE_URL}/Schedule/`)
-    
-    if (area) {
-      targetUrl.searchParams.append('area', area)
+// Enrich Finnkino shows with TMDB data
+export const enrichShowsWithTMDB = async (shows, searchMovieByTitleYear) => {
+  const enrichedShows = []
+  const tmdbCache = new Map()
+  
+  // Get unique movies (by originalTitle + year)
+  const uniqueMovies = new Map()
+  shows.forEach(show => {
+    const key = `${show.originalTitle || show.title}_${show.productionYear}`
+    if (!uniqueMovies.has(key)) {
+      uniqueMovies.set(key, show)
     }
-    if (date) {
-      targetUrl.searchParams.append('dt', date)
-    }
-    if (eventID) {
-      targetUrl.searchParams.append('eventID', eventID)
-    }
-    if (nrOfDays) {
-      targetUrl.searchParams.append('nrOfDays', nrOfDays.toString())
-    }
+  })
+  
+  console.log(`🎬 Fetching TMDB data for ${uniqueMovies.size} unique movies...`)
+  
+  // Fetch TMDB data for unique movies
+  for (const [key, show] of uniqueMovies) {
+    const originalTitle = show.originalTitle || show.title
+    const year = show.productionYear
     
-    const fullUrl = proxyUrl + encodeURIComponent(targetUrl.toString())
-    console.log('Fetching schedule via proxy from:', fullUrl)
-    
-    const response = await fetch(fullUrl)
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+    if (!originalTitle || !year) {
+      tmdbCache.set(key, null)
+      continue
     }
     
-    const xmlText = await response.text()
-    const xmlDoc = parseXML(xmlText)
-    const schedule = parseScheduleXML(xmlDoc)
+    try {
+      const response = await searchMovieByTitleYear(originalTitle, year)
+      if (response?.success && response.results?.length > 0) {
+        const tmdbData = response.results[0]
+        tmdbCache.set(key, tmdbData)
+        console.log(`✅ ${originalTitle} (${year}) → TMDB ID: ${tmdbData.id}`)
+      } else {
+        console.log(`⚠️ No TMDB match: ${originalTitle} (${year})`)
+        tmdbCache.set(key, null)
+      }
+    } catch (error) {
+      console.error(`❌ Error: ${originalTitle}:`, error.message)
+      tmdbCache.set(key, null)
+    }
     
-    console.log('Parsed schedule (via proxy):', schedule.length, 'shows')
-    return schedule
-    
-  } catch (error) {
-    console.error('Error fetching Finnkino schedule via proxy:', error)
-    throw error
+    // Small delay to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 100))
   }
+  
+  // Enrich all shows with cached TMDB data
+  for (const show of shows) {
+    const key = `${show.originalTitle || show.title}_${show.productionYear}`
+    const tmdbData = tmdbCache.get(key)
+    
+    enrichedShows.push({
+      ...show,
+      tmdbData: tmdbData || null,
+      tmdbId: tmdbData?.id || null,
+      posterPath: tmdbData?.posterPath || show.images?.eventMediumImagePortrait || '',
+      overview: tmdbData?.overview || '',
+      voteAverage: tmdbData?.voteAverage || null
+    })
+  }
+  
+  console.log(`✅ Enriched ${enrichedShows.length} shows with TMDB data`)
+  return enrichedShows
 }

@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Link } from "react-router-dom"
 import { useFinnkinoShowTimes } from "../hooks/useFinnkinoShowTimes"
 import { getCurrentDate } from "../helpers/dateUtils"
 import "../styles/ShowTimes.css"
@@ -121,19 +122,53 @@ export default function ShowTimesPage() {
                 ? show.rating
                 : show.rating?.name || "Ei arvostelua"
 
-            return (
-              <div key={index} className="showtime-item">
-                <div className="movie-poster-placeholder">🎬</div>
+            const itemContent = (
+              <div className="showtime-item-content" style={{ display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: '1rem', width: '100%', alignItems: 'center' }}>
+                {/* Movie Poster from TMDB or Finnkino */}
+                {show.posterPath ? (
+                  <img 
+                    src={show.posterPath} 
+                    alt={show.originalTitle || show.title}
+                    className="movie-poster"
+                    style={{ width: '80px', height: '120px', objectFit: 'cover', borderRadius: '4px' }}
+                  />
+                ) : (
+                  <div className="movie-poster-placeholder" style={{ width: '80px', height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#333', borderRadius: '4px' }}>🎬</div>
+                )}
+                
                 <div className="movie-info">
-                  <h3 className="movie-title">{show.originalTitle || show.title}</h3>
+                  <h3 className="movie-title">
+                    {show.originalTitle || show.title}
+                    {show.tmdbId && <span style={{ fontSize: '0.8em', color: '#666', marginLeft: '8px' }}>⭐ {show.voteAverage?.toFixed(1)}</span>}
+                  </h3>
                   <p className="movie-details">
                     {show.presentationMethodAndLanguage || show.language || "Suomi"} • {ratingText}
                   </p>
+                  {show.overview && (
+                    <p className="movie-overview" style={{ fontSize: '0.85em', color: '#888', marginTop: '4px', maxWidth: '500px' }}>
+                      {show.overview.length > 150 ? show.overview.substring(0, 150) + '...' : show.overview}
+                    </p>
+                  )}
                 </div>
                 <div className="showtime-details">
                   <p className="showtime-time">{timeText}</p>
                   <p className="showtime-theater">{show.theatre}</p>
                 </div>
+              </div>
+            )
+
+            return show.tmdbId ? (
+              <Link 
+                key={index} 
+                to={`/movie/${show.tmdbId}`}
+                className="showtime-item"
+                style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+              >
+                {itemContent}
+              </Link>
+            ) : (
+              <div key={index} className="showtime-item">
+                {itemContent}
               </div>
             )
           })

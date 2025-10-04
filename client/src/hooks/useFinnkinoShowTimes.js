@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react"
 import { 
   fetchTheatreAreas, 
-  fetchFinnkinoSchedule, 
-  fetchFinnkinoScheduleWithProxy 
+  fetchFinnkinoSchedule,
+  enrichShowsWithTMDB
 } from "../services/finnkinoApi"
+import { searchMovieByTitleYear } from "../services/tmdb"
 
 export const useFinnkinoShowTimes = () => {
   const [areas, setAreas] = useState([])
@@ -30,35 +31,25 @@ export const useFinnkinoShowTimes = () => {
   }, [])
 
   const getSchedule = async (area, date, eventID = '', nrOfDays = 1) => {
-    console.log('Getting schedule for:', { area, date, eventID, nrOfDays })
+    console.log('🔍 Getting schedule for:', { area, date, eventID, nrOfDays })
     
     setLoading(true)
     setError(null)
     
     try {
-      let schedule = []
+      // Fetch Finnkino schedule directly from browser
+      const schedule = await fetchFinnkinoSchedule(area, date, eventID, nrOfDays)
+      console.log('✅ Finnkino schedule fetched:', schedule.length, 'shows')
       
-      // First try direct API call
-      try {
-        schedule = await fetchFinnkinoSchedule(area, date, eventID, nrOfDays)
-        console.log('Direct API call successful:', schedule.length, 'shows')
-      } catch (directError) {
-        console.log('Direct API call failed, trying proxy:', directError.message)
-        
-        // If direct call fails (likely due to CORS), try with proxy
-        try {
-          schedule = await fetchFinnkinoScheduleWithProxy(area, date, eventID, nrOfDays)
-          console.log('Proxy API call successful:', schedule.length, 'shows')
-        } catch (proxyError) {
-          console.error('Both direct and proxy calls failed:', proxyError.message)
-          throw new Error(`Failed to fetch schedule: ${proxyError.message}`)
-        }
-      }
+      // Enrich with TMDB data
+      console.log('🎬 Enriching with TMDB data...')
+      const enrichedSchedule = await enrichShowsWithTMDB(schedule, searchMovieByTitleYear)
       
-      setShows(Array.isArray(schedule) ? schedule : [])
+      setShows(Array.isArray(enrichedSchedule) ? enrichedSchedule : [])
+      console.log('✅ Schedule ready with TMDB data')
       
     } catch (err) {
-      console.error('Failed to get schedule:', err)
+      console.error('❌ Failed to get schedule:', err)
       setError(err.message || 'Failed to fetch schedule')
       setShows([])
     } finally {

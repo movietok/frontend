@@ -102,6 +102,12 @@ body {
 
 .showtime-item:hover {
   background: #335355;
+  transition: background 0.2s ease;
+}
+
+.showtime-item[style*="cursor: pointer"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .movie-poster {
@@ -109,6 +115,14 @@ body {
   height: 120px;
   object-fit: cover;
   border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.movie-overview {
+  font-size: 0.85em;
+  color: #888;
+  margin-top: 4px;
+  line-height: 1.4;
 }
 
 .movie-info {
