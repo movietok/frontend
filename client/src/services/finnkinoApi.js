@@ -142,6 +142,10 @@ export const fetchFinnkinoSchedule = async (area = '', date = '', eventID = '', 
     url.searchParams.append('area', area)
   }
   if (date) {
+    // Validate date format (should be dd.mm.yyyy)
+    if (!/^\d{2}\.\d{2}\.\d{4}$/.test(date)) {
+      console.warn('⚠️ Date format incorrect:', date, '(expected: dd.mm.yyyy)')
+    }
     url.searchParams.append('dt', date)
   }
   if (eventID) {
