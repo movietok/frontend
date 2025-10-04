@@ -30,3 +30,19 @@ export async function getMovieDetails(id) {
   const res = await axios.get(`${API_BASE}/tmdb/${id}`);
   return res.data;
 }
+
+// Search movie by original title and year
+export async function searchMovieByTitleYear(originalTitle, year) {
+  try {
+    const res = await axios.get(`${API_BASE}/tmdb/title-year`, {
+      params: {
+        originalTitle,
+        year
+      }
+    });
+    return res.data;
+  } catch (error) {
+    console.error(`Error fetching TMDB data for ${originalTitle} (${year}):`, error);
+    return null;
+  }
+}
