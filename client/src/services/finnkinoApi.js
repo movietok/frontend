@@ -50,6 +50,7 @@ const parseScheduleXML = (xmlDoc) => {
   showElements.forEach(show => {
     const showData = {
       id: show.querySelector('ID')?.textContent || '',
+      eventId: show.querySelector('EventID')?.textContent || '', // Finnkino Event ID for TMDB matching
       title: show.querySelector('Title')?.textContent || '', // Finnish title fallback
       originalTitle: show.querySelector('OriginalTitle')?.textContent || '', // Primary title to use
       productionYear: show.querySelector('ProductionYear')?.textContent || '',
@@ -204,13 +205,13 @@ export const enrichShowsWithTMDB = async (shows, searchMovieByTitleYear) => {
     }
     
     try {
-      const response = await searchMovieByTitleYear(originalTitle, year)
+      const response = await searchMovieByTitleYear(originalTitle, year, show.eventId)
       if (response?.success && response.results?.length > 0) {
         const tmdbData = response.results[0]
         tmdbCache.set(key, tmdbData)
-        console.log(`✅ ${originalTitle} (${year}) → TMDB ID: ${tmdbData.id}`)
+        console.log(`✅ ${originalTitle} (${year}) [f_id:${show.eventId}] → TMDB ID: ${tmdbData.id}`)
       } else {
-        console.log(`⚠️ No TMDB match: ${originalTitle} (${year})`)
+        console.log(`⚠️ No TMDB match: ${originalTitle} (${year}) [f_id:${show.eventId}]`)
         tmdbCache.set(key, null)
       }
     } catch (error) {
