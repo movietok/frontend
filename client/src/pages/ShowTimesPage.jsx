@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Link } from "react-router-dom"
 import { useFinnkinoShowTimes } from "../hooks/useFinnkinoShowTimes"
 import { getCurrentDate } from "../helpers/dateUtils"
 import "../styles/ShowTimes.css"
@@ -22,13 +23,43 @@ export default function ShowTimesPage() {
     }
   }
 
+  // Convert dd.mm.yyyy to yyyy-mm-dd for HTML date input
+  const dateToISO = (finnkinoDate) => {
+    if (!finnkinoDate || !/^\d{2}\.\d{2}\.\d{4}$/.test(finnkinoDate)) {
+      return ''
+    }
+    const [day, month, year] = finnkinoDate.split('.')
+    return `${year}-${month}-${day}`
+  }
+
+  // Convert yyyy-mm-dd to dd.mm.yyyy for Finnkino API
+  const isoToFinnkino = (isoDate) => {
+    if (!isoDate) return getCurrentDate()
+    const [year, month, day] = isoDate.split('-')
+    return `${day}.${month}.${year}`
+  }
+
   // Format date for Finnkino API (dd.mm.yyyy)
   const formatDateForFinnkino = (dateString) => {
+    // If already in dd.mm.yyyy format, return as is
+    if (/^\d{2}\.\d{2}\.\d{4}$/.test(dateString)) {
+      console.log('Date already in correct format:', dateString)
+      return dateString
+    }
+    
+    // Parse and convert to dd.mm.yyyy
     const date = new Date(dateString)
+    if (isNaN(date.getTime())) {
+      console.error('Invalid date:', dateString)
+      return dateString // Return original if invalid
+    }
+    
     const day = String(date.getDate()).padStart(2, '0')
     const month = String(date.getMonth() + 1).padStart(2, '0')
     const year = date.getFullYear()
-    return `${day}.${month}.${year}`
+    const formatted = `${day}.${month}.${year}`
+    console.log('Converted date:', dateString, '→', formatted)
+    return formatted
   }
 
   const uniqueShows = Array.isArray(shows)
@@ -74,10 +105,9 @@ export default function ShowTimesPage() {
           <label htmlFor="date">Date</label>
           <input
             id="date"
-            type="text"
-            placeholder="dd.mm.yyyy"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
+            type="date"
+            value={dateToISO(date)}
+            onChange={(e) => setDate(isoToFinnkino(e.target.value))}
           />
         </div>
 
@@ -121,19 +151,53 @@ export default function ShowTimesPage() {
                 ? show.rating
                 : show.rating?.name || "Ei arvostelua"
 
-            return (
-              <div key={index} className="showtime-item">
-                <div className="movie-poster-placeholder">🎬</div>
+            const itemContent = (
+              <div className="showtime-item-content" style={{ display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: '1rem', width: '100%', alignItems: 'center' }}>
+                {/* Movie Poster from TMDB or Finnkino */}
+                {show.posterPath ? (
+                  <img 
+                    src={show.posterPath} 
+                    alt={show.originalTitle || show.title}
+                    className="movie-poster"
+                    style={{ width: '80px', height: '120px', objectFit: 'cover', borderRadius: '4px' }}
+                  />
+                ) : (
+                  <div className="movie-poster-placeholder" style={{ width: '80px', height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#333', borderRadius: '4px' }}>🎬</div>
+                )}
+                
                 <div className="movie-info">
-                  <h3 className="movie-title">{show.originalTitle || show.title}</h3>
+                  <h3 className="movie-title">
+                    {show.originalTitle || show.title}
+                    {show.tmdbId && <span style={{ fontSize: '0.8em', color: '#666', marginLeft: '8px' }}>⭐ {show.voteAverage?.toFixed(1)}</span>}
+                  </h3>
                   <p className="movie-details">
                     {show.presentationMethodAndLanguage || show.language || "Suomi"} • {ratingText}
                   </p>
+                  {show.overview && (
+                    <p className="movie-overview" style={{ fontSize: '0.85em', color: '#888', marginTop: '4px', maxWidth: '500px' }}>
+                      {show.overview.length > 150 ? show.overview.substring(0, 150) + '...' : show.overview}
+                    </p>
+                  )}
                 </div>
                 <div className="showtime-details">
                   <p className="showtime-time">{timeText}</p>
                   <p className="showtime-theater">{show.theatre}</p>
                 </div>
+              </div>
+            )
+
+            return show.tmdbId ? (
+              <Link 
+                key={index} 
+                to={`/movie/${show.tmdbId}`}
+                className="showtime-item"
+                style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+              >
+                {itemContent}
+              </Link>
+            ) : (
+              <div key={index} className="showtime-item">
+                {itemContent}
               </div>
             )
           })

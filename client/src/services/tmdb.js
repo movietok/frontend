@@ -30,3 +30,25 @@ export async function getMovieDetails(id) {
   const res = await axios.get(`${API_BASE}/tmdb/${id}`);
   return res.data;
 }
+
+// Search movie by original title and year
+export async function searchMovieByTitleYear(originalTitle, year, finnkinoEventId = null) {
+  try {
+    const params = {
+      originalTitle,
+      year
+    };
+    
+    // Add Finnkino Event ID if available
+    if (finnkinoEventId) {
+      params.f_id = finnkinoEventId;
+    }
+    
+    console.log('🔍 TMDB search:', params);
+    const res = await axios.get(`${API_BASE}/tmdb/title-year`, { params });
+    return res.data;
+  } catch (error) {
+    console.error(`Error fetching TMDB data for ${originalTitle} (${year}):`, error);
+    return null;
+  }
+}

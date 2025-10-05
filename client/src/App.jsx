@@ -12,6 +12,8 @@ import LoginPage from "./pages/LoginPage"
 import SignupPage from "./pages/SignupPage"
 import ReviewsPage from "./pages/ReviewsPage"
 import MovieDetailsPage from "./pages/MovieDetailsPage";
+import FavoritesPage from "./pages/FavoritesPage";
+import SettingsPage from "./pages/SettingsPage";
 import CreateGroupPage from "./pages/CreateGroupPage";
 import GroupDetailsPage from "./pages/GroupDetailsPage";
 
@@ -38,10 +40,12 @@ function App() {
             <Route path="/homepage" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/search" element={<SearchResultsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/schedule" element={<ShowTimesPage />} />
             <Route path="/reviews" element={<ReviewsPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
             <Route path="/browse" element={<BrowsePage />} />   
             <Route path="/groups" element={<BrowseGroupsPage />} />       
             <Route path="/movie/:id" element={<MovieDetailsPage />} />
