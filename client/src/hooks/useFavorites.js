@@ -7,8 +7,13 @@ export function useFavorites(userId, type, groupId = null) {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    if (!userId || !type) return
+    if (!userId || !type) {
+      setLoading(false)
+      setFavorites([])
+      return
+    }
 
+    setLoading(true)
     getUserFavorites(userId, type)
       .then((data) => setFavorites(data || []))
       .catch((err) => setError(err))
