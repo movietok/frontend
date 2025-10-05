@@ -24,25 +24,27 @@ export const favoritesAPI = axios.create({
 });
 
 //  Global login validator interceptor (applied to all instances)
-[authAPI, reviewAPI, api, favoritesAPI].forEach(instance => {
-  instance.interceptors.response.use(
-    response => response,
-    error => {
-      const token = localStorage.getItem("token")
-      const isLoginRequest = error.config?.url?.includes("/login")
-      if (
-        token && // Only if token exists 
-        !isLoginRequest && // Not for login requests
-        error.response &&
-        (error.response.status === 401 || error.response.status === 403)
-      ) {
-        localStorage.removeItem("token")
-        window.location.href = "/login"
-      }
-      return Promise.reject(error)
-    }
-  )
-})
+// DISABLED: This was causing unexpected logouts when viewing other users' profiles
+// or when API calls fail temporarily. Auth should be handled in components, not globally.
+// [authAPI, reviewAPI, api, favoritesAPI].forEach(instance => {
+//   instance.interceptors.response.use(
+//     response => response,
+//     error => {
+//       const token = localStorage.getItem("token")
+//       const isLoginRequest = error.config?.url?.includes("/login")
+//       if (
+//         token && // Only if token exists 
+//         !isLoginRequest && // Not for login requests
+//         error.response &&
+//         (error.response.status === 401 || error.response.status === 403)
+//       ) {
+//         localStorage.removeItem("token")
+//         window.location.href = "/login"
+//       }
+//       return Promise.reject(error)
+//     }
+//   )
+// })
 
 //  Movie & schedule API methods
 // Hae teatterialueet
