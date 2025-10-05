@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import { authAPI } from "../services/api"
+import { getProfile } from "../services/userService"
 import UniversalModal from "../components/Popups/UniversalModal"
 import "../styles/Login.css"
 
@@ -22,8 +23,17 @@ export default function Login() {
     try {
       const res = await authAPI.post("/login", form)
       if (res.status === 200) {
-        login(res.data.token)
-        localStorage.setItem("token", res.data.token) // save JWT
+        const token = res.data.token
+        
+        // Temporarily set token so getProfile can use it
+        localStorage.setItem("token", token)
+        
+        // Fetch user profile
+        const userData = await getProfile()
+        
+        // Now call login with both token and userData
+        login(token, userData)
+        
         setModalTitle("Login Successful!")
         setModalMessage("You have logged in successfully. Continue to homepage?")
         setShowModal(true)
