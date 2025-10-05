@@ -29,11 +29,12 @@ export default function ProfilePage() {
   const isOwnProfile = !userId || (currentUser && userId === String(currentUser.id))
 
   useEffect(() => {
-    // Only require login for own profile (/profile without userId)
-    if (!userId && !isLoggedIn) {
+    // Only require login for own profile (/profile route without userId parameter)
+    // Allow viewing other users' profiles without login
+    if (isOwnProfile && !isLoggedIn) {
       navigate("/login")
     }
-  }, [userId, isLoggedIn, navigate])
+  }, [isOwnProfile, isLoggedIn, navigate])
 
 
   if (loading) return <div className="profile-loading">Loading profile...</div>

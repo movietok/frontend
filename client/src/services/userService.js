@@ -21,9 +21,15 @@ export const getProfileById = async (userId) => {
   console.log('📝 Fetching profile for user ID:', userId)
   const token = localStorage.getItem("token")
   const headers = token ? { Authorization: `Bearer ${token}` } : {}
-  const res = await authAPI.get(`/${userId}`, { headers })
-  console.log('✅ User profile fetched:', res.data.user)
-  return res.data.user
+  
+  try {
+    const res = await authAPI.get(`/${userId}`, { headers })
+    console.log('✅ User profile fetched:', res.data.user)
+    return res.data.user
+  } catch (err) {
+    console.error('❌ Failed to fetch user profile:', err.response?.status, err.response?.data)
+    throw err
+  }
 }
 
 export const deleteAccount = async () => {
