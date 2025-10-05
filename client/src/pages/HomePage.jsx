@@ -10,6 +10,8 @@ import MostActiveUsers from "../components/homepage/MostActiveUsers";
 import PopularUsers from "../components/homepage/PopularUsers";
 
 import { discoverMovies } from "../services/tmdb"; // use same endpoint as BrowsePage
+import { fetchNowPlayingEvents, enrichShowsWithTMDB } from "../services/finnkinoApi";
+import { searchMovieByTitleYear } from "../services/tmdb";
 
 // keep all other mock data exactly as before
 const mockFinnkino = Array.from({ length: 7 }, (_, i) => ({
@@ -49,18 +51,115 @@ function HomePage() {
   const [activeUsers, setActiveUsers] = useState([]);
   const [popularUsers, setPopularUsers] = useState([]);
 
-  useEffect(() => {
-    // Fetch Popular via discover, change later for another method if wanted (this is the same as Browse default)
-    discoverMovies({ page: 1 })
-      .then((data) => {
-  // data.results is already normalized by TMDBService
-  setMovies(Array.isArray(data?.results) ? data.results.slice(0, 20) : []);
-})
+  // Cache configuration
+  const CACHE_DURATION = 1000 * 60 * 30 // 30 minutes
 
-      .catch(console.error);
+  useEffect(() => {
+    // Fetch Popular Movies with caching
+    const POPULAR_CACHE_KEY = 'homepage_popular_movies'
+    
+    // Check cache first for Popular Movies
+    const cachedPopular = sessionStorage.getItem(POPULAR_CACHE_KEY)
+    if (cachedPopular) {
+      try {
+        const { data, timestamp } = JSON.parse(cachedPopular)
+        const isExpired = Date.now() - timestamp > CACHE_DURATION
+        
+        if (!isExpired && Array.isArray(data) && data.length > 0) {
+          console.log('✅ Using cached Popular Movies data:', data.length, 'movies')
+          setMovies(data)
+        } else {
+          // Fetch fresh if expired
+          fetchPopularMovies()
+        }
+      } catch (error) {
+        console.warn('⚠️ Failed to parse cached Popular Movies:', error)
+        fetchPopularMovies()
+      }
+    } else {
+      fetchPopularMovies()
+    }
+    
+    function fetchPopularMovies() {
+      console.log('🔄 Fetching fresh Popular Movies...')
+      discoverMovies({ page: 1 })
+        .then((data) => {
+          // data.results is already normalized by TMDBService
+          const movies = Array.isArray(data?.results) ? data.results.slice(0, 20) : []
+          setMovies(movies)
+          
+          // Cache the data
+          sessionStorage.setItem(POPULAR_CACHE_KEY, JSON.stringify({
+            data: movies,
+            timestamp: Date.now()
+          }))
+          console.log('✅ Cached Popular Movies:', movies.length)
+        })
+        .catch(console.error)
+    }
+
+    // Fetch Now Playing from Finnkino and enrich with TMDB
+    const CACHE_KEY = 'finnkino_now_playing'
+    
+    // Check cache first
+    const cachedData = sessionStorage.getItem(CACHE_KEY)
+    if (cachedData) {
+      try {
+        const { data, timestamp } = JSON.parse(cachedData)
+        const isExpired = Date.now() - timestamp > CACHE_DURATION
+        
+        if (!isExpired && Array.isArray(data) && data.length > 0) {
+          console.log('✅ Using cached Finnkino data:', data.length, 'movies')
+          setFinnkino(data)
+          setReviews(mockReviews);
+          setGroups(mockGroups);
+          setActiveUsers(mockActiveUsers);
+          setPopularUsers(mockPopularUsers);
+          return
+        }
+      } catch (error) {
+        console.warn('⚠️ Failed to parse cached data:', error)
+      }
+    }
+    
+    // Fetch fresh data if no valid cache
+    console.log('🔄 Fetching fresh Finnkino data...')
+    fetchNowPlayingEvents()
+      .then(async (events) => {
+        console.log('🎬 Fetched Finnkino events:', events.length);
+        
+        // Enrich with TMDB data (limit to first 10)
+        const limitedEvents = events.slice(0, 10)
+        const enriched = await enrichShowsWithTMDB(limitedEvents, searchMovieByTitleYear);
+        
+        // Format for NowPlayingMovies component
+        const formatted = enriched.map(event => ({
+          id: event.tmdbId || event.id,
+          tmdbId: event.tmdbId,
+          finnkinoId: event.id,
+          title: event.originalTitle || event.title,
+          image: event.posterPath || event.images?.eventMediumImagePortrait || '',
+          rating: event.voteAverage || null,
+          year: event.productionYear,
+          overview: event.overview
+        }));
+        
+        console.log('✅ Formatted Now Playing movies:', formatted.length);
+        
+        // Cache the data
+        sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+          data: formatted,
+          timestamp: Date.now()
+        }))
+        
+        setFinnkino(formatted);
+      })
+      .catch((error) => {
+        console.error('❌ Error fetching Finnkino events:', error);
+        setFinnkino(mockFinnkino); // Fallback to mock data
+      });
 
     // keep mocks for the rest
-    setFinnkino(mockFinnkino);
     setReviews(mockReviews);
     setGroups(mockGroups);
     setActiveUsers(mockActiveUsers);
