@@ -2,9 +2,27 @@ import { authAPI, reviewAPI} from "./api"
 
 export const getProfile = async () => {
   const token = localStorage.getItem("token")
+  if (!token) {
+    throw new Error('No authentication token found')
+  }
+  console.log('📝 Fetching own profile')
   const res = await authAPI.get("/profile", {
     headers: { Authorization: `Bearer ${token}` },
   })
+  console.log('✅ Own profile fetched:', res.data.user)
+  return res.data.user
+}
+
+// Get user profile by ID (public or authorized)
+export const getProfileById = async (userId) => {
+  if (!userId) {
+    throw new Error('User ID is required')
+  }
+  console.log('📝 Fetching profile for user ID:', userId)
+  const token = localStorage.getItem("token")
+  const headers = token ? { Authorization: `Bearer ${token}` } : {}
+  const res = await authAPI.get(`/${userId}`, { headers })
+  console.log('✅ User profile fetched:', res.data.user)
   return res.data.user
 }
 

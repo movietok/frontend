@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import { useProfile } from "../hooks/useProfile"
 import { useUserReviews } from "../hooks/useUserReviews"
@@ -13,23 +13,42 @@ function SectionDivider() {
 }
 
 export default function ProfilePage() {
-  const { isLoggedIn } = useAuth()
-  const { user, loading, error } = useProfile()
+  const { userId } = useParams() // Get userId from URL
+  const { isLoggedIn, user: currentUser } = useAuth()
+  
+  console.log('ProfilePage render - userId:', userId, 'isLoggedIn:', isLoggedIn)
+  
+  const { user, loading, error } = useProfile(userId)
   const { favorites: watchlist, loading: watchlistLoading, error: watchlistError } = useFavorites(user?.id, 1)
   const { favorites, loading: favoritesLoading, error: favoritesError } = useFavorites(user?.id, 2)
   const { reviews, loading: reviewsLoading, error: reviewsError } = useUserReviews(user?.id)
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("Profile")
 
+  // Check if viewing own profile (no userId param means /profile route = own profile)
+  const isOwnProfile = !userId || (currentUser && userId === String(currentUser.id))
+
   useEffect(() => {
-    if (!isLoggedIn) {
+    // Only require login for own profile (/profile without userId)
+    if (!userId && !isLoggedIn) {
       navigate("/login")
     }
-  }, [isLoggedIn, navigate])
+  }, [userId, isLoggedIn, navigate])
 
 
-  if (loading) return <div className="profile-loading">Loading...</div>
-  if (error) return <div className="profile-error">Error loading profile.</div>
+  if (loading) return <div className="profile-loading">Loading profile...</div>
+  if (error) {
+    console.error('Profile error:', error)
+    return (
+      <div className="profile-error">
+        <h3>Error loading profile</h3>
+        <p>{error.message || 'Unknown error occurred'}</p>
+        <p style={{ fontSize: '0.9em', color: '#666' }}>
+          {userId ? `Tried to load user ID: ${userId}` : 'Tried to load own profile'}
+        </p>
+      </div>
+    )
+  }
   if (!user) return <div className="profile-error">Profile not found.</div>
 
   return (
@@ -44,6 +63,11 @@ export default function ProfilePage() {
               <span className="profile-user-id">
                 (ID: {user.id})
               </span>
+              {!isOwnProfile && (
+                <span style={{ marginLeft: '10px', fontSize: '0.8em', color: '#888' }}>
+                  (Viewing user's profile)
+                </span>
+              )}
             </h2>
           </div>
           
