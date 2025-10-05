@@ -51,8 +51,10 @@ export const createGroup = async (groupData) => {
 export const getPopularGroups = async (limit = 20) => {
   try {
     const response = await api.get(`/groups/popular?limit=${limit}`);
-    // backend might return either data.groups or a flat array
-    return response.data.data?.groups || response.data.groups || response.data || [];
+
+    // ✅ Adjusted to correctly return the inner array
+    const groups = response.data?.data || [];
+    return Array.isArray(groups) ? groups : [];
   } catch (error) {
     console.error("Error fetching popular groups:", error);
     return [];

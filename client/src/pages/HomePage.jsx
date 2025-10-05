@@ -65,7 +65,7 @@ function HomePage() {
     })
     .catch((err) => console.error("Failed to load recent reviews:", err));
 
-  // ✅ Fetch most active users (by review count)
+ /*  // ✅ Fetch most active users (by review count)
   getUsersByReviewCount()
     .then((data) => {
       setActiveUsers(Array.isArray(data) ? data : []);
@@ -77,7 +77,20 @@ function HomePage() {
     .then((data) => {
       setPopularUsers(Array.isArray(data) ? data : []);
     })
-    .catch((err) => console.error("Failed to load popular users:", err));
+    .catch((err) => console.error("Failed to load popular users:", err)); */
+
+    getUsersByReviewCount()
+  .then((data) => {
+    console.log("🧩 Active users fetched:", data.length, data);
+    setActiveUsers(Array.isArray(data) ? data : []);
+  });
+
+getUsersByAura()
+  .then((data) => {
+    console.log("🧩 Popular users fetched:", data.length, data);
+    setPopularUsers(Array.isArray(data) ? data : []);
+  });
+
 
   // ✅ Keep mock data for now-playing and groups
   setFinnkino(mockFinnkino);

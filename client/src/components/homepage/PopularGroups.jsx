@@ -1,6 +1,6 @@
-import React from "react"
-import { Link } from "react-router-dom"
-import Carousel from "../Carousel"
+import React from "react";
+import { Link } from "react-router-dom";
+import Carousel from "../Carousel";
 
 function PopularGroups({ groups }) {
   return (
@@ -9,6 +9,7 @@ function PopularGroups({ groups }) {
         <h2>Most Popular Groups</h2>
         <p>Join the conversation and connect with movie fans</p>
       </div>
+
       <Carousel
         items={groups}
         cardWidth={220}
@@ -20,7 +21,7 @@ function PopularGroups({ groups }) {
         )}
       />
     </section>
-  )
+  );
 }
 
-export default PopularGroups
+export default PopularGroups;
