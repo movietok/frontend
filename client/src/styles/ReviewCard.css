@@ -1,0 +1,125 @@
+.review-card {
+  background-color: #1c1c1c;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  max-width: 100%; /* fix overflow */
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.review-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.review-stars {
+  color: #ffd700;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.review-user {
+  font-weight: 600;
+  color: #eee;
+}
+
+.review-date {
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.review-votes {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.review-votes button {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #aaa;
+  transition: color 0.2s ease;
+}
+
+.review-votes button:hover {
+  color: #fff;
+}
+
+.review-score {
+  font-weight: bold;
+  min-width: 2rem;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #ccc;
+}
+
+.review-score.positive {
+  color: #4caf50; /* green */
+}
+
+.review-score.negative {
+  color: #f44336; /* red */
+}
+
+.review-body {
+  margin-top: 0.5rem;
+  color: #ddd;
+  line-height: 1.4;
+}
+
+.review-actions {
+  margin-top: 0.8rem;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.review-actions button {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.review-actions button:first-child {
+  background: #4a90e2;
+  color: white;
+}
+
+.review-actions button:first-child:hover {
+  background: #357ab8;
+}
+
+.review-actions button:last-child {
+  background: #d9534f;
+  color: white;
+}
+
+.review-actions button:last-child:hover {
+  background: #b52b27;
+}
+
+.like-btn.active,
+.dislike-btn.active {
+  color: gold;
+}
+
+.like-btn:disabled,
+.dislike-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
