@@ -12,7 +12,7 @@ export default function Navbar() {
   const [query, setQuery] = useState("")
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef(null)
-  const { isLoggedIn, logout, deleteAccount } = useAuth()
+  const { isLoggedIn, logout, deleteAccount, user } = useAuth()
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [showDeletedModal, setShowDeletedModal] = useState(false)
@@ -90,7 +90,7 @@ export default function Navbar() {
 
               {menuOpen && (
                 <div className="burger-menu" ref={menuRef}>
-                  <Link to="/profile" className="navbar-link" onClick={() => setMenuOpen(false)}>Profile</Link><br />
+                  <Link to={`/profile/${user?.id || ''}`} className="navbar-link" onClick={() => setMenuOpen(false)}>Profile</Link><br />
                   <Link to="/settings" className="navbar-link" onClick={() => setMenuOpen(false)}>Settings</Link><br />
                   <Link to="/favorites" className="navbar-link" onClick={() => setMenuOpen(false)}>Favorites</Link><br />
                 </div>

@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import { authAPI } from "../services/api"
+import { getProfile } from "../services/userService"
 import UniversalModal from "../components/Popups/UniversalModal"
 import "../styles/Login.css"
 
@@ -22,8 +23,31 @@ export default function Login() {
     try {
       const res = await authAPI.post("/login", form)
       if (res.status === 200) {
-        login(res.data.token)
-        localStorage.setItem("token", res.data.token) // save JWT
+        const token = res.data.token
+        let userData = res.data.user || res.data.data?.user
+        
+        console.log('Login response:', { token: !!token, userData, fullResponse: res.data })
+        
+        // If userData not in login response, try fetching it
+        if (!userData) {
+          console.log('User data not in login response, fetching profile...')
+          localStorage.setItem("token", token) // Temporarily set token
+          try {
+            userData = await getProfile()
+            console.log('Profile fetched successfully:', userData)
+          } catch (profileErr) {
+            console.error('Failed to fetch profile:', profileErr)
+            // If profile fetch fails, extract what we can from login response
+            userData = { 
+              email: form.email,
+              // Backend might return other fields, log them for debugging
+            }
+          }
+        }
+        
+        // Call login with both token and userData
+        login(token, userData)
+        
         setModalTitle("Login Successful!")
         setModalMessage("You have logged in successfully. Continue to homepage?")
         setShowModal(true)
@@ -34,7 +58,8 @@ export default function Login() {
         setShowModal(true)
       }
     } catch (err) {
-      const errorMessage = err.response?.data?.message || "Something went wrong"
+      console.error('Login error:', err)
+      const errorMessage = err.response?.data?.message || err.message || "Something went wrong"
       setModalTitle("Login Failed")
       setModalMessage(errorMessage)
       setShowModal(true)
