@@ -15,7 +15,7 @@ function PopularUsers({ users }) {
         renderItem={(user) => (
           <Link to={`/profile/${user.id}`} className="user-card">
             <h3>{user.username}</h3>
-            <p>{user.likes} likes</p>
+            <p>{user.total_likes ?? user.likes ?? 0} likes</p>
           </Link>
         )}
       />

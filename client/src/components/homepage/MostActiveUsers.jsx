@@ -15,7 +15,7 @@ function MostActiveUsers({ users }) {
         renderItem={(user) => (
           <Link to={`/profile/${user.id}`} className="user-card">
             <h3>{user.username}</h3>
-            <p>{user.reviews} reviews</p>
+            <p>{user.review_count ?? user.reviews ?? 0} reviews</p>
           </Link>
         )}
       />

@@ -15,7 +15,7 @@ function PopularGroups({ groups }) {
         renderItem={(group) => (
           <Link to={`/groups/${group.id}`} className="group-card">
             <h3>{group.name}</h3>
-            <p>{group.members} members</p>
+            <p>{group.member_count ?? group.members ?? 0} members</p>
           </Link>
         )}
       />

@@ -233,9 +233,6 @@ function BrowsePage() {
                   >
                     Prev
                   </button>
-                  <span className="px-2 py-1 text-sm text-gray-600">
-                    Page {page} of {totalPages}
-                  </span>
                   <button
                     disabled={page === totalPages}
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}

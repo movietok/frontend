@@ -1,4 +1,5 @@
 import axios from "axios";
+import api from "./api"; // or the correct axios instance if you already have one
 
 // Use env when you explicitly want a full URL; otherwise fall back to Vite proxy.
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api";
@@ -44,4 +45,16 @@ export const createGroup = async (groupData) => {
   });
   // Adjust if your backend returns a different shape
   return res.data.group || res.data;
+};
+
+// ✅ Fetch the most popular groups by member count
+export const getPopularGroups = async (limit = 20) => {
+  try {
+    const response = await api.get(`/groups/popular?limit=${limit}`);
+    // backend might return either data.groups or a flat array
+    return response.data.data?.groups || response.data.groups || response.data || [];
+  } catch (error) {
+    console.error("Error fetching popular groups:", error);
+    return [];
+  }
 };

@@ -10,8 +10,8 @@ function CreateReview({ movieId, onReviewAdded }) {
   const [error, setError] = useState("");
 
   if (!hasToken) {
-    return <p>You must be logged in to submit a review.</p>;
-  }
+  return <p><strong>You must be logged in to submit a review.</strong></p>;
+}
 
   const handleSubmit = async (e) => {
     e.preventDefault();

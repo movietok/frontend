@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; //  Added
 import { getMovieDetails } from "../services/tmdb";
 import { getMovieReviews } from "../services/reviews";
 import Carousel from "../components/Carousel";
@@ -7,8 +8,11 @@ import CreateReview from "../components/CreateReview";
 import ReviewCard from "../components/ReviewCard";
 import "../styles/MovieDetailsPage.css";
 
-function MovieDetailsPage({ currentUserId }) {
+function MovieDetailsPage() {
   const { id } = useParams();
+  const { user } = useAuth(); // ✅ logged-in user from context
+  const currentUserId = user?.id || user?.user_id; // handle both possible shapes
+
   const [movie, setMovie] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [stats, setStats] = useState(null);
@@ -16,7 +20,6 @@ function MovieDetailsPage({ currentUserId }) {
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [error, setError] = useState("");
 
-  // Fetch movie details
   useEffect(() => {
     getMovieDetails(id)
       .then((data) => setMovie(data))
@@ -24,7 +27,6 @@ function MovieDetailsPage({ currentUserId }) {
       .finally(() => setLoadingMovie(false));
   }, [id]);
 
-  // Fetch reviews
   useEffect(() => {
     async function fetchReviews() {
       try {
@@ -41,23 +43,18 @@ function MovieDetailsPage({ currentUserId }) {
     fetchReviews();
   }, [id]);
 
-  // Add new review
   const handleReviewAdded = (review) => {
     setReviews((prev) => [review, ...prev]);
   };
 
-  // Delete review
   const handleReviewDeleted = (reviewId) => {
     setReviews((prev) => prev.filter((r) => r.id !== reviewId));
   };
 
-// In MovieDetailsPage.jsx, replace your handler with this:
-const handleReviewUpdated = (updated) => {
-  if (!updated || !updated.id) return; // <— guard: never insert undefined
-  setReviews((prev) =>
-    prev.map((r) => (r.id === updated.id ? updated : r))
-  );
-};
+  const handleReviewUpdated = (updated) => {
+    if (!updated || !updated.id) return;
+    setReviews((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
+  };
 
   if (loadingMovie) return <p>Loading...</p>;
   if (!movie) return <p>Movie not found</p>;
@@ -177,7 +174,7 @@ const handleReviewUpdated = (updated) => {
               <ReviewCard
                 key={rev.id}
                 review={rev}
-                currentUserId={currentUserId}
+                currentUserId={currentUserId} // ✅ now works automatically
                 onDeleted={handleReviewDeleted}
                 onUpdated={handleReviewUpdated}
               />

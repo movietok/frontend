@@ -1,3 +1,7 @@
+/* ===============================
+   MovieDetailsPage.css
+   =============================== */
+
 .movie-details-page {
   color: #fff;
   max-width: 1200px;
@@ -5,7 +9,7 @@
   padding: 2rem;
 }
 
-/* Header */
+/* ===== Header Section ===== */
 .movie-header {
   display: flex;
   gap: 2rem;
@@ -13,9 +17,9 @@
 }
 
 .movie-poster {
-  width: 260px; 
+  width: 260px;
   height: auto;
-  object-fit: contain; 
+  object-fit: contain;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
 }
@@ -54,13 +58,14 @@
   border-radius: 4px;
   color: white;
   text-decoration: none;
+  transition: background 0.2s ease;
 }
 
 .trailer-btn:hover {
   background: #bf0810;
 }
 
-/* Overview + Facts */
+/* ===== Overview + Facts ===== */
 .overview-facts {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -78,7 +83,7 @@
   margin-bottom: 0.5rem;
 }
 
-/* Person Cards */
+/* ===== Person Cards ===== */
 .person-card {
   text-align: center;
   color: #ddd;
@@ -111,7 +116,7 @@
   color: #aaa;
 }
 
-/* Section containers */
+/* ===== Section Containers ===== */
 .cast-section,
 .crew-section,
 .reviews-section {
@@ -121,7 +126,7 @@
   border-radius: 10px;
 }
 
-/* Section header style */
+/* Section Header Style */
 .cast-section h2,
 .crew-section h2,
 .reviews-section h2 {
@@ -132,14 +137,28 @@
   padding-bottom: 0.5rem;
 }
 
-/* Reviews section */
+/* ===== Reviews Section ===== */
 .reviews-section {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
-/* Placeholder "Write a review" bubble */
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  align-items: center;
+}
+
+/* Make review boxes fit nicely inside the frame */
+.reviews-section > * {
+  align-self: center;
+  width: 95%;
+  max-width: 1000px;
+}
+
+/* ===== Write Review Bubble ===== */
 .write-review-bubble {
   border: 2px dashed #444;
   border-radius: 12px;
@@ -150,16 +169,21 @@
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 }
+
 .write-review-bubble:hover {
   background: #2a2a2a;
   color: #fff;
   border-color: #666;
 }
 
-/* Individual review card */
-.review-card {
-  background: #2a2a2a;
-  padding: 1rem;
-  border-radius: 8px;
-  color: #ddd;
+/* ===== Fade-in animation for new reviews ===== */
+@keyframes fadeInReview {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

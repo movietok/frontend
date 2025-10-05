@@ -1,12 +1,19 @@
 // src/services/reviews.js
+import api from "./api";
 const token = () => localStorage.getItem("token");
 
-// Ensure every review has consistent fields
+// Normalize backend review -> frontend shape
 const normalizeReview = (r) => ({
-  ...r,
+  id: r?.id,
+  movieId: r?.movie_id,
+  userId: r?.user_id,
   username: r?.username ?? `User ${r?.user_id}`,
+  content: r?.content ?? r?.body ?? "", // always a string
+  rating: Number(r?.rating ?? 0),
   likes: Number(r?.likes ?? 0),
   dislikes: Number(r?.dislikes ?? 0),
+  created_at: r?.created_at,
+  updated_at: r?.updated_at,
 });
 
 // Create a new review
@@ -17,7 +24,8 @@ export async function createReview({ movieId, rating, comment }) {
       "Content-Type": "application/json",
       ...(token() ? { Authorization: `Bearer ${token()}` } : {}),
     },
-    body: JSON.stringify({ movieId, rating, comment }),
+    // ✅ backend expects "content"
+    body: JSON.stringify({ movieId, rating, content: comment }),
   });
 
   const json = await res.json();
@@ -62,7 +70,8 @@ export async function updateReview(id, { rating, comment }) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
-    body: JSON.stringify({ rating, comment }),
+    // ✅ backend expects "content"
+    body: JSON.stringify({ rating, content: comment }),
   });
 
   const json = await res.json();
@@ -71,7 +80,7 @@ export async function updateReview(id, { rating, comment }) {
   return normalizeReview(json.data.review);
 }
 
-// ✅ Add like/dislike interaction
+// Add like/dislike interaction
 export async function addReviewInteraction(id, type) {
   const res = await fetch(`/api/reviews/${id}/interaction`, {
     method: "POST",
@@ -85,7 +94,41 @@ export async function addReviewInteraction(id, type) {
   const json = await res.json();
   if (!res.ok) throw new Error(json.message || "Failed to update interaction");
 
-  const r = json.data.interaction; // ✅ instead of json.data.review
+  // backend returns { data: { interaction: <review> } }
+  const r = json.data.interaction;
   return normalizeReview(r);
 }
 
+import { reviewAPI } from "./api"; // must be defined as axios instance pointing to /api/reviews
+
+export const getRecentReviews = async (limit = 20) => {
+  try {
+    const res = await reviewAPI.get(`/recent?limit=${limit}`);
+    return res.data?.data?.reviews || [];
+  } catch (err) {
+    console.error("Error fetching recent reviews:", err);
+    return [];
+  }
+};
+
+// ✅ Fetch users sorted by number of reviews
+export const getUsersByReviewCount = async () => {
+  try {
+    const response = await api.get("/reviews/users-by-review-count");
+    return response.data.data?.users || response.data || [];
+  } catch (error) {
+    console.error("Error fetching users by review count:", error);
+    return [];
+  }
+};
+
+// ✅ Fetch users sorted by aura (likes)
+export const getUsersByAura = async () => {
+  try {
+    const response = await api.get("/reviews/users-by-aura");
+    return response.data.data?.users || response.data || [];
+  } catch (error) {
+    console.error("Error fetching users by aura:", error);
+    return [];
+  }
+};

@@ -8,21 +8,21 @@ import RecentReviews from "../components/homepage/RecentReviews";
 import PopularGroups from "../components/homepage/PopularGroups";
 import MostActiveUsers from "../components/homepage/MostActiveUsers";
 import PopularUsers from "../components/homepage/PopularUsers";
+import { getPopularGroups } from "../services/groups";
+import { discoverMovies } from "../services/tmdb";
+import {
+  getRecentReviews,
+  getUsersByReviewCount,
+  getUsersByAura,
+} from "../services/reviews";
 
-import { discoverMovies } from "../services/tmdb"; // use same endpoint as BrowsePage
 
-// keep all other mock data exactly as before
 const mockFinnkino = Array.from({ length: 7 }, (_, i) => ({
   id: i + 101,
   title: `Finnkino Movie ${i + 1}`,
   image: `https://via.placeholder.com/200x300?text=Finnkino+${i + 1}`,
   rating: (Math.random() * 3 + 6).toFixed(1),
 }));
-
-const mockReviews = [
-  { id: 1, movieId: 27205, movie: "Inception", userId: 1, user: "Alice", rating: 5, text: "Amazing movie..." },
-  { id: 2, movieId: 102, movie: "The Matrix", userId: 2, user: "Bob", rating: 4, text: "Classic sci-fi..." },
-];
 
 const mockGroups = [
   { id: 1, name: "Sci-Fi Lovers", members: 120 },
@@ -42,7 +42,7 @@ const mockPopularUsers = [
 ];
 
 function HomePage() {
-  const [movies, setMovies] = useState([]); // Popular Movies
+  const [movies, setMovies] = useState([]);
   const [finnkino, setFinnkino] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [groups, setGroups] = useState([]);
@@ -50,22 +50,45 @@ function HomePage() {
   const [popularUsers, setPopularUsers] = useState([]);
 
   useEffect(() => {
-    // Fetch Popular via discover, change later for another method if wanted (this is the same as Browse default)
-    discoverMovies({ page: 1 })
-      .then((data) => {
-  // data.results is already normalized by TMDBService
-  setMovies(Array.isArray(data?.results) ? data.results.slice(0, 20) : []);
-})
+  // ✅ Fetch popular movies
+  discoverMovies({ page: 1 })
+    .then((data) => {
+      setMovies(Array.isArray(data?.results) ? data.results.slice(0, 20) : []);
+    })
+    .catch(console.error);
 
-      .catch(console.error);
+  // ✅ Fetch recent reviews
+  getRecentReviews()
+    .then((data) => {
+      console.log("✅ Recent reviews fetched:", data);
+      setReviews(Array.isArray(data) ? data : []);
+    })
+    .catch((err) => console.error("Failed to load recent reviews:", err));
 
-    // keep mocks for the rest
-    setFinnkino(mockFinnkino);
-    setReviews(mockReviews);
-    setGroups(mockGroups);
-    setActiveUsers(mockActiveUsers);
-    setPopularUsers(mockPopularUsers);
-  }, []);
+  // ✅ Fetch most active users (by review count)
+  getUsersByReviewCount()
+    .then((data) => {
+      setActiveUsers(Array.isArray(data) ? data : []);
+    })
+    .catch((err) => console.error("Failed to load active users:", err));
+
+  // ✅ Fetch most popular users (by aura/likes)
+  getUsersByAura()
+    .then((data) => {
+      setPopularUsers(Array.isArray(data) ? data : []);
+    })
+    .catch((err) => console.error("Failed to load popular users:", err));
+
+  // ✅ Keep mock data for now-playing and groups
+  setFinnkino(mockFinnkino);
+  getPopularGroups(20)
+  .then((data) => {
+    console.log("✅ Popular groups fetched:", data);
+    setGroups(Array.isArray(data) ? data : []);
+  })
+  .catch((err) => console.error("Failed to load popular groups:", err));
+
+}, []);
 
   return (
     <div className="homepage-container">
