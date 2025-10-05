@@ -1,0 +1,233 @@
+// src/components/groups/EditGroupModal.jsx
+import { useEffect, useMemo, useState } from "react";
+import { updateGroup } from "../../services/groupService";
+import { getAllGroupThemes } from "../../services/groups";
+import { getGenres } from "../../services/tmdb";
+import GenreSelector from "../GenreSelector";
+
+export default function EditGroupModal({ group, onClose, onSave }) {
+  // Base fields
+  const [name, setName] = useState(group.name || "");
+  const [description, setDescription] = useState(group.description || "");
+  const [visibility, setVisibility] = useState(group.visibility || "public");
+
+  // Themes
+  const [themes, setThemes] = useState([]); // [{ id, name, theme }]
+  const [themeId, setThemeId] = useState(
+    group.theme_id == null ? "" : String(group.theme_id)
+  );
+
+  // Genres
+  const [genres, setGenres] = useState([]); // [{ id:"28", name:"Action" }, ...]
+  const [selectedGenres, setSelectedGenres] = useState([]); // ["28","99"]
+
+  const groupId = useMemo(
+    () => group?.id || group?.gID || group?.group?.id,
+    [group]
+  );
+
+  useEffect(() => {
+    // Load genres (TMDB) and seed selected genres
+    getGenres()
+      .then((data) => {
+        const normalized = (data.genres || []).map((g) => ({
+          id: String(g.id),
+          name: g.name,
+        }));
+        setGenres(normalized);
+
+        // Seed from ids first; else try mapping names -> ids
+        if (Array.isArray(group.tags) && group.tags.length) {
+          setSelectedGenres(group.tags.map((n) => String(n)));
+        } else if (Array.isArray(group.genre_tags) && group.genre_tags.length) {
+          const byName = new Map(
+            normalized.map((g) => [g.name.toLowerCase(), String(g.id)])
+          );
+          const mapped = group.genre_tags
+            .map((name) => byName.get(String(name).toLowerCase()))
+            .filter(Boolean);
+          setSelectedGenres(mapped);
+        } else {
+          setSelectedGenres([]);
+        }
+      })
+      .catch(console.error);
+
+    // Load themes
+    getAllGroupThemes()
+      .then((data) => setThemes(data.themes || []))
+      .catch(console.error);
+  }, [group]);
+
+  const toggleGenre = (gid) => {
+    const idStr = String(gid);
+    setSelectedGenres((prev) =>
+      prev.includes(idStr) ? prev.filter((x) => x !== idStr) : [...prev, idStr]
+    );
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Build minimal updates — only send changed fields
+    const updates = {};
+    const safeTrim = (s) => (typeof s === "string" ? s.trim() : s);
+
+    // name
+    const newName = safeTrim(name);
+    const oldName = safeTrim(group.name ?? "");
+    if (newName && newName !== oldName) updates.name = newName;
+
+    // description (allow empty string to clear)
+    const newDesc = description ?? "";
+    const oldDesc = group.description ?? "";
+    if (newDesc !== oldDesc) updates.description = newDesc;
+
+    // visibility (only "public" | "private" in UI)
+    if (visibility && visibility !== group.visibility) {
+      updates.visibility = visibility;
+    }
+
+    // theme_id: number or null; never send ""
+    const oldTheme = group.theme_id == null ? null : Number(group.theme_id);
+    const newTheme =
+      themeId === "" ? null : Number.isNaN(Number(themeId)) ? oldTheme : Number(themeId);
+    if (newTheme !== oldTheme) updates.theme_id = newTheme;
+
+    // tags: send only if they actually changed (including clearing)
+    const numericTags = selectedGenres
+      .map((id) => Number(id))
+      .filter((n) => Number.isInteger(n) && n > 0);
+
+    const currentTags =
+      Array.isArray(group.tags) && group.tags.length
+        ? group.tags.map((n) => Number(n)).filter(Number.isInteger)
+        : [];
+
+    const eqSets = (a, b) => {
+      if (a.length !== b.length) return false;
+      const A = new Set(a);
+      for (const v of b) if (!A.has(v)) return false;
+      return true;
+    };
+
+    if (!eqSets(numericTags, currentTags)) {
+      updates.tags = numericTags; // [] means "clear all" intentionally
+    }
+
+    // Nothing changed?
+    if (Object.keys(updates).length === 0) {
+      onClose();
+      return;
+    }
+
+    try {
+      const updated = await updateGroup(groupId, updates);
+      alert("Group updated successfully");
+      onSave?.(updated?.group ?? updated);
+      onClose();
+    } catch (err) {
+      const status = err?.response?.status;
+      const data = err?.response?.data;
+      console.error("Update failed:", status, data, err?.message);
+      const msg =
+        data?.error ||
+        data?.message ||
+        err?.message ||
+        "Failed to update group.";
+      alert(msg);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded shadow-lg w-[32rem] max-w-[95vw]">
+        <h3 className="text-lg font-semibold mb-4">Edit Group</h3>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Name */}
+          <div>
+            <label className="block text-sm font-medium mb-1">Group Name</label>
+            <input
+              name="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full border p-2 rounded"
+              placeholder="Group name"
+              required
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-medium mb-1">Description</label>
+            <textarea
+              name="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full border p-2 rounded"
+              placeholder="Group description"
+            />
+          </div>
+
+          {/* Theme */}
+          <div>
+            <label className="block text-sm font-medium mb-1">Theme</label>
+            <select
+              value={themeId}
+              onChange={(e) => setThemeId(e.target.value)}
+              className="w-full border p-2 rounded"
+            >
+              <option value="">-- No theme --</option>
+              {themes.map((t) => (
+                <option key={t.id} value={String(t.id)}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Genres */}
+          <div>
+            <label className="block text-sm font-medium mb-1">Genres</label>
+            <GenreSelector
+              genres={genres}
+              selectedGenres={selectedGenres}
+              onToggle={toggleGenre}
+            />
+          </div>
+
+          {/* Visibility (no 'closed') */}
+          <div>
+            <label className="block text-sm font-medium mb-1">Visibility</label>
+            <select
+              value={visibility}
+              onChange={(e) => setVisibility(e.target.value)}
+              className="w-full border p-2 rounded"
+            >
+              <option value="public">Public</option>
+              <option value="private">Private</option>
+            </select>
+          </div>
+
+          {/* Actions */}
+          <div className="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-3 py-1 bg-gray-300 rounded"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-3 py-1 bg-green-600 text-white rounded"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

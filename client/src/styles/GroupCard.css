@@ -1,0 +1,67 @@
+.group-card {
+  background: #1f2937; /* Tailwind gray-800 */
+  color: #fff;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.group-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+}
+
+.group-poster {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  background: #374151; /* fallback bg */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: #ccc;
+}
+
+.group-card-body {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.group-card-title {
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.group-card-description {
+  font-size: 0.85rem;
+  color: #d1d5db; /* gray-300 */
+  margin: 0.25rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* clamp to 3 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.group-card-meta {
+  font-size: 0.75rem;
+  color: #9ca3af; /* gray-400 */
+}
+
+/* Link wrapper for group cards */
+.group-card-link {
+  display: block;              /* make link fill card space */
+  text-decoration: none;       /* remove blue underline */
+  color: inherit;              /* keep text same as card */
+  cursor: pointer;             /* show pointer on hover */
+}
+
+.group-card-link:hover .group-card {
+  transform: translateY(-4px); /* subtle lift effect */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+}

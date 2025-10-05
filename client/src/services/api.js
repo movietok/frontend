@@ -12,10 +12,16 @@ export const authAPI = axios.create({
   baseURL: `${API_BASE_URL}/v1/users`,
 })
 
-// hae reviews 
+// Create a separate instance for group endpoints
+export const groupAPI = axios.create({
+  baseURL: `${API_BASE_URL}/groups`,
+})
+
+// Create a separate instance for reviews
 export const reviewAPI = axios.create({
   baseURL: `${API_BASE_URL}/v1/reviews`,
 })
+
 // Hae teatterialueet
 export const fetchAreas = async () => {
   const res = await api.get("/theatres")
@@ -45,8 +51,8 @@ export const searchMovies = async (query) => {
   return res.data
 }
 
-// login validater interceptor 
-[authAPI, reviewAPI, api].forEach(instance => {
+// login validator interceptor 
+[authAPI, reviewAPI, groupAPI, api].forEach(instance => {
   instance.interceptors.response.use(
     response => response,
     error => {

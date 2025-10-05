@@ -1,0 +1,44 @@
+:root {
+  --mt-grid-cols: 4;         /* number of columns */
+  --mt-gap-x: 28px;         
+  --mt-gap-y: 36px;          
+}
+
+.mt-groups-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mt-gap-y) var(--mt-gap-x); 
+  align-items: flex-start;
+}
+
+.mt-group-tile {
+  flex: 0 0 calc(
+    (100% - (var(--mt-grid-cols) - 1) * var(--mt-gap-x)) / var(--mt-grid-cols)
+  );
+  display: flex;
+}
+
+.mt-group-tile > .group-card {
+  width: 100%;
+}
+
+/* Separate section for Create Group button */
+.create-group-section {
+  margin-top: 3rem;   /* big breathing room */
+  display: flex;
+  justify-content: center; /* center it under sidebar */
+}
+
+.create-group-btn {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  background-color: #16a34a; /* green-600 */
+  color: white;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.create-group-btn:hover {
+  background-color: #15803d; /* green-700 */
+}
