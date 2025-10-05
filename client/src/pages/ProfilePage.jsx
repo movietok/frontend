@@ -16,25 +16,26 @@ export default function ProfilePage() {
   const { userId } = useParams() // Get userId from URL
   const { isLoggedIn, user: currentUser } = useAuth()
   
-  console.log('ProfilePage render - userId:', userId, 'isLoggedIn:', isLoggedIn)
+  console.log('ProfilePage render - userId:', userId, 'currentUser?.id:', currentUser?.id, 'isLoggedIn:', isLoggedIn)
+  
+  // Check if viewing own profile BEFORE making API calls
+  // If no userId in URL (/profile), it's own profile
+  // If userId matches current user's id, it's also own profile
+  const isOwnProfile = !userId || (currentUser?.id && userId === String(currentUser.id))
   
   const { user, loading, error } = useProfile(userId)
-  const { favorites: watchlist, loading: watchlistLoading, error: watchlistError } = useFavorites(user?.id, 1)
+  
+  // Only fetch watchlist if viewing own profile
+  const { favorites: watchlist, loading: watchlistLoading, error: watchlistError } = useFavorites(
+    isOwnProfile ? user?.id : null, 
+    1
+  )
+  
+  // Always fetch favorites (public)
   const { favorites, loading: favoritesLoading, error: favoritesError } = useFavorites(user?.id, 2)
   const { reviews, loading: reviewsLoading, error: reviewsError } = useUserReviews(user?.id)
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("Profile")
-
-  // Check if viewing own profile (no userId param means /profile route = own profile)
-  const isOwnProfile = !userId || (currentUser && userId === String(currentUser.id))
-
-  useEffect(() => {
-    // Only require login for own profile (/profile route without userId parameter)
-    // Allow viewing other users' profiles without login
-    if (isOwnProfile && !isLoggedIn) {
-      navigate("/login")
-    }
-  }, [isOwnProfile, isLoggedIn, navigate])
 
 
   if (loading) return <div className="profile-loading">Loading profile...</div>
@@ -56,7 +57,7 @@ export default function ProfilePage() {
     <div className="profile-container">
       <div className="profile-header">
         <div className="profile-avatar">
-          <img src={"https://www.gravatar.com/avatar?d=mp"} alt="Avatar" />
+          <img src={`https://ui-avatars.com/api/?name=${user.username}`} alt="Avatar" />
         </div>
         <div className="profile-main">
           <div className="profile-username-row">
@@ -115,12 +116,14 @@ export default function ProfilePage() {
         >
           Reviews
         </button>
-        <button
-          className={activeTab === "Watchlist" ? "active" : ""}
-          onClick={() => setActiveTab("Watchlist")}
-        >
-          Watchlist
-        </button>
+        {isOwnProfile && (
+          <button
+            className={activeTab === "Watchlist" ? "active" : ""}
+            onClick={() => setActiveTab("Watchlist")}
+          >
+            Watchlist
+          </button>
+        )}
       </div>
       <div className="profile-content">
         <SectionDivider />
@@ -187,7 +190,7 @@ export default function ProfilePage() {
 
         {activeTab === "Reviews" && (
           <div>
-            <span className="section-title">MY REVIEWS</span>
+            <span className="section-title">{isOwnProfile ? "MY REVIEWS" : "REVIEWS"}</span>
             <div className="my-reviews-content">
               {reviewsLoading && <p>Loading reviews...</p>}
               {reviewsError && <p>Error loading reviews.</p>}
@@ -206,9 +209,9 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
-        {activeTab === "Watchlist" && (
+        {isOwnProfile && activeTab === "Watchlist" && (
           <div>
-            <span className="section-title">WATCHLIST</span>
+            <span className="section-title">MY WATCHLIST</span>
             <div className="watchlist-content">
               {watchlistLoading && <p>Loading watchlist...</p>}
               {watchlistError && <p>Error loading watchlist.</p>}

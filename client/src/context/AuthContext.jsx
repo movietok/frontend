@@ -26,21 +26,9 @@ const [user, setUser] = useState(() => {
     return () => window.removeEventListener("storage", syncAuth)
   }, [])
 
-  // Optional: refresh user from backend on mount
-  useEffect(() => {
-    const token = localStorage.getItem("token")
-    if (token && !user) {
-      getProfile()
-        .then((freshUser) => {
-          setUser(freshUser)
-          localStorage.setItem("user", JSON.stringify(freshUser))
-        })
-        .catch((err) => {
-          console.error("Failed to refresh user profile:", err)
-          logout()
-        })
-    }
-  }, [])
+  // Removed automatic profile refresh to prevent unexpected logouts
+  // User data is loaded from localStorage on mount (see useState above)
+  // Profile will be fetched during login process only
 
   const login = (token, userData) => {
     localStorage.setItem("token", token)
