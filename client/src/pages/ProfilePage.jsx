@@ -16,7 +16,7 @@ export default function ProfilePage() {
   const { userId } = useParams() // Get userId from URL
   const { isLoggedIn, user: currentUser } = useAuth()
   
-  console.log('ProfilePage render - userId:', userId, 'isLoggedIn:', isLoggedIn)
+  console.log('ProfilePage render - userId:', userId, 'currentUser?.id:', currentUser?.id, 'isLoggedIn:', isLoggedIn)
   
   const { user, loading, error } = useProfile(userId)
   const { favorites: watchlist, loading: watchlistLoading, error: watchlistError } = useFavorites(user?.id, 1)
@@ -25,16 +25,10 @@ export default function ProfilePage() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("Profile")
 
-  // Check if viewing own profile (no userId param means /profile route = own profile)
-  const isOwnProfile = !userId || (currentUser && userId === String(currentUser.id))
-
-  useEffect(() => {
-    // Only require login for own profile (/profile route without userId parameter)
-    // Allow viewing other users' profiles without login
-    if (isOwnProfile && !isLoggedIn) {
-      navigate("/login")
-    }
-  }, [isOwnProfile, isLoggedIn, navigate])
+  // Check if viewing own profile
+  // If no userId in URL (/profile), it's own profile
+  // If userId matches current user's id, it's also own profile
+  const isOwnProfile = !userId || (currentUser?.id && userId === String(currentUser.id))
 
 
   if (loading) return <div className="profile-loading">Loading profile...</div>
@@ -56,7 +50,7 @@ export default function ProfilePage() {
     <div className="profile-container">
       <div className="profile-header">
         <div className="profile-avatar">
-          <img src={"https://www.gravatar.com/avatar?d=mp"} alt="Avatar" />
+          <img src={`https://ui-avatars.com/api/?name=${user.username}`} alt="Avatar" />
         </div>
         <div className="profile-main">
           <div className="profile-username-row">
