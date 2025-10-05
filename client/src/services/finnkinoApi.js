@@ -178,6 +178,56 @@ export const fetchFinnkinoSchedule = async (area = '', date = '', eventID = '', 
   return schedule
 }
 
+// Fetch Now Playing events from Finnkino
+export const fetchNowPlayingEvents = async () => {
+  const url = new URL(`${FINNKINO_BASE_URL}/Events/`)
+  url.searchParams.append('listType', 'NowInTheatres')
+  
+  console.log('🎬 Fetching Now Playing events from:', url.toString())
+  
+  const response = await fetch(url.toString(), {
+    method: 'GET',
+    mode: 'cors',
+    headers: {
+      'Accept': 'application/xml, text/xml'
+    }
+  })
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+  
+  const xmlText = await response.text()
+  const xmlDoc = parseXML(xmlText)
+  
+  // Parse events
+  const events = []
+  const eventElements = xmlDoc.querySelectorAll('Event')
+  
+  eventElements.forEach(event => {
+    const eventData = {
+      id: event.querySelector('ID')?.textContent || '',
+      title: event.querySelector('Title')?.textContent || '',
+      originalTitle: event.querySelector('OriginalTitle')?.textContent || '',
+      productionYear: event.querySelector('ProductionYear')?.textContent || '',
+      lengthInMinutes: event.querySelector('LengthInMinutes')?.textContent || '',
+      dtLocalRelease: event.querySelector('dtLocalRelease')?.textContent || '',
+      rating: event.querySelector('Rating')?.textContent || '',
+      ratingLabel: event.querySelector('RatingLabel')?.textContent || '',
+      genres: event.querySelector('Genres')?.textContent || '',
+      images: {
+        eventSmallImagePortrait: event.querySelector('EventSmallImagePortrait')?.textContent || '',
+        eventMediumImagePortrait: event.querySelector('EventMediumImagePortrait')?.textContent || '',
+        eventLargeImagePortrait: event.querySelector('EventLargeImagePortrait')?.textContent || ''
+      }
+    }
+    events.push(eventData)
+  })
+  
+  console.log('✅ Parsed events:', events.length, 'movies')
+  return events
+}
+
 // Enrich Finnkino shows with TMDB data
 export const enrichShowsWithTMDB = async (shows, searchMovieByTitleYear) => {
   const enrichedShows = []
@@ -205,13 +255,13 @@ export const enrichShowsWithTMDB = async (shows, searchMovieByTitleYear) => {
     }
     
     try {
-      const response = await searchMovieByTitleYear(originalTitle, year, show.eventId)
+      const response = await searchMovieByTitleYear(originalTitle, year, show.id || show.eventId)
       if (response?.success && response.results?.length > 0) {
         const tmdbData = response.results[0]
         tmdbCache.set(key, tmdbData)
-        console.log(`✅ ${originalTitle} (${year}) [f_id:${show.eventId}] → TMDB ID: ${tmdbData.id}`)
+        console.log(`✅ ${originalTitle} (${year}) [f_id:${show.id || show.eventId}] → TMDB ID: ${tmdbData.id}`)
       } else {
-        console.log(`⚠️ No TMDB match: ${originalTitle} (${year}) [f_id:${show.eventId}]`)
+        console.log(`⚠️ No TMDB match: ${originalTitle} (${year}) [f_id:${show.id || show.eventId}]`)
         tmdbCache.set(key, null)
       }
     } catch (error) {

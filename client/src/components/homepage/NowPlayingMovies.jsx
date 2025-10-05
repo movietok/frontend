@@ -1,4 +1,5 @@
 import React from "react"
+import { Link } from "react-router-dom"
 import Carousel from "../Carousel"
 
 function NowPlayingMovies({ movies }) {
@@ -11,16 +12,28 @@ function NowPlayingMovies({ movies }) {
       <Carousel
         items={movies}
         cardWidth={200}
-        renderItem={(movie) => (
-          <div className="movie-card">
-            <img src={movie.image} alt={movie.title} />
-            <div className="movie-overlay">
-              <h4>{movie.title}</h4>
-              <p>⭐ {movie.rating || "N/A"}</p>
-              <button className="bookmark-btn">🔖 Bookmark</button>
-            </div>
-          </div>
-        )}
+        renderItem={(movie) => {
+          const movieLink = movie.tmdbId ? `/movie/${movie.tmdbId}` : '#'
+          
+          return (
+            <Link to={movieLink} className="movie-card-link" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div className="movie-card">
+                <img 
+                  src={movie.image || 'https://via.placeholder.com/200x300?text=No+Image'} 
+                  alt={movie.title}
+                  onError={(e) => {
+                    e.target.src = 'https://via.placeholder.com/200x300?text=No+Image'
+                  }}
+                />
+                <div className="movie-overlay">
+                  <h4>{movie.title}</h4>
+                  <p>⭐ {movie.rating ? movie.rating.toFixed(1) : "N/A"}</p>
+                  {movie.year && <p className="movie-year">{movie.year}</p>}
+                </div>
+              </div>
+            </Link>
+          )
+        }}
       />
     </section>
   )
