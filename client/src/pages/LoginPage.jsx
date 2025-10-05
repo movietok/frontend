@@ -24,14 +24,28 @@ export default function Login() {
       const res = await authAPI.post("/login", form)
       if (res.status === 200) {
         const token = res.data.token
+        let userData = res.data.user || res.data.data?.user
         
-        // Temporarily set token so getProfile can use it
-        localStorage.setItem("token", token)
+        console.log('Login response:', { token: !!token, userData, fullResponse: res.data })
         
-        // Fetch user profile
-        const userData = await getProfile()
+        // If userData not in login response, try fetching it
+        if (!userData) {
+          console.log('User data not in login response, fetching profile...')
+          localStorage.setItem("token", token) // Temporarily set token
+          try {
+            userData = await getProfile()
+            console.log('Profile fetched successfully:', userData)
+          } catch (profileErr) {
+            console.error('Failed to fetch profile:', profileErr)
+            // If profile fetch fails, extract what we can from login response
+            userData = { 
+              email: form.email,
+              // Backend might return other fields, log them for debugging
+            }
+          }
+        }
         
-        // Now call login with both token and userData
+        // Call login with both token and userData
         login(token, userData)
         
         setModalTitle("Login Successful!")
@@ -44,7 +58,8 @@ export default function Login() {
         setShowModal(true)
       }
     } catch (err) {
-      const errorMessage = err.response?.data?.message || "Something went wrong"
+      console.error('Login error:', err)
+      const errorMessage = err.response?.data?.message || err.message || "Something went wrong"
       setModalTitle("Login Failed")
       setModalMessage(errorMessage)
       setShowModal(true)
