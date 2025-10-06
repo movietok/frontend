@@ -5,8 +5,7 @@ import {
   addReviewInteraction,
 } from "../services/reviews";
 import "../styles/ReviewCard.css";
-import { Link } from "react-router-dom"; // 
-
+import { Link } from "react-router-dom";
 
 function ReviewCard({ review, currentUserId, onDeleted, onUpdated }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -18,7 +17,11 @@ function ReviewCard({ review, currentUserId, onDeleted, onUpdated }) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
 
-  // ✅ Robust ownership detection
+  // ✅ Read more / less state
+  const [expanded, setExpanded] = useState(false);
+  const maxPreviewLength = 300; // characters before collapsing
+
+  // ✅ Ownership detection
   useEffect(() => {
     if (!review || !currentUserId) return;
     const reviewUserId = Number(review.userId ?? review.user_id);
@@ -71,6 +74,14 @@ function ReviewCard({ review, currentUserId, onDeleted, onUpdated }) {
     }
   };
 
+  // ✅ Determine if text is long
+  const isLong = review.content?.length > maxPreviewLength;
+  const displayedText = expanded
+    ? review.content
+    : isLong
+    ? review.content.slice(0, maxPreviewLength) + "..."
+    : review.content;
+
   return (
     <div className={`review-card ${showDeleteModal ? "modal-open" : ""}`}>
       {isEditing ? (
@@ -110,11 +121,20 @@ function ReviewCard({ review, currentUserId, onDeleted, onUpdated }) {
             <div className="review-meta">
               <strong>⭐ {review.rating}</strong> —{" "}
               <span className="username">
-  <Link to={`/profile/${review.userId ?? review.user_id}`} className="username-link">
-    {review.username || `User ${review.userId ?? review.user_id}`}
-  </Link>
-</span>
-              <small>• {new Date(review.created_at).toLocaleString()}</small>
+                <Link
+                  to={`/profile/${review.userId ?? review.user_id}`}
+                  className="username-link"
+                >
+                  {review.username || `User ${review.userId ?? review.user_id}`}
+                </Link>
+              </span>
+              <small>
+                • {new Date(review.created_at).toLocaleString()}
+                {review.updated_at &&
+                  review.updated_at !== review.created_at && (
+                    <span className="edited-tag"> (edited)</span>
+                  )}
+              </small>
             </div>
 
             <div className="review-interactions">
@@ -146,7 +166,18 @@ function ReviewCard({ review, currentUserId, onDeleted, onUpdated }) {
             </div>
           </div>
 
-          <p className="review-body">{review.content}</p>
+          {/* ✅ Review content with Read more/less */}
+          <div className="review-body">
+            {displayedText}
+            {isLong && (
+              <button
+                className="read-more-btn"
+                onClick={() => setExpanded(!expanded)}
+              >
+                {expanded ? "Read less" : "Read more"}
+              </button>
+            )}
+          </div>
 
           {/* ✅ Owner-only buttons */}
           {isOwner && (
@@ -165,6 +196,7 @@ function ReviewCard({ review, currentUserId, onDeleted, onUpdated }) {
         </div>
       )}
 
+      {/* ===== Inline Delete Confirmation ===== */}
       {showDeleteModal && (
         <div
           className="inline-delete-overlay"

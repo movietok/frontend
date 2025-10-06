@@ -9,106 +9,142 @@ import PopularGroups from "../components/homepage/PopularGroups";
 import MostActiveUsers from "../components/homepage/MostActiveUsers";
 import PopularUsers from "../components/homepage/PopularUsers";
 
+import { discoverMovies } from "../services/tmdb"; // use same endpoint as BrowsePage
+import { fetchNowPlayingEvents, enrichShowsWithTMDB } from "../services/finnkinoApi";
+import { searchMovieByTitleYear } from "../services/tmdb";
 import { getPopularGroups } from "../services/groups";
-import { discoverMovies } from "../services/tmdb";
 import {
   getRecentReviews,
   getUsersByReviewCount,
   getUsersByAura,
 } from "../services/reviews";
-import { getNowInTheatres } from "../services/finnkino";
+
+// keep all other mock data exactly as before
+const mockFinnkino = Array.from({ length: 7 }, (_, i) => ({
+  id: i + 101,
+  title: `Finnkino Movie ${i + 1}`,
+  image: `https://via.placeholder.com/200x300?text=Finnkino+${i + 1}`,
+  rating: (Math.random() * 3 + 6).toFixed(1),
+}));
+
 
 function HomePage() {
-  const [movies, setMovies] = useState([]);
+  const [movies, setMovies] = useState([]); // Popular Movies
   const [finnkino, setFinnkino] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [groups, setGroups] = useState([]);
   const [activeUsers, setActiveUsers] = useState([]);
   const [popularUsers, setPopularUsers] = useState([]);
 
-  const CACHE_DURATION = 1000 * 60 * 30; // 30 minutes
+  // Cache configuration
+  const CACHE_DURATION = 1000 * 60 * 30 // 30 minutes
 
   useEffect(() => {
-    // -------------------------------
-    // ✅ POPULAR MOVIES (with caching)
-    // -------------------------------
-    const POPULAR_CACHE_KEY = "homepage_popular_movies";
-
-    const cachedPopular = sessionStorage.getItem(POPULAR_CACHE_KEY);
+    // Fetch Popular Movies with caching
+    const POPULAR_CACHE_KEY = 'homepage_popular_movies'
+    
+    // Check cache first for Popular Movies
+    const cachedPopular = sessionStorage.getItem(POPULAR_CACHE_KEY)
     if (cachedPopular) {
       try {
-        const { data, timestamp } = JSON.parse(cachedPopular);
-        const isExpired = Date.now() - timestamp > CACHE_DURATION;
-
+        const { data, timestamp } = JSON.parse(cachedPopular)
+        const isExpired = Date.now() - timestamp > CACHE_DURATION
+        
         if (!isExpired && Array.isArray(data) && data.length > 0) {
-          console.log("✅ Using cached Popular Movies:", data.length);
-          setMovies(data);
+          console.log('✅ Using cached Popular Movies data:', data.length, 'movies')
+          setMovies(data)
         } else {
-          fetchPopularMovies();
+          // Fetch fresh if expired
+          fetchPopularMovies()
         }
-      } catch {
-        fetchPopularMovies();
+      } catch (error) {
+        console.warn('⚠️ Failed to parse cached Popular Movies:', error)
+        fetchPopularMovies()
       }
     } else {
-      fetchPopularMovies();
+      fetchPopularMovies()
     }
-
+    
     function fetchPopularMovies() {
-      console.log("🔄 Fetching fresh Popular Movies...");
+      console.log('🔄 Fetching fresh Popular Movies...')
       discoverMovies({ page: 1 })
         .then((data) => {
-          const movies = Array.isArray(data?.results)
-            ? data.results.slice(0, 20)
-            : [];
-          setMovies(movies);
-          sessionStorage.setItem(
-            POPULAR_CACHE_KEY,
-            JSON.stringify({ data: movies, timestamp: Date.now() })
-          );
+          // data.results is already normalized by TMDBService
+          const movies = Array.isArray(data?.results) ? data.results.slice(0, 20) : []
+          setMovies(movies)
+          
+          // Cache the data
+          sessionStorage.setItem(POPULAR_CACHE_KEY, JSON.stringify({
+            data: movies,
+            timestamp: Date.now()
+          }))
+          console.log('✅ Cached Popular Movies:', movies.length)
         })
-        .catch(console.error);
+        .catch(console.error)
     }
 
-    // -------------------------------
-    // ✅ FINNKINO "Now In Theatres" (with caching)
-    // -------------------------------
-    const FINNKINO_CACHE_KEY = "finnkino_now_playing";
-    const cachedFinnkino = sessionStorage.getItem(FINNKINO_CACHE_KEY);
-
-    if (cachedFinnkino) {
+    // Fetch Now Playing from Finnkino and enrich with TMDB
+    const CACHE_KEY = 'finnkino_now_playing'
+    
+    // Check cache first
+    const cachedData = sessionStorage.getItem(CACHE_KEY)
+    if (cachedData) {
       try {
-        const { data, timestamp } = JSON.parse(cachedFinnkino);
-        const isExpired = Date.now() - timestamp > CACHE_DURATION;
-
+        const { data, timestamp } = JSON.parse(cachedData)
+        const isExpired = Date.now() - timestamp > CACHE_DURATION
+        
         if (!isExpired && Array.isArray(data) && data.length > 0) {
-          console.log("✅ Using cached Finnkino data:", data.length, "movies");
-          setFinnkino(data);
-        } else {
-          fetchFinnkino();
+          console.log('✅ Using cached Finnkino data:', data.length, 'movies')
+          setFinnkino(data)
+          setReviews(mockReviews);
+          setGroups(mockGroups);
+          setActiveUsers(mockActiveUsers);
+          setPopularUsers(mockPopularUsers);
+          return
         }
-      } catch {
-        fetchFinnkino();
+      } catch (error) {
+        console.warn('⚠️ Failed to parse cached data:', error)
       }
-    } else {
-      fetchFinnkino();
     }
+    
+    // Fetch fresh data if no valid cache
+    console.log('🔄 Fetching fresh Finnkino data...')
+    fetchNowPlayingEvents()
+      .then(async (events) => {
+        console.log('🎬 Fetched Finnkino events:', events.length);
+        
+        // Enrich with TMDB data (limit to first 10)
+        const limitedEvents = events.slice(0, 10)
+        const enriched = await enrichShowsWithTMDB(limitedEvents, searchMovieByTitleYear);
+        
+        // Format for NowPlayingMovies component
+        const formatted = enriched.map(event => ({
+          id: event.tmdbId || event.id,
+          tmdbId: event.tmdbId,
+          finnkinoId: event.id,
+          title: event.originalTitle || event.title,
+          image: event.posterPath || event.images?.eventMediumImagePortrait || '',
+          rating: event.voteAverage || null,
+          year: event.productionYear,
+          overview: event.overview
+        }));
+        
+        console.log('✅ Formatted Now Playing movies:', formatted.length);
+        
+        // Cache the data
+        sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+          data: formatted,
+          timestamp: Date.now()
+        }))
+        
+        setFinnkino(formatted);
+      })
+      .catch((error) => {
+        console.error('❌ Error fetching Finnkino events:', error);
+        setFinnkino(mockFinnkino); // Fallback to mock data
+      });
 
-    function fetchFinnkino() {
-      console.log("🔄 Fetching Finnkino NowInTheatres...");
-      getNowInTheatres()
-        .then((data) => {
-          console.log("🎬 Now in Theatres fetched:", data.length, "movies");
-          const list = Array.isArray(data) ? data.slice(0, 20) : [];
-          setFinnkino(list);
-          sessionStorage.setItem(
-            FINNKINO_CACHE_KEY,
-            JSON.stringify({ data: list, timestamp: Date.now() })
-          );
-        })
-        .catch((err) => console.error("Failed to load NowInTheatres:", err));
-    }
-
-    // -------------------------------
+  // -------------------------------
     // ✅ REAL DATA FOR OTHER SECTIONS
     // -------------------------------
     // Recent Reviews

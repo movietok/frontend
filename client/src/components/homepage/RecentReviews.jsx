@@ -3,6 +3,11 @@ import { Link } from "react-router-dom";
 import Carousel from "../Carousel";
 
 function RecentReviews({ reviews = [] }) {
+  const truncateUsername = (name, maxLen = 16) => {
+    if (!name) return "Unknown";
+    return name.length > maxLen ? name.slice(0, maxLen) + "..." : name;
+  };
+
   return (
     <section className="recent-reviews">
       <div className="section-header">
@@ -26,7 +31,7 @@ function RecentReviews({ reviews = [] }) {
               {/* 👤 Username + rating */}
               <p>
                 <Link to={`/profile/${review.user_id}`}>
-                  <strong>{review.username}</strong>
+                  <strong>{truncateUsername(review.username)}</strong>
                 </Link>{" "}
                 – {"⭐".repeat(review.rating || 0)}
               </p>

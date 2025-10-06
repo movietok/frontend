@@ -61,19 +61,29 @@ function BrowseGroupsPage() {
   }, []);
 
   // 📡 Fetch groups by genres
-  useEffect(() => {
-    if (isSearchMode) return;
+ useEffect(() => {
+  if (isSearchMode) return;
 
-    setLoading(true);
-    setGroups([]);
-    discoverGroups({ withGenres: appliedGenres, page })
-      .then((data) => {
-        setGroups(data.groups || []);
-        setTotalPages(1); // keep simple for now
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [appliedGenres, page, isSearchMode]);
+  setLoading(true);
+  setGroups([]);
+  discoverGroups({ withGenres: appliedGenres, page })
+    .then((data) => {
+      console.log("📦 Raw group data from backend:", data); // ✅ added line
+      if (data && Array.isArray(data.groups)) {
+        data.groups.forEach((g) =>
+          console.log(`Group: ${g.name}, Members: ${g.member_count}`)
+        );
+      }
+
+      setGroups(data.groups || []);
+      setTotalPages(1); // keep simple for now
+    })
+    .catch((err) => {
+      console.error("Error fetching groups:", err);
+    })
+    .finally(() => setLoading(false));
+}, [appliedGenres, page, isSearchMode]);
+
 
   const toggleGenre = (genreId) => {
     const idStr = String(genreId);

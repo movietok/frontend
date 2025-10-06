@@ -24,7 +24,6 @@ function PopularMovies({ movies }) {
             <div className="movie-overlay">
               <h4>{movie.title}</h4>
               <p>⭐ {movie.voteAverage?.toFixed(1) || "N/A"}</p>
-              <button className="bookmark-btn">🔖 Bookmark</button>
             </div>
           </Link>
         )}

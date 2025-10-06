@@ -1,67 +1,91 @@
 .group-card {
-  background: #1f2937; /* Tailwind gray-800 */
-  color: #fff;
-  border-radius: 0.5rem;
-  overflow: hidden;
+  position: relative;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 280px;
+  background: #111827;
+  border-radius: 0.8rem;
+  overflow: hidden;
+  color: #fff;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
 }
 
 .group-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
 }
 
+/* Poster or fallback */
 .group-poster {
   width: 100%;
-  height: 180px;
+  height: 100%;
   object-fit: cover;
-  background: #374151; /* fallback bg */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  color: #ccc;
+  object-position: center;
 }
 
+/* Info section */
 .group-card-body {
-  padding: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+  box-sizing: border-box;
 }
 
 .group-card-title {
+  font-weight: 700;
   font-size: 1rem;
-  font-weight: bold;
   margin: 0;
-}
-
-.group-card-description {
-  font-size: 0.85rem;
-  color: #d1d5db; /* gray-300 */
-  margin: 0.25rem 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 3; /* clamp to 3 lines */
-  -webkit-box-orient: vertical;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis; /* ✅ ensures proper "..." truncation */
+  border-bottom: 2px solid #a788ff;
+  display: inline-block;
+  padding-bottom: 0.1rem;
+  max-width: 100%;
 }
 
 .group-card-meta {
-  font-size: 0.75rem;
-  color: #9ca3af; /* gray-400 */
+  font-size: 0.85rem;
+  color: #ccc;
+  margin-top: 0.25rem;
 }
 
-/* Link wrapper for group cards */
+/* ✅ Fixed hover overlay */
+.group-hover-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  color: #ddd;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  overflow: hidden;
+}
+
+.group-hover-overlay p {
+  max-width: 90%;
+  max-height: 80%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Show overlay smoothly on hover */
+.group-card:hover .group-hover-overlay {
+  opacity: 1;
+}
+
 .group-card-link {
-  display: block;              /* make link fill card space */
-  text-decoration: none;       /* remove blue underline */
-  color: inherit;              /* keep text same as card */
-  cursor: pointer;             /* show pointer on hover */
-}
-
-.group-card-link:hover .group-card {
-  transform: translateY(-4px); /* subtle lift effect */
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+  display: block;
+  text-decoration: none;
+  color: inherit;
 }

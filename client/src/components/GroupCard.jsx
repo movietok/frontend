@@ -1,31 +1,41 @@
 import { Link } from "react-router-dom";
 import "../styles/GroupCard.css";
+import fallbackImg from "../images/fallback.png";
 
 function GroupCard({ group }) {
+  // ✅ Safe truncate helper
+  const truncate = (text, len) =>
+    text && text.length > len ? text.slice(0, len) + "..." : text;
+
+  // ✅ Determine which image to use
+  const imageSrc = group.poster_url ? group.poster_url : fallbackImg;
+
+  // ✅ Fix member count duplication
+  const memberCount = group.member_count ?? 0;
+
   return (
     <Link to={`/groups/${group.id}`} className="group-card-link">
-      <div className="group-card bg-gray-800 text-white rounded shadow-md overflow-hidden hover:shadow-lg transition">
-        {group.poster_url ? (
-          <img
-            src={group.poster_url}
-            alt={group.name}
-            className="w-full h-48 object-cover"
-          />
-        ) : (
-          <div className="w-full h-48 bg-gray-600 flex items-center justify-center">
-            No Image
-          </div>
-        )}
-        <div className="p-3">
-          <h3 className="font-bold text-lg">{group.name}</h3>
-          <p className="text-sm text-gray-300 line-clamp-3">
-            {group.description}
+      <div className="group-card">
+        {/* Poster or fallback */}
+        <img src={imageSrc} alt={group.name || "Group"} className="group-poster" />
+
+        {/* Info section */}
+        <div className="group-card-body">
+          {/* ✅ Truncated title with ellipsis */}
+          <h3 className="group-card-title" title={group.name}>
+            {truncate(group.name, 24)}
+          </h3>
+          <p className="group-card-meta">
+            {memberCount} {memberCount === 1 ? "member" : "members"}
           </p>
-          <p className="text-xs text-gray-400 mt-1">
-            Owner: {group.owner_name}
-          </p>
-          <p className="text-xs text-gray-400">
-            Members: {group.member_count}
+        </div>
+
+        {/* ✅ Hover overlay with truncated description */}
+        <div className="group-hover-overlay">
+          <p>
+            {group.description
+              ? truncate(group.description, 140)
+              : "No description available."}
           </p>
         </div>
       </div>
