@@ -7,7 +7,26 @@ import {
 import "../styles/ReviewCard.css";
 import { Link } from "react-router-dom";
 
-function ReviewCard({ review, currentUserId, onDeleted, onUpdated }) {
+function ReviewCard({
+  review,
+  currentUserId,
+  onDeleted,
+  onUpdated,
+  showMovieHeader = false, // ✅ Only true in GroupDetailsPage
+}) {
+  console.log("🎬 ReviewCard props check:", {
+  id: review?.id,
+  movie_id: review?.movie_id,
+  movieId: review?.movieId,
+  movie_name: review?.movie_name,
+  movieName: review?.movieName,
+  poster_url: review?.poster_url,
+  posterUrl: review?.posterUrl,
+  release_year: review?.release_year,
+  releaseYear: review?.releaseYear,
+  showMovieHeader
+});
+
   const [isEditing, setIsEditing] = useState(false);
   const [rating, setRating] = useState(review?.rating ?? 0);
   const [comment, setComment] = useState(review?.content ?? "");
@@ -17,9 +36,8 @@ function ReviewCard({ review, currentUserId, onDeleted, onUpdated }) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
 
-  // ✅ Read more / less state
   const [expanded, setExpanded] = useState(false);
-  const maxPreviewLength = 300; // characters before collapsing
+  const maxPreviewLength = 300;
 
   // ✅ Ownership detection
   useEffect(() => {
@@ -29,9 +47,7 @@ function ReviewCard({ review, currentUserId, onDeleted, onUpdated }) {
     setIsOwner(reviewUserId === normalizedCurrent);
   }, [review?.userId, review?.user_id, currentUserId]);
 
-  if (!review) {
-    return <div className="review-card">Loading review...</div>;
-  }
+  if (!review) return <div className="review-card">Loading review...</div>;
 
   const likes = Number(review.likes ?? 0);
   const dislikes = Number(review.dislikes ?? 0);
@@ -64,17 +80,14 @@ function ReviewCard({ review, currentUserId, onDeleted, onUpdated }) {
     try {
       if (!review?.id) throw new Error("Review ID missing on interaction");
       setTemporaryInteraction(type);
-
       const updated = await addReviewInteraction(review.id, type);
       if (updated && updated.id) onUpdated(updated);
-
       setTimeout(() => setTemporaryInteraction(null), 500);
     } catch (err) {
       setError(err.message);
     }
   };
 
-  // ✅ Determine if text is long
   const isLong = review.content?.length > maxPreviewLength;
   const displayedText = expanded
     ? review.content
@@ -82,8 +95,40 @@ function ReviewCard({ review, currentUserId, onDeleted, onUpdated }) {
     ? review.content.slice(0, maxPreviewLength) + "..."
     : review.content;
 
+  // ✅ Inline Movie Header (for GroupDetailsPage only)
+  const MovieHeader = () => {
+    // Handle both snake_case and camelCase keys
+    const movieId = review.movie_id ?? review.movieId;
+    const movieTitle = review.movie_name ?? review.movieName;
+    const moviePoster = review.poster_url ?? review.posterUrl;
+    const movieYear = review.release_year ?? review.releaseYear;
+
+    if (!showMovieHeader || !movieTitle) return null;
+
+    return (
+      <div className="review-movie-inline-header">
+        <Link to={`/movie/${movieId}`} className="review-movie-inline-link">
+          <img
+            src={
+              moviePoster ||
+              "https://via.placeholder.com/80x120?text=No+Poster"
+            }
+            alt={movieTitle}
+            className="review-movie-inline-poster"
+          />
+          <div className="review-movie-inline-info">
+            <h3>{movieTitle}</h3>
+            {movieYear && <span>{movieYear}</span>}
+          </div>
+        </Link>
+      </div>
+    );
+  };
+
   return (
     <div className={`review-card ${showDeleteModal ? "modal-open" : ""}`}>
+      <MovieHeader />
+
       {isEditing ? (
         <div className="review-edit-box">
           <label className="edit-label">
@@ -117,6 +162,7 @@ function ReviewCard({ review, currentUserId, onDeleted, onUpdated }) {
         </div>
       ) : (
         <div>
+          {/* ===== Review Header ===== */}
           <div className="review-header">
             <div className="review-meta">
               <strong>⭐ {review.rating}</strong> —{" "}
@@ -166,7 +212,7 @@ function ReviewCard({ review, currentUserId, onDeleted, onUpdated }) {
             </div>
           </div>
 
-          {/* ✅ Review content with Read more/less */}
+          {/* ===== Review Body ===== */}
           <div className="review-body">
             {displayedText}
             {isLong && (
@@ -179,7 +225,7 @@ function ReviewCard({ review, currentUserId, onDeleted, onUpdated }) {
             )}
           </div>
 
-          {/* ✅ Owner-only buttons */}
+          {/* ===== Owner Buttons ===== */}
           {isOwner && (
             <div className="review-actions-bottom">
               <button className="edit-btn" onClick={() => setIsEditing(true)}>

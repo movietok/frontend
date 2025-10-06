@@ -6,6 +6,11 @@ import { getGenres } from "../../services/tmdb";
 import GenreSelector from "../GenreSelector";
 
 export default function EditGroupModal({ group, onClose, onSave }) {
+  useEffect(() => {
+  console.log("🟣 EditGroupModal mounted");
+  console.log("group prop in modal:", group);
+}, []);
+
   // Base fields
   const [name, setName] = useState(group.name || "");
   const [description, setDescription] = useState(group.description || "");
@@ -140,8 +145,8 @@ export default function EditGroupModal({ group, onClose, onSave }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded shadow-lg w-[32rem] max-w-[95vw]">
+    <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-[9999]">
+  <div className="bg-white text-black p-6 rounded shadow-lg w-[32rem] max-w-[95vw]">
         <h3 className="text-lg font-semibold mb-4">Edit Group</h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">

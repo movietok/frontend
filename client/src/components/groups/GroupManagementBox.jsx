@@ -33,7 +33,10 @@ export default function GroupManagementBox({ group, onGroupUpdated, onGroupDelet
       <h3 className="text-lg font-semibold mb-3">Management</h3>
       <div className="space-x-2">
         <button
-          onClick={() => setShowEditModal(true)}
+          onClick={() => {
+    console.log("🟢 Edit Group clicked");
+    setShowEditModal(true);
+  }}
           className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
           Edit Group

@@ -229,9 +229,9 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.9rem;
   background: #1f1f1f;
-  padding: 0.7rem 1rem;
+  padding: 0.8rem 1rem;
   border-radius: 8px;
   border: 1px solid #333;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -250,30 +250,40 @@
 }
 
 .review-movie-poster {
-  width: 70px;
-  height: 100px;
+  width: 65px;
+  height: 95px;
   object-fit: cover;
   border-radius: 6px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
   flex-shrink: 0;
 }
 
+/* ✅ Added margin-left to give breathing room between poster and title */
 .review-movie-info {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: 0.25rem;
+  margin-left: 0.8rem; /* <-- added breathing space */
 }
 
 .review-movie-title {
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 600;
   margin: 0;
   color: #fff;
+  line-height: 1.4;
 }
 
 .review-movie-year {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: #aaa;
+}
+
+/* Divider between movie header and review */
+.review-card .review-movie-header {
+  border-bottom: 1px solid #2c2c2c;
+  padding-bottom: 0.7rem;
 }
 
 /* ==========================
@@ -301,7 +311,7 @@
   gap: 1rem;
   margin-bottom: 1rem;
   border-bottom: 1px solid #333;
-  padding-bottom: 0.7rem;
+  padding-bottom: 0.8rem;
 }
 
 .group-review-movie-link {
@@ -312,17 +322,21 @@
 }
 
 .group-review-poster {
-  width: 60px;
-  height: 90px;
+  width: 65px;
+  height: 95px;
   object-fit: cover;
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
 }
 
+/* ✅ Added margin-left for consistent spacing here too */
 .group-review-movie-info {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: 0.25rem;
+  margin-left: 0.8rem; /* <-- consistent breathing space */
 }
 
 .group-review-movie-title {
@@ -330,6 +344,7 @@
   font-weight: 600;
   color: #fff;
   margin: 0;
+  line-height: 1.4;
 }
 
 .group-review-year {
@@ -343,10 +358,10 @@
 .review-movie-inline-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.2rem;
   margin-bottom: 1rem;
   border-bottom: 1px solid #333;
-  padding-bottom: 0.6rem;
+  padding-bottom: 0.7rem;
   background: transparent;
 }
 
@@ -363,6 +378,16 @@
   object-fit: cover;
   border-radius: 6px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
+}
+
+/* ✅ Added margin-left for inline version as well */
+.review-movie-inline-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-left: 0.8rem;
 }
 
 .review-movie-inline-info h3 {
@@ -370,13 +395,13 @@
   color: #fff;
   font-size: 1.05rem;
   font-weight: 600;
+  line-height: 1.4;
 }
 
 .review-movie-inline-info span {
   color: #aaa;
   font-size: 0.9rem;
 }
-
 
 /* ==========================
    MANAGEMENT BOX
@@ -406,4 +431,15 @@
 
 .group-management-box button:hover {
   background: #357ab8;
+}
+
+/* === Force modal overlay to top layer === */
+.fixed.inset-0 {
+  position: fixed;
+  inset: 0;
+  z-index: 9999 !important;
+}
+
+.bg-black.bg-opacity-40 {
+  background-color: rgba(0, 0, 0, 0.4) !important;
 }

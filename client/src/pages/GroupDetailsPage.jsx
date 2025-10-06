@@ -31,10 +31,19 @@ function GroupDetailsPage() {
     }
   }, []);
 
-  // Fetch group details, favorites, and reviews
+  // Helpers to normalize API responses
+  const extractArray = (payload, key) => {
+    if (Array.isArray(payload)) return payload;
+    if (payload && Array.isArray(payload[key])) return payload[key];
+    if (payload?.data && Array.isArray(payload.data)) return payload.data;
+    if (payload?.data && Array.isArray(payload.data[key])) return payload.data[key];
+    return [];
+  };
+
   useEffect(() => {
     async function fetchData() {
       try {
+        // 1) Group details
         const data = await getGroupDetails(id);
         const g = data?.group ?? data;
         setGroup(g);
@@ -42,13 +51,53 @@ function GroupDetailsPage() {
         const isMember =
           g?.is_member || g?.is_owner || currentUserId === g?.owner_id;
 
-        if (isMember) {
-          const favData = await getGroupFavorites(id);
-          setFavorites(favData?.favorites || []);
+        if (!isMember) return;
 
-          const groupReviews = await getGroupReviews(id);
-          setReviews(groupReviews || []);
-        }
+        // 2) Favorites (movies the group has favorited)
+        const favRaw = await getGroupFavorites(id);
+        const favs =
+          extractArray(favRaw, "favorites") ||
+          []; // safety
+        setFavorites(favs);
+
+        // Build quick lookup by tmdb_id for enrichment
+        const favIndex = new Map(
+          favs.map((m) => [String(m.tmdb_id), m])
+        );
+
+        // 3) Reviews (by group members)
+        const revRaw = await getGroupReviews(id);
+        // Support: array OR {reviews} OR {data:{reviews}}
+        let list =
+          extractArray(revRaw, "reviews") ||
+          [];
+
+        // 4) Enrich reviews with movie info from favorites if missing
+        list = list.map((rev) => {
+          const movieId = String(rev.movie_id ?? rev.movieId ?? "");
+          const hasMovieMeta =
+            (rev.movie_name ?? rev.movieName) ||
+            (rev.poster_url ?? rev.posterUrl) ||
+            (rev.release_year ?? rev.releaseYear);
+
+          if (!movieId || hasMovieMeta) return rev;
+
+          const match = favIndex.get(movieId);
+          if (!match) return rev;
+
+          // Add both snake_case and camelCase so any consumer can read it
+          return {
+            ...rev,
+            movie_name: rev.movie_name ?? rev.movieName ?? match.original_title,
+            movieName: rev.movieName ?? rev.movie_name ?? match.original_title,
+            poster_url: rev.poster_url ?? rev.posterUrl ?? match.poster_url,
+            posterUrl: rev.posterUrl ?? rev.poster_url ?? match.poster_url,
+            release_year: rev.release_year ?? rev.releaseYear ?? match.release_year,
+            releaseYear: rev.releaseYear ?? rev.release_year ?? match.release_year,
+          };
+        });
+
+        setReviews(list);
       } catch (err) {
         console.error("Error loading group details:", err);
       } finally {
@@ -66,7 +115,7 @@ function GroupDetailsPage() {
     navigate("/groups");
   };
 
-  // ✅ Remove movie from favorites
+  // Remove movie from favorites
   const handleRemoveFavorite = async (tmdb_id) => {
     if (!window.confirm("Remove this movie from group favorites?")) return;
 
@@ -93,7 +142,7 @@ function GroupDetailsPage() {
 
   return (
     <div className={`group-details-page group-theme ${group.theme_class || ""}`}>
-      {/* ===== Header ===== */}
+      {/* Header */}
       <div className="group-header">
         <img
           src={
@@ -115,7 +164,7 @@ function GroupDetailsPage() {
         </div>
       </div>
 
-      {/* ===== Overview + Facts ===== */}
+      {/* Overview + Facts */}
       <div className="overview-facts">
         <div className="overview">
           <h2>About this Group</h2>
@@ -135,7 +184,7 @@ function GroupDetailsPage() {
         </div>
       </div>
 
-      {/* ===== Group Favorites ===== */}
+      {/* Group Favorites */}
       {isMember && (
         <section className="favorites-section">
           <h2>Group Favorites</h2>
@@ -182,7 +231,7 @@ function GroupDetailsPage() {
         </section>
       )}
 
-      {/* ===== Group Reviews / Activity ===== */}
+      {/* Group Reviews / Activity */}
       {isMember && (
         <section className="reviews-section">
           <h2>Group Activity</h2>
@@ -195,15 +244,16 @@ function GroupDetailsPage() {
                   key={rev.id}
                   review={rev}
                   currentUserId={currentUserId}
-                  showMovieHeader={true} // ✅ show movie info above review
-                  onDeleted={(id) =>
-                    setReviews((prev) => prev.filter((r) => r.id !== id))
+                  onDeleted={(rid) =>
+                    setReviews((prev) => prev.filter((r) => r.id !== rid))
                   }
                   onUpdated={(updated) =>
                     setReviews((prev) =>
                       prev.map((r) => (r.id === updated.id ? updated : r))
                     )
                   }
+                  // Show movie indicator only on this page
+                  showMovieHeader={true}
                 />
               ))}
             </div>
@@ -211,7 +261,7 @@ function GroupDetailsPage() {
         </section>
       )}
 
-      {/* ===== Owner-only Management ===== */}
+      {/* Owner-only Management */}
       {isOwner && (
         <GroupManagementBox
           group={group}
