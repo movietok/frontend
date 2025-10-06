@@ -40,7 +40,7 @@ function App() {
             <Route path="/homepage" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
-            <Route path="/favorites" element={<FavoritesPage />} />
+            <Route path="/favorites/:userId" element={<FavoritesPage />} />
             <Route path="/search" element={<SearchResultsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/:userId" element={<ProfilePage />} />  

@@ -1,18 +1,18 @@
-import { useAuth } from "../context/AuthContext";
-import { useFavorites } from "../hooks/useFavorites"; 
-import { Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+import { useFavorites } from "../hooks/useFavorites";
 import MovieActionBar from "../components/MovieActionBar";
 import "../styles/FavoritesPage.css";
 
 export default function FavoritesPage() {
-  const { user } = useAuth();
-  const { favorites: rawFavorites, loading, error } = useFavorites(user?.id, 2);
-  const { favorites: watchlist } = useFavorites(user?.id, 1);
+  const { userId } = useParams(); 
 
-  const watchlistIds = new Set(watchlist.map(m => m.tmdb_id));
-  const favorites = rawFavorites.map(fav => ({
+  const { favorites: rawFavorites, loading, error } = useFavorites(userId, 2); // ✅ public favorites
+  const { favorites: watchlist } = useFavorites(userId, 1); // ✅ public watchlist for cross-check
+
+  const watchlistIds = new Set(watchlist.map((m) => m.tmdb_id));
+  const favorites = rawFavorites.map((fav) => ({
     ...fav,
-    isWatchlist: watchlistIds.has(fav.tmdb_id)
+    isWatchlist: watchlistIds.has(fav.tmdb_id),
   }));
 
   if (loading) return <div className="favorites-loading">Loading favorites...</div>;
@@ -22,11 +22,11 @@ export default function FavoritesPage() {
     <div className="favorites-container max-w-6xl mx-auto px-6 py-8">
       <h2 className="favorites-header">
         <span className="favorites-star">★</span>
-        <span className="favorites-text">My Favorites</span>
+        <span className="favorites-text">Favorites</span>
       </h2>
 
       {favorites.length === 0 ? (
-        <p className="text-gray-400">You have no favorite movies yet. ⭐</p>
+        <p className="text-gray-400">This user has no favorite movies yet. ⭐</p>
       ) : (
         <div className="favorites-grid">
           {favorites.map((fav) => (
@@ -45,7 +45,9 @@ export default function FavoritesPage() {
                   <div className="poster-overlay group-hover:opacity-100">
                     <div className="overlay-header">
                       <p className="title">{fav.original_title}</p>
-                      <p className="meta">{fav.release_year} • IMDb {fav.imdb_rating}</p>
+                      <p className="meta">
+                        {fav.release_year} • IMDb {fav.imdb_rating ?? "N/A"}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -60,7 +62,7 @@ export default function FavoritesPage() {
                   movieData={{
                     original_title: fav.original_title,
                     release_year: fav.release_year,
-                    poster_path: fav.poster_url
+                    poster_path: fav.poster_url,
                   }}
                 />
               </div>
