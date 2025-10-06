@@ -93,7 +93,7 @@ function GroupDetailsPage() {
 
   return (
     <div className={`group-details-page group-theme ${group.theme_class || ""}`}>
-      {/* Header */}
+      {/* ===== Header ===== */}
       <div className="group-header">
         <img
           src={
@@ -115,7 +115,7 @@ function GroupDetailsPage() {
         </div>
       </div>
 
-      {/* Overview + Facts */}
+      {/* ===== Overview + Facts ===== */}
       <div className="overview-facts">
         <div className="overview">
           <h2>About this Group</h2>
@@ -135,7 +135,7 @@ function GroupDetailsPage() {
         </div>
       </div>
 
-      {/* ✅ Group Favorites */}
+      {/* ===== Group Favorites ===== */}
       {isMember && (
         <section className="favorites-section">
           <h2>Group Favorites</h2>
@@ -146,7 +146,7 @@ function GroupDetailsPage() {
               {favorites.map((movie) => (
                 <div key={movie.tmdb_id} className="fav-card-wrapper">
                   <Link
-                    to={`/movies/${movie.tmdb_id}`}
+                    to={`/movie/${movie.tmdb_id}`}
                     className="fav-card-link"
                   >
                     <div className="fav-card">
@@ -164,7 +164,7 @@ function GroupDetailsPage() {
                     </div>
                   </Link>
 
-                  {/* ✅ Hover-visible remove button (owner only) */}
+                  {/* Hover-visible remove button (owner only) */}
                   {isOwner && (
                     <button
                       className="remove-fav-btn"
@@ -182,7 +182,7 @@ function GroupDetailsPage() {
         </section>
       )}
 
-      {/* ✅ Group Reviews / Activity */}
+      {/* ===== Group Reviews / Activity ===== */}
       {isMember && (
         <section className="reviews-section">
           <h2>Group Activity</h2>
@@ -191,61 +191,27 @@ function GroupDetailsPage() {
           ) : (
             <div className="reviews-list">
               {reviews.map((rev) => (
-                <div key={rev.id} className="review-with-movie">
-                  {/* ✅ Movie context header */}
-                  <div
-                    className={`review-movie-header ${
-                      rev.movie_name ? "" : "empty"
-                    }`}
-                  >
-                    {rev.movie_name && (
-                      <Link
-                        to={`/movies/${rev.movie_id}`}
-                        className="review-movie-link"
-                      >
-                        <img
-                          src={
-                            rev.poster_url ||
-                            "https://via.placeholder.com/80x120?text=No+Image"
-                          }
-                          alt={rev.movie_name}
-                          className="review-movie-poster"
-                        />
-                        <div className="review-movie-info">
-                          <h4 className="review-movie-title">
-                            {rev.movie_name}
-                          </h4>
-                          <span className="review-movie-year">
-                            {rev.release_year}
-                          </span>
-                        </div>
-                      </Link>
-                    )}
-                  </div>
-
-                  {/* Existing ReviewCard */}
-                  <ReviewCard
-                    review={rev}
-                    currentUserId={currentUserId}
-                    onDeleted={(id) =>
-                      setReviews((prev) => prev.filter((r) => r.id !== id))
-                    }
-                    onUpdated={(updated) =>
-                      setReviews((prev) =>
-                        prev.map((r) =>
-                          r.id === updated.id ? updated : r
-                        )
-                      )
-                    }
-                  />
-                </div>
+                <ReviewCard
+                  key={rev.id}
+                  review={rev}
+                  currentUserId={currentUserId}
+                  showMovieHeader={true} // ✅ show movie info above review
+                  onDeleted={(id) =>
+                    setReviews((prev) => prev.filter((r) => r.id !== id))
+                  }
+                  onUpdated={(updated) =>
+                    setReviews((prev) =>
+                      prev.map((r) => (r.id === updated.id ? updated : r))
+                    )
+                  }
+                />
               ))}
             </div>
           )}
         </section>
       )}
 
-      {/* Owner-only Management */}
+      {/* ===== Owner-only Management ===== */}
       {isOwner && (
         <GroupManagementBox
           group={group}
