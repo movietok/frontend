@@ -1,16 +1,23 @@
 import { useEffect, useState, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { getGroupDetails } from "../services/groups";
-import "../styles/GroupDetailsPage.css";
+import { getGroupFavorites, removeFavorite } from "../services/favoriteService";
+import { getGroupReviews } from "../services/reviews";
 import GroupManagementBox from "../components/groups/GroupManagementBox";
+import ReviewCard from "../components/ReviewCard";
+import "../styles/GroupDetailsPage.css";
 
 function GroupDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [group, setGroup] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  // derive current user id from JWT (no network)
+  const [group, setGroup] = useState(null);
+  const [favorites, setFavorites] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [removing, setRemoving] = useState(false);
+
+  // Decode user ID from JWT
   const currentUserId = useMemo(() => {
     try {
       const token = localStorage.getItem("token");
@@ -18,22 +25,38 @@ function GroupDetailsPage() {
       const [, payload] = token.split(".");
       if (!payload) return null;
       const decoded = JSON.parse(atob(payload));
-      return decoded?.id ?? null; // your backend signs { id, username, email }
+      return decoded?.id ?? null;
     } catch {
       return null;
     }
   }, []);
 
+  // Fetch group details, favorites, and reviews
   useEffect(() => {
-    getGroupDetails(id)
-      .then((data) => {
-        // be robust to either shape: {success, group} or just group
+    async function fetchData() {
+      try {
+        const data = await getGroupDetails(id);
         const g = data?.group ?? data;
         setGroup(g);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [id]);
+
+        const isMember =
+          g?.is_member || g?.is_owner || currentUserId === g?.owner_id;
+
+        if (isMember) {
+          const favData = await getGroupFavorites(id);
+          setFavorites(favData?.favorites || []);
+
+          const groupReviews = await getGroupReviews(id);
+          setReviews(groupReviews || []);
+        }
+      } catch (err) {
+        console.error("Error loading group details:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, [id, currentUserId]);
 
   const handleGroupUpdated = (updatedGroup) => {
     setGroup(updatedGroup?.group ?? updatedGroup);
@@ -43,18 +66,34 @@ function GroupDetailsPage() {
     navigate("/groups");
   };
 
+  // ✅ Remove movie from favorites
+  const handleRemoveFavorite = async (tmdb_id) => {
+    if (!window.confirm("Remove this movie from group favorites?")) return;
+
+    setRemoving(true);
+    try {
+      await removeFavorite(tmdb_id, 3, id);
+      setFavorites((prev) => prev.filter((m) => m.tmdb_id !== tmdb_id));
+    } catch (err) {
+      console.error("Error removing favorite:", err);
+      alert("Failed to remove movie from favorites");
+    } finally {
+      setRemoving(false);
+    }
+  };
+
   if (loading) return <p>Loading...</p>;
   if (!group) return <p>Group not found</p>;
 
-  // Compute ownership: prefer backend flag if present, else compare owner_id to JWT id
   const isOwner =
     group?.is_owner === true ||
-    (currentUserId != null &&
-      Number(currentUserId) === Number(group?.owner_id));
+    (currentUserId != null && Number(currentUserId) === Number(group?.owner_id));
+
+  const isMember = group?.is_member || isOwner;
 
   return (
     <div className={`group-details-page group-theme ${group.theme_class || ""}`}>
-      {/* Top Section */}
+      {/* Header */}
       <div className="group-header">
         <img
           src={
@@ -96,7 +135,117 @@ function GroupDetailsPage() {
         </div>
       </div>
 
-      {/* Management Box (owner only) */}
+      {/* ✅ Group Favorites */}
+      {isMember && (
+        <section className="favorites-section">
+          <h2>Group Favorites</h2>
+          {favorites.length === 0 ? (
+            <p className="empty-text">No movies yet in favorites.</p>
+          ) : (
+            <div className="favorites-grid">
+              {favorites.map((movie) => (
+                <div key={movie.tmdb_id} className="fav-card-wrapper">
+                  <Link
+                    to={`/movies/${movie.tmdb_id}`}
+                    className="fav-card-link"
+                  >
+                    <div className="fav-card">
+                      <img
+                        src={
+                          movie.poster_url ||
+                          "https://via.placeholder.com/150x225"
+                        }
+                        alt={movie.original_title}
+                      />
+                      <div className="fav-info">
+                        <p className="fav-title">{movie.original_title}</p>
+                        <span className="fav-year">{movie.release_year}</span>
+                      </div>
+                    </div>
+                  </Link>
+
+                  {/* ✅ Hover-visible remove button (owner only) */}
+                  {isOwner && (
+                    <button
+                      className="remove-fav-btn"
+                      onClick={() => handleRemoveFavorite(movie.tmdb_id)}
+                      disabled={removing}
+                      title="Remove from favorites"
+                    >
+                      ✖
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* ✅ Group Reviews / Activity */}
+      {isMember && (
+        <section className="reviews-section">
+          <h2>Group Activity</h2>
+          {reviews.length === 0 ? (
+            <p className="empty-text">No reviews yet from group members.</p>
+          ) : (
+            <div className="reviews-list">
+              {reviews.map((rev) => (
+                <div key={rev.id} className="review-with-movie">
+                  {/* ✅ Movie context header */}
+                  <div
+                    className={`review-movie-header ${
+                      rev.movie_name ? "" : "empty"
+                    }`}
+                  >
+                    {rev.movie_name && (
+                      <Link
+                        to={`/movies/${rev.movie_id}`}
+                        className="review-movie-link"
+                      >
+                        <img
+                          src={
+                            rev.poster_url ||
+                            "https://via.placeholder.com/80x120?text=No+Image"
+                          }
+                          alt={rev.movie_name}
+                          className="review-movie-poster"
+                        />
+                        <div className="review-movie-info">
+                          <h4 className="review-movie-title">
+                            {rev.movie_name}
+                          </h4>
+                          <span className="review-movie-year">
+                            {rev.release_year}
+                          </span>
+                        </div>
+                      </Link>
+                    )}
+                  </div>
+
+                  {/* Existing ReviewCard */}
+                  <ReviewCard
+                    review={rev}
+                    currentUserId={currentUserId}
+                    onDeleted={(id) =>
+                      setReviews((prev) => prev.filter((r) => r.id !== id))
+                    }
+                    onUpdated={(updated) =>
+                      setReviews((prev) =>
+                        prev.map((r) =>
+                          r.id === updated.id ? updated : r
+                        )
+                      )
+                    }
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* Owner-only Management */}
       {isOwner && (
         <GroupManagementBox
           group={group}
@@ -104,15 +253,6 @@ function GroupDetailsPage() {
           onGroupDeleted={handleGroupDeleted}
         />
       )}
-
-      {/* Activity */}
-      <section className="reviews-section">
-        <h2>Group Activity</h2>
-        <div className="write-review-bubble">💬 Start a Discussion</div>
-        <div className="review-card">
-          <p>No posts yet. (slots reserved for DB data)</p>
-        </div>
-      </section>
     </div>
   );
 }

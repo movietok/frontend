@@ -132,3 +132,22 @@ export const getUsersByAura = async () => {
     return [];
   }
 };
+
+// ✅ Fetch reviews of movies in a group's favorites (for group activity)
+export async function getGroupReviews(groupId) {
+  try {
+    const res = await fetch(`/api/reviews/group/${groupId}`, {
+      headers: {
+        "Content-Type": "application/json",
+        ...(token() ? { Authorization: `Bearer ${token()}` } : {}),
+      },
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || "Failed to fetch group reviews");
+
+    return (json?.data?.reviews || []).map(normalizeReview);
+  } catch (err) {
+    console.error("Error fetching group reviews:", err);
+    return [];
+  }
+}

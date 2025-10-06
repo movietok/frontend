@@ -187,3 +187,32 @@
     transform: translateY(0);
   }
 }
+
+.group-favorite-box {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.group-select {
+  background: #222;
+  border: 1px solid #444;
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+}
+
+.add-to-group-btn {
+  background: #3dd68c;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  color: #111;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.add-to-group-btn:hover {
+  background: #2fbf78;
+}

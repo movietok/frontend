@@ -1,126 +1,312 @@
+/* ==========================
+   GROUP DETAILS PAGE STYLES
+   ========================== */
+
+/* ===== Base Layout ===== */
 .group-details-page {
-  color: #fff;
-  max-width: 1200px;
-  margin: 0 auto;
   padding: 2rem;
+  color: #eee;
+  background: #111;
 }
 
-/* Header */
+/* ===== Header Section ===== */
 .group-header {
   display: flex;
-  gap: 2rem;
   align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .group-poster {
-  width: 260px;
-  height: auto;
-  object-fit: contain;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  width: 200px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #333;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
 .group-info {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .group-title {
   font-size: 2rem;
-  font-weight: bold;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.3rem;
 }
 
 .group-meta {
-  margin-top: 0.5rem;
   font-size: 0.95rem;
-  color: #bbb;
-}
-
-.group-genres {
-  margin-top: 0.25rem;
-  font-size: 0.95rem;
-}
-
-/* Overview + Facts */
-.overview-facts {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 2rem;
-  margin-top: 2rem;
-}
-
-.facts-box {
-  background: #1f1f1f;
-  padding: 1rem;
-  border-radius: 8px;
-}
-
-.facts-box h3 {
+  color: #aaa;
   margin-bottom: 0.5rem;
 }
 
-/* Sections */
+.group-genres {
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+/* ===== Overview + Facts ===== */
+.overview-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.overview {
+  flex: 2;
+  background: #1c1c1c;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 1.2rem 1.5rem;
+}
+
+.overview h2 {
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+  font-size: 1.3rem;
+  color: #fff;
+}
+
+.overview p {
+  color: #ccc;
+  line-height: 1.6;
+}
+
+.facts-box {
+  flex: 1;
+  background: #1c1c1c;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 1.2rem 1.5rem;
+  min-width: 240px;
+}
+
+.facts-box h3 {
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+  font-size: 1.2rem;
+  color: #fff;
+}
+
+.facts-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: #ccc;
+}
+
+.facts-box li {
+  margin-bottom: 0.5rem;
+}
+
+/* ==========================
+   FAVORITES SECTION
+   ========================== */
+
+.favorites-section {
+  margin-bottom: 3rem;
+}
+
+.favorites-section h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.favorites-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.4rem;
+  margin-top: 0.5rem;
+}
+
+.fav-card-wrapper {
+  position: relative;
+}
+
+.fav-card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.fav-card {
+  background: #1f1f1f;
+  border: 1px solid #333;
+  border-radius: 10px;
+  overflow: hidden;
+  width: 160px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.fav-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+.fav-card img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+}
+
+.fav-info {
+  padding: 0.6rem;
+  text-align: center;
+}
+
+.fav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+}
+
+.fav-year {
+  font-size: 0.85rem;
+  color: #aaa;
+}
+
+/* Hover remove button (owner only) */
+.remove-fav-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.7);
+  border: none;
+  color: #ff5555;
+  font-size: 1rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 50%;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.fav-card-wrapper:hover .remove-fav-btn {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.empty-text {
+  color: #888;
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
+/* ==========================
+   REVIEWS / GROUP ACTIVITY
+   ========================== */
+
 .reviews-section {
   margin-top: 3rem;
-  background: #1a1a1a;
-  padding: 1.5rem;
-  border-radius: 10px;
 }
 
 .reviews-section h2 {
-  font-size: 1.5rem;
-  font-weight: bold;
+  font-size: 1.4rem;
+  font-weight: 700;
   margin-bottom: 1rem;
-  border-bottom: 2px solid #333;
-  padding-bottom: 0.5rem;
 }
 
-/* Placeholder "write" bubble */
-.write-review-bubble {
-  border: 2px dashed #444;
-  border-radius: 12px;
-  padding: 1rem;
-  text-align: center;
-  color: #bbb;
-  font-style: italic;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
-.write-review-bubble:hover {
-  background: #2a2a2a;
-  color: #fff;
-  border-color: #666;
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
-/* Individual card */
-.review-card {
-  background: #2a2a2a;
-  padding: 1rem;
+/* ===== Review Movie Header (consistent layout) ===== */
+.review-with-movie {
+  margin-bottom: 2rem;
+}
+
+.review-movie-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+  background: #1f1f1f;
+  padding: 0.7rem 1rem;
   border-radius: 8px;
-  color: #ddd;
-  margin-top: 1rem;
+  border: 1px solid #333;
+  min-height: 110px;
 }
 
-.group-theme {
-  border-radius: 0.5rem;
-  padding: 1rem;
+.review-movie-header.empty {
+  visibility: hidden;
+  margin-bottom: 0.8rem;
+  padding: 0;
+  border: none;
+  min-height: 110px;
 }
 
-.theme-blue {
-  background-color: #e0f2fe; /* pastel light blue */
-  border: 1px solid #bae6fd;
+.review-movie-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
 }
 
-.theme-green {
-  background-color: #ecfdf5; /* pastel light green */
-  border: 1px solid #bbf7d0;
+.review-movie-link:hover .review-movie-title {
+  color: #4da6ff;
 }
 
-.theme-purple {
-  background-color: #f3e8ff; /* pastel lavender */
-  border: 1px solid #e9d5ff;
+.review-movie-poster {
+  width: 60px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }
 
-.theme-orange {
-  background-color: #fff7ed; /* pastel peach/orange */
-  border: 1px solid #fed7aa;
+.review-movie-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.review-movie-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: #fff;
+}
+
+.review-movie-year {
+  font-size: 0.85rem;
+  color: #aaa;
+}
+
+/* ==========================
+   MANAGEMENT BOX
+   ========================== */
+.group-management-box {
+  margin-top: 3rem;
+  padding: 1.5rem;
+  background: #1c1c1c;
+  border: 1px solid #333;
+  border-radius: 10px;
+}
+
+.group-management-box h3 {
+  color: #fff;
+  margin-bottom: 0.8rem;
+}
+
+.group-management-box button {
+  background: #4a90e2;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.group-management-box button:hover {
+  background: #357ab8;
 }

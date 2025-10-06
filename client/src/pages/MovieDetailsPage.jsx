@@ -1,8 +1,11 @@
+// src/pages/MovieDetailsPage.jsx
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; //  Added
+import { useAuth } from "../context/AuthContext";
 import { getMovieDetails } from "../services/tmdb";
 import { getMovieReviews } from "../services/reviews";
+import { addFavorite } from "../services/favoriteService";
+import { getUserGroupsAPI } from "../services/groups"; // or create this if not existing
 import Carousel from "../components/Carousel";
 import CreateReview from "../components/CreateReview";
 import ReviewCard from "../components/ReviewCard";
@@ -10,8 +13,8 @@ import "../styles/MovieDetailsPage.css";
 
 function MovieDetailsPage() {
   const { id } = useParams();
-  const { user } = useAuth(); // ✅ logged-in user from context
-  const currentUserId = user?.id || user?.user_id; // handle both possible shapes
+  const { user } = useAuth();
+  const currentUserId = user?.id || user?.user_id;
 
   const [movie, setMovie] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -19,6 +22,10 @@ function MovieDetailsPage() {
   const [loadingMovie, setLoadingMovie] = useState(true);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [error, setError] = useState("");
+
+  // ✅ Group favorites feature
+  const [groups, setGroups] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState("");
 
   useEffect(() => {
     getMovieDetails(id)
@@ -43,6 +50,19 @@ function MovieDetailsPage() {
     fetchReviews();
   }, [id]);
 
+  // ✅ Fetch user groups (for dropdown)
+ useEffect(() => {
+  if (!user?.id && !user?.user_id) return;
+  const uid = user.id || user.user_id;
+
+  getUserGroupsAPI(uid)
+    .then((data) => {
+      console.log("Fetched user groups:", data); // optional debug
+      setGroups(data);
+    })
+    .catch(console.error);
+}, [user]);
+
   const handleReviewAdded = (review) => {
     setReviews((prev) => [review, ...prev]);
   };
@@ -56,12 +76,24 @@ function MovieDetailsPage() {
     setReviews((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
   };
 
+  // ✅ Add movie to group favorites
+  async function handleAddToGroupFavorites() {
+    if (!selectedGroup) return alert("Please select a group first.");
+    try {
+      const res = await addFavorite(id, 3, selectedGroup);
+      alert(res.message || "Added to group favorites!");
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Failed to add movie to group favorites.");
+    }
+  }
+
   if (loadingMovie) return <p>Loading...</p>;
   if (!movie) return <p>Movie not found</p>;
 
   return (
     <div className="movie-details-page">
-      {/* Top Section */}
+      {/* ===== Top Section ===== */}
       <div className="movie-header">
         <img
           src={
@@ -81,6 +113,7 @@ function MovieDetailsPage() {
             {movie.releaseDate?.slice(0, 4)} • {movie.runtime} min
           </p>
           <p className="movie-genres">{movie.genres.join(", ")}</p>
+
           {movie.trailer?.url && (
             <a
               href={movie.trailer.url}
@@ -91,10 +124,35 @@ function MovieDetailsPage() {
               🎬 Watch Trailer
             </a>
           )}
+
+          {/* ✅ Add-to-group-favorites UI */}
+          {user && groups.length > 0 && (
+            <div className="group-favorite-box">
+              <select
+                value={selectedGroup}
+                onChange={(e) => setSelectedGroup(e.target.value)}
+                className="group-select"
+              >
+                <option value="">Select Group...</option>
+                {groups.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.name}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={handleAddToGroupFavorites}
+                disabled={!selectedGroup}
+                className="add-to-group-btn"
+              >
+                ➕ Add to Group Favorites
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Overview + Facts */}
+      {/* ===== Overview + Facts ===== */}
       <div className="overview-facts">
         <div className="overview">
           <h2>Overview</h2>
@@ -113,7 +171,7 @@ function MovieDetailsPage() {
         </div>
       </div>
 
-      {/* Cast Carousel */}
+      {/* ===== Cast Carousel ===== */}
       <section className="cast-section">
         <h2>Cast</h2>
         <Carousel
@@ -135,7 +193,7 @@ function MovieDetailsPage() {
         />
       </section>
 
-      {/* Crew Carousel */}
+      {/* ===== Crew Carousel ===== */}
       <section className="crew-section">
         <h2>Key Crew</h2>
         <Carousel
@@ -155,11 +213,10 @@ function MovieDetailsPage() {
         />
       </section>
 
-      {/* Community Reviews */}
+      {/* ===== Community Reviews ===== */}
       <section className="reviews-section">
         <h2>Community Reviews</h2>
 
-        {/* Create Review */}
         <CreateReview movieId={id} onReviewAdded={handleReviewAdded} />
 
         {loadingReviews ? (
@@ -174,7 +231,7 @@ function MovieDetailsPage() {
               <ReviewCard
                 key={rev.id}
                 review={rev}
-                currentUserId={currentUserId} // ✅ now works automatically
+                currentUserId={currentUserId}
                 onDeleted={handleReviewDeleted}
                 onUpdated={handleReviewUpdated}
               />

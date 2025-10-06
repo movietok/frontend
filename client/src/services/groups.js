@@ -60,3 +60,16 @@ export const getPopularGroups = async (limit = 20) => {
     return [];
   }
 };
+
+// ---------- User's Groups ----------
+export const getUserGroupsAPI = async (userId) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Not authenticated");
+
+  const res = await axios.get(`${API_URL}/user/${userId}/groups`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  // Backend likely returns { groups: [...] }
+  return res.data.groups || res.data || [];
+};
