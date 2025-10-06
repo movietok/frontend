@@ -12,6 +12,12 @@ import PopularUsers from "../components/homepage/PopularUsers";
 import { discoverMovies } from "../services/tmdb"; // use same endpoint as BrowsePage
 import { fetchNowPlayingEvents, enrichShowsWithTMDB } from "../services/finnkinoApi";
 import { searchMovieByTitleYear } from "../services/tmdb";
+import { getPopularGroups } from "../services/groups";
+import {
+  getRecentReviews,
+  getUsersByReviewCount,
+  getUsersByAura,
+} from "../services/reviews";
 
 // keep all other mock data exactly as before
 const mockFinnkino = Array.from({ length: 7 }, (_, i) => ({
@@ -21,27 +27,6 @@ const mockFinnkino = Array.from({ length: 7 }, (_, i) => ({
   rating: (Math.random() * 3 + 6).toFixed(1),
 }));
 
-const mockReviews = [
-  { id: 1, movieId: 27205, movie: "Inception", userId: 1, user: "Alice", rating: 5, text: "Amazing movie..." },
-  { id: 2, movieId: 102, movie: "The Matrix", userId: 2, user: "Bob", rating: 4, text: "Classic sci-fi..." },
-];
-
-const mockGroups = [
-  { id: 1, name: "Sci-Fi Lovers", members: 120 },
-  { id: 2, name: "Action Fans", members: 98 },
-  { id: 3, name: "Indie Movie Club", members: 75 },
-  { id: 4, name: "Horror Nights", members: 65 },
-];
-
-const mockActiveUsers = [
-  { id: 1, username: "MovieBuff", reviews: 45 },
-  { id: 2, username: "Cinephile42", reviews: 38 },
-];
-
-const mockPopularUsers = [
-  { id: 3, username: "FilmGeek", likes: 210 },
-  { id: 4, username: "ScreenJunkie", likes: 180 },
-];
 
 function HomePage() {
   const [movies, setMovies] = useState([]); // Popular Movies
@@ -159,11 +144,38 @@ function HomePage() {
         setFinnkino(mockFinnkino); // Fallback to mock data
       });
 
-    // keep mocks for the rest
-    setReviews(mockReviews);
-    setGroups(mockGroups);
-    setActiveUsers(mockActiveUsers);
-    setPopularUsers(mockPopularUsers);
+  // -------------------------------
+    // ✅ REAL DATA FOR OTHER SECTIONS
+    // -------------------------------
+    // Recent Reviews
+    getRecentReviews()
+      .then((data) => {
+        console.log("✅ Recent reviews fetched:", data);
+        setReviews(Array.isArray(data) ? data : []);
+      })
+      .catch((err) => console.error("Failed to load recent reviews:", err));
+
+    // Most Active Users
+    getUsersByReviewCount()
+      .then((data) => {
+        setActiveUsers(Array.isArray(data) ? data : []);
+      })
+      .catch((err) => console.error("Failed to load active users:", err));
+
+    // Most Popular Users
+    getUsersByAura()
+      .then((data) => {
+        setPopularUsers(Array.isArray(data) ? data : []);
+      })
+      .catch((err) => console.error("Failed to load popular users:", err));
+
+    // Popular Groups
+    getPopularGroups(20)
+      .then((data) => {
+        console.log("✅ Popular groups fetched:", data);
+        setGroups(Array.isArray(data) ? data : []);
+      })
+      .catch((err) => console.error("Failed to load popular groups:", err));
   }, []);
 
   return (

@@ -1,4 +1,3 @@
-// src/components/MovieActionsBar.jsx
 import FavoriteButton from "./buttons/FavoriteButton"
 import WatchlistButton from "./buttons/WatchlistButton"
 import GroupFavoritesButton from "./buttons/GroupFavoritesButton"

@@ -13,6 +13,10 @@ export const authAPI = axios.create({
   baseURL: `${API_BASE_URL}/v1/users`,
 })
 
+// Create a separate instance for group endpoints
+export const groupAPI = axios.create({
+  baseURL: `${API_BASE_URL}/groups`,
+})
 // Create a separate instance for review endpoints
 export const reviewAPI = axios.create({
   baseURL: `${API_BASE_URL}/v1/reviews`,

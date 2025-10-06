@@ -1,0 +1,57 @@
+.create-review-card {
+  background-color: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1.2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+.create-review-card h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  color: #ffd700;
+}
+
+.create-review-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.create-review-card label {
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.create-review-card select,
+.create-review-card textarea {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 5px;
+  padding: 0.5rem;
+  color: #eee;
+  font-size: 0.9rem;
+}
+
+.create-review-card textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.create-review-card button {
+  align-self: flex-start;
+  background: #ffd700;
+  border: none;
+  border-radius: 5px;
+  padding: 0.6rem 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.create-review-card button:hover {
+  background: #e6c200;
+}

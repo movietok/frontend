@@ -1,0 +1,72 @@
+:root {
+  --mt-grid-cols: 4;
+  --mt-gap-x: 24px;
+  --mt-gap-y: 28px;
+}
+
+.mt-groups-wrap {
+  display: grid;
+  grid-template-columns: repeat(var(--mt-grid-cols), 1fr);
+  gap: var(--mt-gap-y) var(--mt-gap-x);
+  align-items: start;
+  justify-items: stretch;
+  width: 100%;
+}
+
+/* Each tile fills its cell */
+.mt-group-tile {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+}
+
+
+
+/* Link fills tile; card fills link */
+.mt-group-tile > .group-card-link {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+.mt-group-tile > .group-card-link > .group-card {
+  width: 100%;
+}
+
+/* Separate section for Create Group button */
+.create-group-section {
+  margin-top: 3rem;   /* big breathing room */
+  display: flex;
+  justify-content: center; /* center it under sidebar */
+}
+
+.create-group-btn {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  background-color: #16a34a; /* green-600 */
+  color: white;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.create-group-btn:hover {
+  background-color: #15803d; /* green-700 */
+}
+
+@media (max-width: 1280px) {
+  :root {
+    --mt-grid-cols: 3;
+  }
+}
+
+@media (max-width: 900px) {
+  :root {
+    --mt-grid-cols: 2;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --mt-grid-cols: 1;
+  }
+}
