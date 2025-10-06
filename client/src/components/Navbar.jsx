@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import searchIcon from "../images/searchimage.png"
 import movieTokLogo from "../images/Movietoklogo.png"
-import ConfirmModal from "./Popups/ConfirmModal"
 import UniversalModal from "./Popups/UniversalModal" 
 
 import "../styles/navbar.css"
@@ -12,10 +11,8 @@ export default function Navbar() {
   const [query, setQuery] = useState("")
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef(null)
-  const { isLoggedIn, logout, deleteAccount, user } = useAuth()
+  const { isLoggedIn, logout, user } = useAuth()
   const navigate = useNavigate()
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [showDeletedModal, setShowDeletedModal] = useState(false)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
 
   const handleSearch = (e) => {
@@ -92,7 +89,7 @@ export default function Navbar() {
                 <div className="burger-menu" ref={menuRef}>
                   <Link to={`/profile/${user?.id || ''}`} className="navbar-link" onClick={() => setMenuOpen(false)}>Profile</Link><br />
                   <Link to="/settings" className="navbar-link" onClick={() => setMenuOpen(false)}>Settings</Link><br />
-                  <Link to="/favorites" className="navbar-link" onClick={() => setMenuOpen(false)}>Favorites</Link><br />
+                  <Link to={`/favorites/${user?.id}`} className="navbar-link" onClick={() => setMenuOpen(false)}>Favorites</Link>
                 </div>
               )}
             </div>

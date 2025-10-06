@@ -1,65 +1,70 @@
 import { Link } from "react-router-dom"
-import FavoriteButton from "./buttons/FavoriteButton"
-import WatchlistButton from "./buttons/WatchlistButton"
+import MovieActionsBar from "./MovieActionBar"
 import "../styles/FavoritesGrid.css"
 
-export default function FavoriteGrid({ favorites, type = 2 }) {
+export default function FavoriteGrid({ favorites, type = 2, userId, limit = 4 }) {
   if (!favorites || favorites.length === 0) {
     return (
       <p className="text-gray-400">
-        {type === 1 ? "No movies in your watchlist yet. 👁" : "No favorite movies yet. ⭐"}
+        {type === 1 ? "No movies in this watchlist yet. 👁" : "No favorite movies yet. ⭐"}
       </p>
     )
   }
 
-  const recentFavorites = [...favorites]
-    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-    .slice(0, 4)
+  const sorted = [...favorites].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+  const displayed = limit ? sorted.slice(0, limit) : sorted
+  const viewAllPath = type === 1 ? `/watchlist/${userId}` : `/favorites/${userId}`
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {recentFavorites.map((fav) => (
-        <div key={fav.tmdb_id} className="relative group">
-          <Link to={`/movie/${fav.tmdb_id}`}>
-            <div className="movie-card rounded-xl overflow-hidden shadow-xl transform transition hover:scale-105 hover:shadow-2xl">
-              {fav.poster_url ? (
-                <img
-                  src={`${fav.poster_url}`}
-                  alt={fav.original_title}
-                  className="w-full h-auto"
-                />
-              ) : (
-                <div className="bg-gray-800 text-white flex items-center justify-center h-64">
-                  No image
-                </div>
-              )}
-              <div className="movie-meta p-2 text-center bg-gradient-to-t from-black/80 to-transparent absolute bottom-0 w-full">
-                <p className="text-white font-semibold text-sm truncate">{fav.original_title}</p>
-                {fav.release_year && (
-                  <p className="text-gray-300 text-xs">{fav.release_year}</p>
+    <div>
+      <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 gap-4">
+        {displayed.map((fav) => (
+          <div key={fav.tmdb_id} className="relative group">
+            <Link to={`/movie/${fav.tmdb_id}`}>
+              <div className="movie-card rounded-xl overflow-hidden shadow-xl transform transition hover:scale-105 hover:shadow-2xl">
+                {fav.poster_url ? (
+                  <img
+                    src={`https://image.tmdb.org/t/p/w300${fav.poster_url}`}
+                    alt={fav.original_title}
+                    className="poster-image group-hover:brightness-75 transition duration-300"
+                  />
+                ) : (
+                  <div className="poster-placeholder">No image</div>
                 )}
-              </div>
-            </div>
-          </Link>
 
-          {type === 2 && (
-            <FavoriteButton
-              tmdbId={fav.tmdb_id}
-              type={2}
-              initialIsFavorite={true}
-              movieData={fav}
-              disableAutoCheck={true}
-            />
-          )}
-          {type === 1 && (
-            <WatchlistButton
-              tmdbId={fav.tmdb_id}
-              initialIsWatchlist={true}
-              onStatusChange={() => {}}
-            />
-          )}
+                {/* Overlay Info */}
+              <div className="poster-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center text-center">
+                <div className="overlay-header">
+                  <p className="title">{fav.original_title}</p>
+                  <p className="meta">{fav.release_year} • IMDb {fav.imdb_rating ?? "N/A"}</p>
+                </div>
+              </div>
+              </div>
+            </Link>
+
+            {/* Action Buttons */}
+            <div className="actions-hover-wrapper opacity-0 group-hover:opacity-100 transition-opacity duration-0">
+              <MovieActionsBar
+                tmdbId={fav.tmdb_id}
+                type={type}
+                groupId={fav.group_id ?? null}
+                initialIsFavorite={type === 2}
+                initialIsWatchlist={type === 1}
+                movieData={fav}
+                showGroupButton={!!fav.group_id}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {limit && (
+        <div className="view-all-link text-right mt-4">
+          <Link to={viewAllPath} className="text-blue-400 hover:underline text-sm">
+            View All {type === 1 ? "Watchlist" : "Favorites"} →
+          </Link>
         </div>
-      ))}
+      )}
     </div>
   )
 }
