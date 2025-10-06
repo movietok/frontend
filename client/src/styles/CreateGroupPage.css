@@ -1,0 +1,130 @@
+/* PAGE CONTAINER */
+.create-group-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0d0d0d 0%, #121212 100%);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 4rem 1rem;
+  color: #e4e4e4;
+  font-family: 'Inter', sans-serif;
+}
+
+/* MAIN FORM CARD */
+.create-group-page .group-form-container {
+  width: 100%;
+  max-width: 700px;
+  background: #1a1a1a;
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  padding: 2.5rem;
+  border: 1px solid #2a2a2a;
+}
+
+/* HEADER */
+.create-group-page .form-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.5rem;
+}
+
+/* FORM LAYOUT */
+.create-group-page form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* LABELS */
+.create-group-page label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  color: #cfcfcf;
+}
+
+/* INPUTS / SELECTS / TEXTAREAS */
+.create-group-page input,
+.create-group-page textarea,
+.create-group-page select {
+  background-color: #202020;
+  border: 1px solid #333;
+  color: #eee;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  transition: all 0.25s ease;
+}
+
+.create-group-page input:focus,
+.create-group-page textarea:focus,
+.create-group-page select:focus {
+  outline: none;
+  border-color: #3dd68c;
+  box-shadow: 0 0 0 2px rgba(61, 214, 140, 0.3);
+}
+
+.create-group-page textarea {
+  resize: none;
+  min-height: 100px;
+}
+
+/* GENRE BOX */
+.create-group-page .genre-box {
+  background-color: #181818;
+  border: 1px solid #2a2a2a;
+  padding: 1rem;
+  border-radius: 0.75rem;
+}
+
+/* BUTTONS */
+.create-group-page button {
+  background-color: #3dd68c;
+  color: #111;
+  border: none;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  padding: 0.9rem;
+  margin-top: 1rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.create-group-page button:hover:not(:disabled) {
+  background-color: #47e79a;
+  transform: translateY(-1px);
+}
+
+.create-group-page button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Fix genre button contrast inside the create group form */
+.create-group-page .genre-box button {
+  border: 1px solid #ccc !important;        /* Clear white border */
+  color: #f3f3f3 !important;                /* Brighter text */
+  background: transparent !important;
+  border-radius: 9999px;
+  padding: 0.4rem 0.9rem;
+  margin: 0.3rem;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+/* Hover highlight */
+.create-group-page .genre-box button:hover {
+  border-color: #3dd68c !important;         /* Subtle green accent */
+  color: #3dd68c !important;
+}
+
+/* Active/selected state */
+.create-group-page .genre-box button[aria-pressed="true"] {
+  background: #3dd68c !important;
+  color: #111 !important;
+  border-color: #3dd68c !important;
+}
