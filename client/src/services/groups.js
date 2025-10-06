@@ -47,12 +47,12 @@ export const createGroup = async (groupData) => {
   return res.data.group || res.data;
 };
 
-// ✅ Fetch the most popular groups by member count
+// Fetch the most popular groups by member count
 export const getPopularGroups = async (limit = 20) => {
   try {
     const response = await api.get(`/groups/popular?limit=${limit}`);
 
-    // ✅ Adjusted to correctly return the inner array
+    // Adjusted to correctly return the inner array
     const groups = response.data?.data || [];
     return Array.isArray(groups) ? groups : [];
   } catch (error) {

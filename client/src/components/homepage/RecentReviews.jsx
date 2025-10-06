@@ -28,7 +28,7 @@ function RecentReviews({ reviews = [] }) {
                 <h3>{review.movie_name || "Unknown Movie"}</h3>
               </Link>
 
-              {/* 👤 Username + rating */}
+              {/* Username + rating */}
               <p>
                 <Link to={`/profile/${review.user_id}`}>
                   <strong>{truncateUsername(review.username)}</strong>
@@ -36,14 +36,14 @@ function RecentReviews({ reviews = [] }) {
                 – {"⭐".repeat(review.rating || 0)}
               </p>
 
-              {/* 💬 Review text */}
+              {/* Review text */}
               <p className="review-text">
                 {review.content?.length > 120
                   ? review.content.slice(0, 120) + "..."
                   : review.content || "No review text"}
               </p>
 
-              {/* 🔗 See more */}
+              {/* See more */}
               <Link
                 to={`/movie/${review.movie_id}#review-${review.id}`}
                 className="review-btn"

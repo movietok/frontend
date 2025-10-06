@@ -1,7 +1,3 @@
-/* ==========================
-   GROUP DETAILS PAGE STYLES
-   ========================== */
-
 /* ===== Base Layout ===== */
 .group-details-page {
   padding: 2rem;
@@ -258,13 +254,13 @@
   flex-shrink: 0;
 }
 
-/* ✅ Added margin-left to give breathing room between poster and title */
+/* Added margin-left to give breathing room between poster and title */
 .review-movie-info {
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 0.25rem;
-  margin-left: 0.8rem; /* <-- added breathing space */
+  margin-left: 0.8rem;
 }
 
 .review-movie-title {
@@ -330,13 +326,13 @@
   flex-shrink: 0;
 }
 
-/* ✅ Added margin-left for consistent spacing here too */
+/* Added margin-left for consistent spacing */
 .group-review-movie-info {
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 0.25rem;
-  margin-left: 0.8rem; /* <-- consistent breathing space */
+  margin-left: 0.8rem; 
 }
 
 .group-review-movie-title {
@@ -381,7 +377,7 @@
   flex-shrink: 0;
 }
 
-/* ✅ Added margin-left for inline version as well */
+/* Added margin-left for inline version as well */
 .review-movie-inline-info {
   display: flex;
   flex-direction: column;

@@ -24,7 +24,7 @@ export async function createReview({ movieId, rating, comment }) {
       "Content-Type": "application/json",
       ...(token() ? { Authorization: `Bearer ${token()}` } : {}),
     },
-    // ✅ backend expects "content"
+    // backend expects "content"
     body: JSON.stringify({ movieId, rating, content: comment }),
   });
 
@@ -70,7 +70,7 @@ export async function updateReview(id, { rating, comment }) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
-    // ✅ backend expects "content"
+    // backend expects "content"
     body: JSON.stringify({ rating, content: comment }),
   });
 
@@ -111,7 +111,7 @@ export const getRecentReviews = async (limit = 20) => {
   }
 };
 
-// ✅ Fetch users sorted by number of reviews
+// Fetch users sorted by number of reviews
 export const getUsersByReviewCount = async () => {
   try {
     const response = await api.get("/reviews/users-by-review-count");
@@ -122,7 +122,7 @@ export const getUsersByReviewCount = async () => {
   }
 };
 
-// ✅ Fetch users sorted by aura (likes)
+// Fetch users sorted by aura (likes)
 export const getUsersByAura = async () => {
   try {
     const response = await api.get("/reviews/users-by-aura");
@@ -133,7 +133,7 @@ export const getUsersByAura = async () => {
   }
 };
 
-// ✅ Fetch reviews of movies in a group's favorites (for group activity)
+//  Fetch reviews of movies in a group's favorites (for group activity)
 export async function getGroupReviews(groupId) {
   try {
     const res = await fetch(`/api/reviews/group/${groupId}`, {

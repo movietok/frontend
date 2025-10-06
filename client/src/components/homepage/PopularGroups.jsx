@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Carousel from "../Carousel";
 
 function PopularGroups({ groups }) {
-  // ✂️ Helper to safely truncate long group names
+  // Helper to safely truncate
   const truncateGroupName = (name, maxLen = 18) => {
     if (!name) return "Unnamed Group";
     return name.length > maxLen ? name.slice(0, maxLen) + "..." : name;

@@ -41,7 +41,7 @@
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* ✅ ensures proper "..." truncation */
+  text-overflow: ellipsis; /* ensures proper "..." truncation */
   border-bottom: 2px solid #a788ff;
   display: inline-block;
   padding-bottom: 0.1rem;
@@ -54,7 +54,7 @@
   margin-top: 0.25rem;
 }
 
-/* ✅ Fixed hover overlay */
+/* Fixed hover overlay */
 .group-hover-overlay {
   position: absolute;
   inset: 0;

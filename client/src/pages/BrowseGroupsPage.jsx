@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom"; // ⬅️ add useNavigate
+import { useSearchParams, useNavigate } from "react-router-dom"; 
 import { getGenres } from "../services/tmdb"
 import { discoverGroups, searchGroups } from "../services/groups";
 import GroupCard from "../components/GroupCard";
@@ -8,7 +8,7 @@ import "../styles/BrowseGroupsPage.css";
 
 function BrowseGroupsPage() {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate(); // ⬅️ initialize
+  const navigate = useNavigate();
   const [genres, setGenres] = useState([]);
   const [selectedGenresDraft, setSelectedGenresDraft] = useState([]);
   const [appliedGenres, setAppliedGenres] = useState([]);
@@ -68,7 +68,6 @@ function BrowseGroupsPage() {
   setGroups([]);
   discoverGroups({ withGenres: appliedGenres, page })
     .then((data) => {
-      console.log("📦 Raw group data from backend:", data); // ✅ added line
       if (data && Array.isArray(data.groups)) {
         data.groups.forEach((g) =>
           console.log(`Group: ${g.name}, Members: ${g.member_count}`)

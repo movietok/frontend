@@ -3,14 +3,13 @@ import "../styles/GroupCard.css";
 import fallbackImg from "../images/fallback.png";
 
 function GroupCard({ group }) {
-  // ✅ Safe truncate helper
+  //  Safe truncate helper
   const truncate = (text, len) =>
     text && text.length > len ? text.slice(0, len) + "..." : text;
 
-  // ✅ Determine which image to use
+  //  Determine which image to use
   const imageSrc = group.poster_url ? group.poster_url : fallbackImg;
 
-  // ✅ Fix member count duplication
   const memberCount = group.member_count ?? 0;
 
   return (
@@ -21,7 +20,7 @@ function GroupCard({ group }) {
 
         {/* Info section */}
         <div className="group-card-body">
-          {/* ✅ Truncated title with ellipsis */}
+          {/*  Truncated title with ellipsis */}
           <h3 className="group-card-title" title={group.name}>
             {truncate(group.name, 24)}
           </h3>
@@ -30,7 +29,7 @@ function GroupCard({ group }) {
           </p>
         </div>
 
-        {/* ✅ Hover overlay with truncated description */}
+        {/*  Hover overlay with truncated description */}
         <div className="group-hover-overlay">
           <p>
             {group.description

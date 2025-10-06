@@ -3,7 +3,7 @@ import { favoritesAPI } from "./api"
 export const addFavorite = async (tmdb_id, type, group_id, movieData = {}) => {
   const token = localStorage.getItem("token")
   const payload = {
-    movie_id: tmdb_id, // ✅ renamed here
+    movie_id: tmdb_id, 
     type,
     group_id,
     ...movieData

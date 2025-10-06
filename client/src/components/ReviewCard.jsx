@@ -12,7 +12,7 @@ function ReviewCard({
   currentUserId,
   onDeleted,
   onUpdated,
-  showMovieHeader = false, // ✅ Only true in GroupDetailsPage
+  showMovieHeader = false, // Only true in GroupDetailsPage
 }) {
   console.log("🎬 ReviewCard props check:", {
   id: review?.id,
@@ -39,7 +39,7 @@ function ReviewCard({
   const [expanded, setExpanded] = useState(false);
   const maxPreviewLength = 300;
 
-  // ✅ Ownership detection
+  // Ownership detection
   useEffect(() => {
     if (!review || !currentUserId) return;
     const reviewUserId = Number(review.userId ?? review.user_id);
@@ -95,7 +95,7 @@ function ReviewCard({
     ? review.content.slice(0, maxPreviewLength) + "..."
     : review.content;
 
-  // ✅ Inline Movie Header (for GroupDetailsPage only)
+  // Inline Movie Header (for GroupDetailsPage only)
   const MovieHeader = () => {
     // Handle both snake_case and camelCase keys
     const movieId = review.movie_id ?? review.movieId;

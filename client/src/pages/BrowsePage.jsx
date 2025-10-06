@@ -1,4 +1,3 @@
-// [imports remain unchanged]
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 import { getGenres, discoverMovies } from "../services/tmdb"
