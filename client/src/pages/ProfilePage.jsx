@@ -1,57 +1,56 @@
-import { useEffect, useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
-import { useAuth } from "../context/AuthContext"
-import { useProfile } from "../hooks/useProfile"
-import { useUserReviews } from "../hooks/useUserReviews"
-import "../styles/ProfilePage.css"
-import { useFavorites } from "../hooks/useFavorites"
-import FavoriteGrid from "../components/FavoriteGrid"
-
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useProfile } from "../hooks/useProfile";
+import { useUserReviews } from "../hooks/useUserReviews";
+import "../styles/ProfilePage.css";
+import { useFavorites } from "../hooks/useFavorites";
+import FavoriteGrid from "../components/FavoriteGrid";
 
 function SectionDivider() {
-  return <div className="section-divider" />
+  return <div className="section-divider" />;
 }
 
 export default function ProfilePage() {
-  const { userId } = useParams() // Get userId from URL
-  const { isLoggedIn, user: currentUser } = useAuth()
-  
-  console.log('ProfilePage render - userId:', userId, 'currentUser?.id:', currentUser?.id, 'isLoggedIn:', isLoggedIn)
-  
-  // Check if viewing own profile BEFORE making API calls
-  // If no userId in URL (/profile), it's own profile
-  // If userId matches current user's id, it's also own profile
-  const isOwnProfile = !userId || (currentUser?.id && userId === String(currentUser.id))
-  
-  const { user, loading, error } = useProfile(userId)
-  
+  const { userId } = useParams();
+  const { isLoggedIn, user: currentUser } = useAuth();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("Profile");
+
+  const isOwnProfile = !userId || (currentUser?.id && userId === String(currentUser.id));
+
+  const { user, loading, error } = useProfile(userId);
+
   // Only fetch watchlist if viewing own profile
   const { favorites: watchlist, loading: watchlistLoading, error: watchlistError } = useFavorites(
-    isOwnProfile ? user?.id : null, 
+    isOwnProfile ? user?.id : null,
     1
-  )
-  
+  );
+
   // Always fetch favorites (public)
-  const { favorites, loading: favoritesLoading, error: favoritesError } = useFavorites(user?.id, 2)
-  const { reviews, loading: reviewsLoading, error: reviewsError } = useUserReviews(user?.id)
-  const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState("Profile")
+  const { favorites, loading: favoritesLoading, error: favoritesError } = useFavorites(user?.id, 2);
+  const { reviews, loading: reviewsLoading, error: reviewsError } = useUserReviews(user?.id);
 
+  useEffect(() => {
+    if (isOwnProfile && !isLoggedIn) {
+      navigate("/login");
+    }
+  }, [isOwnProfile, isLoggedIn, navigate]);
 
-  if (loading) return <div className="profile-loading">Loading profile...</div>
+  if (loading) return <div className="profile-loading">Loading profile...</div>;
   if (error) {
-    console.error('Profile error:', error)
+    console.error("Profile error:", error);
     return (
       <div className="profile-error">
         <h3>Error loading profile</h3>
-        <p>{error.message || 'Unknown error occurred'}</p>
-        <p style={{ fontSize: '0.9em', color: '#666' }}>
-          {userId ? `Tried to load user ID: ${userId}` : 'Tried to load own profile'}
+        <p>{error.message || "Unknown error occurred"}</p>
+        <p style={{ fontSize: "0.9em", color: "#666" }}>
+          {userId ? `Tried to load user ID: ${userId}` : "Tried to load own profile"}
         </p>
       </div>
-    )
+    );
   }
-  if (!user) return <div className="profile-error">Profile not found.</div>
+  if (!user) return <div className="profile-error">Profile not found.</div>;
 
   return (
     <div className="profile-container">
@@ -61,23 +60,20 @@ export default function ProfilePage() {
         </div>
         <div className="profile-main">
           <div className="profile-username-row">
-            <h2>{user.username}    
-              <span className="profile-user-id">
-                (ID: {user.id})
-              </span>
+            <h2>
+              {user.username}
+              <span className="profile-user-id">(ID: {user.id})</span>
               {!isOwnProfile && (
-                <span style={{ marginLeft: '10px', fontSize: '0.8em', color: '#888' }}>
+                <span style={{ marginLeft: "10px", fontSize: "0.8em", color: "#888" }}>
                   (Viewing user's profile)
                 </span>
               )}
             </h2>
           </div>
-          
+
           <div className="profile-stats">
             <div>
-              <span className="stat-number">
-                {favoritesLoading ? "…" : favorites.length}
-              </span>
+              <span className="stat-number">{favoritesLoading ? "…" : favorites.length}</span>
               <span className="stat-label">FAVORITES</span>
             </div>
             <div>
@@ -91,42 +87,22 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+
       <div className="profile-tabs">
-        <button
-          className={activeTab === "Profile" ? "active" : ""}
-          onClick={() => setActiveTab("Profile")}
-        >
-          Profile
-        </button>
-        <button
-          className={activeTab === "Activity" ? "active" : ""}
-          onClick={() => setActiveTab("Activity")}
-        >
-          Activity
-        </button>
-        <button
-          className={activeTab === "Favorites" ? "active" : ""}
-          onClick={() => setActiveTab("Favorites")}
-        >
-          Favorites
-        </button>
-        <button
-          className={activeTab === "Reviews" ? "active" : ""}
-          onClick={() => setActiveTab("Reviews")}
-        >
-          Reviews
-        </button>
-        {isOwnProfile && (
+        {["Profile", "Activity", "Favorites", "Reviews", ...(isOwnProfile ? ["Watchlist"] : [])].map((tab) => (
           <button
-            className={activeTab === "Watchlist" ? "active" : ""}
-            onClick={() => setActiveTab("Watchlist")}
+            key={tab}
+            className={activeTab === tab ? "active" : ""}
+            onClick={() => setActiveTab(tab)}
           >
-            Watchlist
+            {tab}
           </button>
-        )}
+        ))}
       </div>
+
       <div className="profile-content">
         <SectionDivider />
+
         {activeTab === "Profile" && (
           <>
             <div className="favorite-films">
@@ -151,7 +127,7 @@ export default function ProfilePage() {
                 {!reviewsLoading && reviews.length === 0 && <p>No reviews yet.</p>}
                 {!reviewsLoading && reviews.length > 0 && (
                   <ul>
-                    {reviews.map(review => (
+                    {reviews.map((review) => (
                       <li key={review.id}>
                         <b>Movie:</b> {review.tmdb_id} &nbsp;
                         <b>Rating:</b> {review.rating} &nbsp;
@@ -164,12 +140,14 @@ export default function ProfilePage() {
             </div>
           </>
         )}
+
         {activeTab === "Activity" && (
           <div>
             <span className="section-title">ACTIVITY</span>
             <div>Activity content goes here.</div>
           </div>
         )}
+
         {activeTab === "Favorites" && (
           <div>
             <span className="section-title">FAVORITES</span>
@@ -178,11 +156,7 @@ export default function ProfilePage() {
               {favoritesError && <p>Error loading favorites.</p>}
               {!favoritesLoading && favorites.length === 0 && <p>No favorite movies yet. ⭐</p>}
               {!favoritesLoading && favorites.length > 0 && (
-                <FavoriteGrid
-                  favorites={[...favorites]
-                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                    .slice(0, 4)}
-                />
+                <FavoriteGrid favorites={favorites} type={2} userId={user.id} limit={8} />
               )}
             </div>
           </div>
@@ -197,7 +171,7 @@ export default function ProfilePage() {
               {!reviewsLoading && reviews.length === 0 && <p>No reviews yet.</p>}
               {!reviewsLoading && reviews.length > 0 && (
                 <ul>
-                  {reviews.map(review => (
+                  {reviews.map((review) => (
                     <li key={review.id}>
                       <b>Movie:</b> {review.tmdb_id} &nbsp;
                       <b>Rating:</b> {review.rating} &nbsp;
@@ -209,6 +183,7 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
+
         {isOwnProfile && activeTab === "Watchlist" && (
           <div>
             <span className="section-title">MY WATCHLIST</span>
@@ -217,12 +192,7 @@ export default function ProfilePage() {
               {watchlistError && <p>Error loading watchlist.</p>}
               {!watchlistLoading && watchlist.length === 0 && <p>No movies in your watchlist yet. 👁</p>}
               {!watchlistLoading && watchlist.length > 0 && (
-                <FavoriteGrid
-                  favorites={[...watchlist]
-                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                    .slice(0, 4)}
-                  type={1} // ✅ pass type=1 so FavoriteGrid knows it's watchlist
-                />
+                <FavoriteGrid favorites={watchlist} type={1} userId={user.id} limit={null} />
               )}
             </div>
           </div>
@@ -231,5 +201,5 @@ export default function ProfilePage() {
         <SectionDivider />
       </div>
     </div>
-  )
+  );
 }
