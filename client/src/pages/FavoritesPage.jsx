@@ -30,43 +30,43 @@ export default function FavoritesPage() {
       ) : (
         <div className="favorites-grid">
           {favorites.map((fav) => (
-            <div key={fav.tmdb_id} className="movie-card group">
-              <Link to={`/movie/${fav.tmdb_id}`}>
-                <div className="poster-container">
-                  {fav.poster_url ? (
-                    <img
-                      src={`https://image.tmdb.org/t/p/w300${fav.poster_url}`}
-                      alt={fav.original_title}
-                      className="poster-image"
-                    />
-                  ) : (
-                    <div className="poster-placeholder">No image</div>
-                  )}
-                  <div className="poster-overlay group-hover:opacity-100">
-                    <div className="overlay-header">
-                      <p className="title">{fav.original_title}</p>
-                      <p className="meta">
-                        {fav.release_year} • IMDb {fav.imdb_rating ?? "N/A"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </Link>
+           <div key={fav.tmdb_id} className="relative group">
+  <Link to={`/movie/${fav.tmdb_id}`}>
+    <div className="movie-card rounded-xl overflow-hidden shadow-xl transform transition hover:scale-105 hover:shadow-2xl">
+      {fav.poster_url ? (
+        <img
+          src={`https://image.tmdb.org/t/p/w300${fav.poster_url}`}
+          alt={fav.original_title}
+          className="poster-image group-hover:brightness-75 transition duration-300"
+        />
+      ) : (
+        <div className="poster-placeholder">No image</div>
+      )}
 
-              <div className="actions-hover-wrapper">
-                <MovieActionBar
-                  tmdbId={fav.tmdb_id}
-                  type={2}
-                  initialIsFavorite={true}
-                  initialIsWatchlist={fav.isWatchlist || false}
-                  movieData={{
-                    original_title: fav.original_title,
-                    release_year: fav.release_year,
-                    poster_path: fav.poster_url,
-                  }}
-                />
-              </div>
-            </div>
+      <div className="poster-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center text-center">
+        <div className="overlay-header">
+          <p className="title">{fav.original_title}</p>
+          <p className="meta">{fav.release_year} • IMDb {fav.imdb_rating ?? "N/A"}</p>
+        </div>
+      </div>
+    </div>
+  </Link>
+
+  <div className="actions-hover-wrapper opacity-0 group-hover:opacity-100 transition-opacity duration-0">
+    <MovieActionBar
+      tmdbId={fav.tmdb_id}
+      type={2}
+      initialIsFavorite={true}
+      initialIsWatchlist={fav.isWatchlist || false}
+      movieData={{
+        original_title: fav.original_title,
+        release_year: fav.release_year,
+        poster_path: fav.poster_url,
+      }}
+    />
+  </div>
+</div>
+
           ))}
         </div>
       )}

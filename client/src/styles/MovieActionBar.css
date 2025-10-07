@@ -2,8 +2,7 @@
   position: absolute;
   top: 1rem;
   right: 5.5rem; 
-  display: flex;
-  gap: 0.1rem;   
+  display: flex;  
   z-index: 10;
   align-items: center;
 }
@@ -23,6 +22,11 @@ button svg {
   outline: none;
   border: none;
 }
+
+.movie-actions-bar button + button {
+  margin-left: -20px;
+}
+
 
 .movie-actions-bar button:active {
   transform: scale(0.95); /* Optional: press animation */
