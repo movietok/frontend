@@ -25,6 +25,37 @@
   margin-right: 32px;
 }
 
+.review-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-top: 1.5rem;
+  word-break: break-word;
+}
+.review-card {
+  background-color: #fdfdfd;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.review-content p {
+  font-size: 0.9rem;
+  color: #333;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+
 .profile-main {
   flex: 1;
 }
@@ -89,18 +120,6 @@
   padding-bottom: 8px;
   align-items: center;
   flex-wrap: wrap;
-}
-
-.profile-tabs button {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 1rem;
-  padding: 8px 0;
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-  font-weight: 500;
-  transition: color 0.2s;
 }
 
 .profile-tabs .active {

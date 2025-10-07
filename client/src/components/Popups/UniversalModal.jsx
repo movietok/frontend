@@ -1,13 +1,38 @@
-import "../../styles/modal.css"
+import "../../styles/modal.css";
 
-export default function UniversalModal({ isOpen, title, message, onOk, onCancel }) {
-  if (!isOpen) return null
+export default function UniversalModal({
+  isOpen,
+  title,
+  message,
+  onOk,
+  onCancel,
+  inputLabel,
+  inputType = "text",
+  inputValue,
+  onInputChange
+}) {
+  if (!isOpen) return null;
 
   return (
     <div className="modal-overlay">
       <div className="modal">
         <h2>{title}</h2>
         <p>{message}</p>
+
+        {/* Optional input field */}
+        {inputLabel && (
+          <div className="modal-input-group">
+            <label>{inputLabel}</label>
+            <input
+              type={inputType}
+              value={inputValue}
+              onChange={onInputChange}
+              className="modal-input"
+              placeholder={inputLabel}
+            />
+          </div>
+        )}
+
         <div className="modal-actions">
           {onCancel && (
             <button className="btn cancel" onClick={onCancel}>Cancel</button>
@@ -16,5 +41,5 @@ export default function UniversalModal({ isOpen, title, message, onOk, onCancel 
         </div>
       </div>
     </div>
-  )
+  );
 }
