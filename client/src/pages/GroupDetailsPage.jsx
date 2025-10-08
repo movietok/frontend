@@ -5,6 +5,7 @@ import { getGroupFavorites, removeFavorite } from "../services/favoriteService";
 import { getGroupReviews } from "../services/reviews";
 import GroupManagementBox from "../components/groups/GroupManagementBox";
 import ReviewCard from "../components/ReviewCard";
+import CopyLinkButton from "../components/CopyLinkButton";
 import "../styles/GroupDetailsPage.css";
 
 function GroupDetailsPage() {
@@ -154,6 +155,7 @@ function GroupDetailsPage() {
         />
         <div className="group-info">
           <h1 className="group-title">{group.name}</h1>
+          <CopyLinkButton />
           <p className="group-meta">
             Owner: <span>{group.owner_name || "Unknown"}</span> • Members:{" "}
             <span>{group.member_count || 0}</span>

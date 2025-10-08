@@ -1,14 +1,14 @@
-// src/pages/MovieDetailsPage.jsx
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getMovieDetails } from "../services/tmdb";
 import { getMovieReviews } from "../services/reviews";
 import { addFavorite } from "../services/favoriteService";
-import { getUserGroupsAPI } from "../services/groups"; // or create this if not existing
+import { getUserGroupsAPI } from "../services/groups"; 
 import Carousel from "../components/Carousel";
 import CreateReview from "../components/CreateReview";
 import ReviewCard from "../components/ReviewCard";
+import CopyLinkButton from "../components/CopyLinkButton";
 import "../styles/MovieDetailsPage.css";
 
 function MovieDetailsPage() {
@@ -147,6 +147,7 @@ function MovieDetailsPage() {
               >
                 ➕ Add to Group Favorites
               </button>
+              <CopyLinkButton />
             </div>
           )}
         </div>
