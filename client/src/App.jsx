@@ -16,6 +16,10 @@ import FavoritesPage from "./pages/FavoritesPage";
 import SettingsPage from "./pages/SettingsPage";
 import CreateGroupPage from "./pages/CreateGroupPage";
 import GroupDetailsPage from "./pages/GroupDetailsPage";
+import AboutPage from "./pages/AboutPage"
+import FaqPage from "./pages/FaqPage"
+import TermsPage from "./pages/TermsPage"
+import ContactPage from "./pages/ContactPage"
 
 function App() {
   return (
@@ -40,7 +44,6 @@ function App() {
             <Route path="/homepage" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
-            
             <Route path="/favorites/:userId" element={<FavoritesPage />} />
             <Route path="/search" element={<SearchResultsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
@@ -53,6 +56,10 @@ function App() {
             <Route path="/movie/:id" element={<MovieDetailsPage />} />
             <Route path="/groups/:id" element={<GroupDetailsPage />} />
             <Route path="/groups/create" element={<CreateGroupPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/faq" element={<FaqPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/contact" element={<ContactPage />} />
      
           </Routes>
         </main>

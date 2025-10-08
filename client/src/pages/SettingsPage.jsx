@@ -125,10 +125,10 @@ export default function SettingsPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="settings-form">
-          <label>Email</label>
+          <label>New Email</label>
           <input name="email" value={formData.email} onChange={handleChange} />
 
-          <label>Username</label>
+          <label>New Username</label>
           <input name="username" value={formData.username} onChange={handleChange} />
 
           <label>New Password</label>

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import searchIcon from "../images/searchimage.png"
-import movieTokLogo from "../images/Movietoklogo.png"
+import movieTokLogo from "../images/movietoknbg.png"
 import UniversalModal from "./Popups/UniversalModal" 
 
 import "../styles/navbar.css"
