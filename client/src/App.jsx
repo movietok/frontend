@@ -11,11 +11,11 @@ import ShowTimesPage from "./pages/ShowTimesPage"
 import LoginPage from "./pages/LoginPage"
 import SignupPage from "./pages/SignupPage"
 import ReviewsPage from "./pages/ReviewsPage"
-import MovieDetailsPage from "./pages/MovieDetailsPage";
-import FavoritesPage from "./pages/FavoritesPage";
-import SettingsPage from "./pages/SettingsPage";
-import CreateGroupPage from "./pages/CreateGroupPage";
-import GroupDetailsPage from "./pages/GroupDetailsPage";
+import MovieDetailsPage from "./pages/MovieDetailsPage"
+import FavoritesPage from "./pages/FavoritesPage"
+import SettingsPage from "./pages/SettingsPage"
+import CreateGroupPage from "./pages/CreateGroupPage"
+import GroupDetailsPage from "./pages/GroupDetailsPage"
 import AboutPage from "./pages/AboutPage"
 import FaqPage from "./pages/FaqPage"
 import TermsPage from "./pages/TermsPage"

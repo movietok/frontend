@@ -110,14 +110,16 @@ export default function ShowTimesPage() {
             onChange={(e) => setDate(isoToFinnkino(e.target.value))}
           />
         </div>
+        <div className="search-button-wrapper">
+          <button
+            className="search-button"
+            onClick={handleSearch}
+            disabled={loading || !selectedArea || !date}
+          >
+            {loading ? "Loading..." : "Search Showtimes"}
+          </button>
+        </div>
 
-        <button
-          className="search-button"
-          onClick={handleSearch}
-          disabled={loading || !selectedArea || !date}
-        >
-          {loading ? "Loading..." : "Search Showtimes"}
-        </button>
       </section>
 
       {/* Error message */}
@@ -220,16 +222,13 @@ export default function ShowTimesPage() {
             const dateStr = `${day}.${month}.${year}`
 
             return (
-              <button
-                key={days}
-                onClick={() => {
-                  setDate(dateStr)
-                  setTimeout(handleSearch, 100)
-                }}
-                className={date === dateStr ? "active" : ""}
-              >
-                {days === 0 ? "Today" : days === 1 ? "Tomorrow" : dateStr}
-              </button>
+          <button
+            key={days}
+            onClick={() => setDate(dateStr)}
+            className={date === dateStr ? "active" : ""}
+          >
+            {days === 0 ? "Today" : days === 1 ? "Tomorrow" : dateStr}
+          </button>
             )
           })}
         </div>

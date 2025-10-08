@@ -193,7 +193,7 @@ function BrowsePage() {
                     const movieStatus = statuses[movie.id] || { isFavorite: false, isWatchlist: false }
 
                     return (
-                      <div className="mt-movie-tile group" key={movie.id} style={{ position: "relative" }}>
+                      <div className="movie-hover-wrapper mt-movie-tile group" key={movie.id} style={{ position: "relative" }}>
                         <MovieCard movie={movie} />
 
                       {(!user || !statusLoading) && (

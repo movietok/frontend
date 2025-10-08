@@ -1,4 +1,4 @@
-;import { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { addFavorite, removeFavorite, checkFavoriteStatus } from "../../services/favoriteService"
 import { useAuth } from "../../context/AuthContext"
 import "../../styles/FavoriteButton.css"

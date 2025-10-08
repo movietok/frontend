@@ -7,15 +7,25 @@ export function useUserGroups(userId) {
   const [groupsError, setGroupsError] = useState(null);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) {
+      setUserGroups([]);
+      setGroupsLoading(false);
+      return;
+    }
+
+    setGroupsLoading(true);
+    setGroupsError(null);
 
     getUserGroupsAPI(userId)
       .then((groups) => {
-        setUserGroups(groups);
+        const safeGroups = Array.isArray(groups) ? groups : [];
+        setUserGroups(safeGroups);
         setGroupsLoading(false);
+        console.log("✅ Fetched user groups:", safeGroups);
       })
       .catch((err) => {
-        console.error("Failed to fetch user groups:", err);
+        console.error("❌ Failed to fetch user groups:", err);
+        setUserGroups([]);
         setGroupsError(err);
         setGroupsLoading(false);
       });

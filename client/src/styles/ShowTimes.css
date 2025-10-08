@@ -64,6 +64,10 @@ body {
   font-size: 1rem;
 }
 
+.search-button:hover {
+  background: #fcba03;
+}
+
 .search-button {
   background: #335355;
   color: white;
@@ -71,13 +75,17 @@ body {
   padding: 0.75rem 1.5rem;
   border-radius: 4px;
   cursor: pointer;
+  width: 100%;
   font-size: 1rem;
   font-weight: 600;
-  align-self: end;
+  display: block;
 }
 
-.search-button:hover {
-  background: #f40612;
+.search-button-wrapper {
+  grid-column: 1 / -1; 
+  display: flex;
+  justify-content: center;
+
 }
 
 /* Näytöslista */
@@ -101,7 +109,7 @@ body {
 }
 
 .showtime-item:hover {
-  background: #335355;
+  background: #fcba03;
   transition: background 0.2s ease;
 }
 
@@ -144,9 +152,6 @@ body {
   margin: 0;
 }
 
-.showtime-details {
-  text-align: right;
-}
 
 .showtime-time {
   font-size: 1.1rem;
@@ -210,9 +215,15 @@ body {
     margin: 0 auto;
   }
   
-  .showtime-details {
-    text-align: center;
-  }
+ .showtime-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  text-align: right;
+  gap: 0.25rem;
+  min-width: 100px; /* optional: ensures consistent spacing */
+}
   
   .filters-section {
     grid-template-columns: 1fr;
