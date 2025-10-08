@@ -1,15 +1,15 @@
-// src/components/groups/EditGroupModal.jsx
 import { useEffect, useMemo, useState } from "react";
 import { updateGroup } from "../../services/groupService";
 import { getAllGroupThemes } from "../../services/groups";
 import { getGenres } from "../../services/tmdb";
 import GenreSelector from "../GenreSelector";
+import OnsitePopup from "../Popups/OnsitePopup";
 
 export default function EditGroupModal({ group, onClose, onSave }) {
   useEffect(() => {
-  console.log("🟣 EditGroupModal mounted");
-  console.log("group prop in modal:", group);
-}, []);
+    console.log("🟣 EditGroupModal mounted");
+    console.log("group prop in modal:", group);
+  }, []);
 
   // Base fields
   const [name, setName] = useState(group.name || "");
@@ -30,6 +30,11 @@ export default function EditGroupModal({ group, onClose, onSave }) {
     () => group?.id || group?.gID || group?.group?.id,
     [group]
   );
+
+  // === On-site Popup states ===
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState("info");
 
   useEffect(() => {
     // Load genres (TMDB) and seed selected genres
@@ -96,7 +101,11 @@ export default function EditGroupModal({ group, onClose, onSave }) {
     // theme_id: number or null; never send ""
     const oldTheme = group.theme_id == null ? null : Number(group.theme_id);
     const newTheme =
-      themeId === "" ? null : Number.isNaN(Number(themeId)) ? oldTheme : Number(themeId);
+      themeId === ""
+        ? null
+        : Number.isNaN(Number(themeId))
+        ? oldTheme
+        : Number(themeId);
     if (newTheme !== oldTheme) updates.theme_id = newTheme;
 
     // tags: send only if they actually changed (including clearing)
@@ -128,9 +137,17 @@ export default function EditGroupModal({ group, onClose, onSave }) {
 
     try {
       const updated = await updateGroup(groupId, updates);
-      alert("Group updated successfully");
+
+      // ✅ Replace alert with styled popup
+      setPopupMessage("Group updated successfully!");
+      setPopupType("success");
+      setShowPopup(true);
+
       onSave?.(updated?.group ?? updated);
-      onClose();
+      setTimeout(() => {
+        setShowPopup(false);
+        onClose();
+      }, 2000);
     } catch (err) {
       const status = err?.response?.status;
       const data = err?.response?.data;
@@ -140,13 +157,17 @@ export default function EditGroupModal({ group, onClose, onSave }) {
         data?.message ||
         err?.message ||
         "Failed to update group.";
-      alert(msg);
+
+      // ❌ Replace alert with styled popup
+      setPopupMessage(msg);
+      setPopupType("error");
+      setShowPopup(true);
     }
   };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-[9999]">
-  <div className="bg-white text-black p-6 rounded shadow-lg w-[32rem] max-w-[95vw]">
+      <div className="bg-white text-black p-6 rounded shadow-lg w-[32rem] max-w-[95vw]">
         <h3 className="text-lg font-semibold mb-4">Edit Group</h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -165,7 +186,9 @@ export default function EditGroupModal({ group, onClose, onSave }) {
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium mb-1">Description</label>
+            <label className="block text-sm font-medium mb-1">
+              Description
+            </label>
             <textarea
               name="description"
               value={description}
@@ -202,7 +225,7 @@ export default function EditGroupModal({ group, onClose, onSave }) {
             />
           </div>
 
-          {/* Visibility (no 'closed') */}
+          {/* Visibility */}
           <div>
             <label className="block text-sm font-medium mb-1">Visibility</label>
             <select
@@ -233,6 +256,16 @@ export default function EditGroupModal({ group, onClose, onSave }) {
           </div>
         </form>
       </div>
+
+      {/* === On-site Popup integration === */}
+      {showPopup && (
+        <OnsitePopup
+          message={popupMessage}
+          type={popupType}
+          onConfirm={() => setShowPopup(false)}
+          confirmText="OK"
+        />
+      )}
     </div>
   );
 }
