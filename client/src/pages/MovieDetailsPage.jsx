@@ -9,7 +9,7 @@ import Carousel from "../components/Carousel";
 import CreateReview from "../components/CreateReview";
 import ReviewCard from "../components/ReviewCard";
 import CopyLinkButton from "../components/CopyLinkButton";
-import OnsitePopup from "../components/popups/OnsitePopup";
+import OnsitePopup from "../components/Popups/OnsitePopup";
 import FavoriteButton from "../components/buttons/FavoriteButton";
 import WatchlistButton from "../components/buttons/WatchlistButton";
 import "../styles/MovieDetailsPage.css";
@@ -64,14 +64,39 @@ function MovieDetailsPage() {
     fetchReviews();
   }, [id]);
 
-  // ✅ Fetch user groups (for dropdown)
+  // Helper: normalize rank/role from API response
+  const getRank = (g) =>
+    String(
+      g?.rank ??
+        g?.role ??
+        g?.user_role ??
+        g?.membership_role ??
+        g?.membership?.role ??
+        g?.membership?.rank ??
+        ""
+    ).toLowerCase();
+
+  // Only owner/moderator can add to group favorites
+  const hasManagePermission = (g) => {
+    const rank = getRank(g);
+    return rank === "owner" || rank === "moderator" || rank === "mod" || rank === "admin";
+  };
+
+  // ✅ Fetch user groups (filter to owner/moderator)
   useEffect(() => {
     if (!user?.id && !user?.user_id) return;
     const uid = user.id || user.user_id;
 
     getUserGroupsAPI(uid)
       .then((data) => {
-        setGroups(data);
+        const list = Array.isArray(data) ? data : data?.groups || [];
+        const eligible = list.filter(hasManagePermission);
+        setGroups(eligible);
+
+        // Reset selection if it’s no longer valid
+        setSelectedGroup((prev) =>
+          eligible.some((g) => String(g.id) === String(prev)) ? prev : ""
+        );
       })
       .catch(console.error);
   }, [user]);
@@ -107,10 +132,11 @@ function MovieDetailsPage() {
       });
     } catch (err) {
       console.error(err);
-      setPopup({
-        message: err.message || "Failed to add movie to group favorites.",
-        type: "error",
-      });
+      const msg =
+        err?.response?.status === 403
+          ? "You don’t have permission to add favorites for this group."
+          : err?.message || "Failed to add movie to group favorites.";
+      setPopup({ message: msg, type: "error" });
     }
   }
 
@@ -165,7 +191,7 @@ function MovieDetailsPage() {
             </div>
           )}
 
-          {/* ===== Group Favorites Section ===== */}
+          {/* ===== Group Favorites Section (only owner/moderator groups) ===== */}
           {user && groups.length > 0 && (
             <div className="group-favorite-box">
               <select
