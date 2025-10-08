@@ -1,0 +1,57 @@
+.about-page {
+  background-image: url("../images/movietoknbg.png"); /* adjust path if needed */
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 300px;
+  background-color: #1b1b1e;
+  color: #f0f0f0;
+  min-height: 100vh;
+  padding: 4rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.about-container {
+  max-width: 800px;
+  width: 100%;
+  padding: 2.5rem;
+  background-color: rgba(42, 42, 46, 0.85); /* semi-transparent overlay */
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  line-height: 1.7;
+  backdrop-filter: blur(2px);
+  z-index: 1;
+  position: relative;
+}
+
+.about-title {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+  text-align: center;
+}
+
+.about-subtitle {
+  font-size: 1.25rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #f87171;
+  text-align: center;
+}
+
+.about-list {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.about-list li {
+  margin-bottom: 0.5rem;
+}
+
+.about-footer {
+  margin-top: 2rem;
+  font-style: italic;
+  text-align: center;
+  color: #f87171;
+}

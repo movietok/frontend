@@ -1,7 +1,7 @@
 /* Full-page wrapper with clean background */
 .settings-page-wrapper {
   background-color: #1b1b1e;
-  min-height: 100vh;
+  min-height: 1cap;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -11,7 +11,7 @@
 /* Main container — now 80% wide */
 .settings-container {
   background-color: #2a2a2e;
-  width: 95%;
+  width: 100%;
   max-width: 1600px;
   padding: 3rem 5rem;
   border-radius: 12px;
