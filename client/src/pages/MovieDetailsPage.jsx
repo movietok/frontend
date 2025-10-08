@@ -4,11 +4,14 @@ import { useAuth } from "../context/AuthContext";
 import { getMovieDetails } from "../services/tmdb";
 import { getMovieReviews } from "../services/reviews";
 import { addFavorite } from "../services/favoriteService";
-import { getUserGroupsAPI } from "../services/groups"; 
+import { getUserGroupsAPI } from "../services/groups";
 import Carousel from "../components/Carousel";
 import CreateReview from "../components/CreateReview";
 import ReviewCard from "../components/ReviewCard";
 import CopyLinkButton from "../components/CopyLinkButton";
+import OnsitePopup from "../components/popups/OnsitePopup";
+import FavoriteButton from "../components/buttons/FavoriteButton";
+import WatchlistButton from "../components/buttons/WatchlistButton";
 import "../styles/MovieDetailsPage.css";
 
 function MovieDetailsPage() {
@@ -26,6 +29,17 @@ function MovieDetailsPage() {
   // ✅ Group favorites feature
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("");
+
+  // ✅ On-site popup state
+  const [popup, setPopup] = useState(null);
+
+  // Auto-dismiss popup after 2.5s
+  useEffect(() => {
+    if (popup) {
+      const timer = setTimeout(() => setPopup(null), 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [popup]);
 
   useEffect(() => {
     getMovieDetails(id)
@@ -51,17 +65,16 @@ function MovieDetailsPage() {
   }, [id]);
 
   // ✅ Fetch user groups (for dropdown)
- useEffect(() => {
-  if (!user?.id && !user?.user_id) return;
-  const uid = user.id || user.user_id;
+  useEffect(() => {
+    if (!user?.id && !user?.user_id) return;
+    const uid = user.id || user.user_id;
 
-  getUserGroupsAPI(uid)
-    .then((data) => {
-      console.log("Fetched user groups:", data); // optional debug
-      setGroups(data);
-    })
-    .catch(console.error);
-}, [user]);
+    getUserGroupsAPI(uid)
+      .then((data) => {
+        setGroups(data);
+      })
+      .catch(console.error);
+  }, [user]);
 
   const handleReviewAdded = (review) => {
     setReviews((prev) => [review, ...prev]);
@@ -78,13 +91,26 @@ function MovieDetailsPage() {
 
   // ✅ Add movie to group favorites
   async function handleAddToGroupFavorites() {
-    if (!selectedGroup) return alert("Please select a group first.");
+    if (!selectedGroup) {
+      setPopup({
+        message: "Please select a group first.",
+        type: "info",
+      });
+      return;
+    }
+
     try {
       const res = await addFavorite(id, 3, selectedGroup);
-      alert(res.message || "Added to group favorites!");
+      setPopup({
+        message: res.message || "Added to group favorites!",
+        type: "success",
+      });
     } catch (err) {
       console.error(err);
-      alert(err.message || "Failed to add movie to group favorites.");
+      setPopup({
+        message: err.message || "Failed to add movie to group favorites.",
+        type: "error",
+      });
     }
   }
 
@@ -125,7 +151,21 @@ function MovieDetailsPage() {
             </a>
           )}
 
-          {/* ✅ Add-to-group-favorites UI */}
+          {/* ===== Personal Actions (Watchlist + Favorites) ===== */}
+          {user && (
+            <div className="personal-favorite-box">
+              <div className="action-item">
+                <WatchlistButton tmdbId={id} />
+                <span className="action-label">Add to Watchlist</span>
+              </div>
+              <div className="action-item">
+                <FavoriteButton tmdbId={id} type={2} />
+                <span className="action-label">Add to Favorites</span>
+              </div>
+            </div>
+          )}
+
+          {/* ===== Group Favorites Section ===== */}
           {user && groups.length > 0 && (
             <div className="group-favorite-box">
               <select
@@ -147,7 +187,7 @@ function MovieDetailsPage() {
               >
                 ➕ Add to Group Favorites
               </button>
-              <CopyLinkButton />
+              <CopyLinkButton label="Copy Movie Link" />
             </div>
           )}
         </div>
@@ -240,6 +280,16 @@ function MovieDetailsPage() {
           </div>
         )}
       </section>
+
+      {/* ✅ On-site popup */}
+      {popup && (
+        <OnsitePopup
+          message={popup.message}
+          type={popup.type}
+          confirmText="OK"
+          onConfirm={() => setPopup(null)}
+        />
+      )}
     </div>
   );
 }

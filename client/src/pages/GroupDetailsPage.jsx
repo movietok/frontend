@@ -155,7 +155,7 @@ function GroupDetailsPage() {
         />
         <div className="group-info">
           <h1 className="group-title">{group.name}</h1>
-          <CopyLinkButton />
+          <CopyLinkButton label="Copy Group Link" />
           <p className="group-meta">
             Owner: <span>{group.owner_name || "Unknown"}</span> • Members:{" "}
             <span>{group.member_count || 0}</span>
