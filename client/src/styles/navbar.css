@@ -1,3 +1,7 @@
+:root {
+  --navbar-height: 65px;
+}
+
 /* Navbar container */
 .navbar-header {
   position: fixed;
@@ -5,7 +9,7 @@
   left: 0;
   right: 0;
   width: 100%;
-  height: 65px;
+  height: var(--navbar-height);
   z-index: 1000;
   background-color: #335355;
   display: flex;
@@ -15,23 +19,35 @@
   box-sizing: border-box;
 }
 
+/* Logo */
 .navbar-logo {
-  height: 65px;
+  height: auto;
+  max-height: var(--navbar-height);
   margin-right: 1rem;
   padding-left: 0;
 }
+
 @media (min-width: 768px) {
   .navbar-logo {
     padding-left: 100px;
   }
 }
 
+@media (max-width: 480px) {
+  .navbar-logo {
+    margin: 0 auto;
+    padding-left: 0;
+  }
+}
 
 /* Search bar */
 .search-form {
-  position: relative;
-  z-index: 1001;
+  justify-self: center;
+  width: 100%;
+  max-width: 400px;
+  padding-left: 15rem;
 }
+
 
 .search-bar {
   display: flex;
@@ -52,7 +68,7 @@
   width: 70%;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .search-bar.expanded,
   .search-bar.collapsed {
     width: 100%;
@@ -107,89 +123,9 @@
 /* Burger menu dropdown */
 .burger-menu {
   position: absolute;
+  top: var(--navbar-height);
   right: 0;
-  top: 100%;
-  background: #222;
-  border-radius: 4px;
-  padding: 0.5rem;
-  min-width: 150px;
-}
-@media (max-width: 768px) {
-  .burger-menu {
-    width: 80%;
-    top: 65px;
-    right: 0;
-    border-radius: 4px 0 0 4px;
-  }
-}
-
-.burger-menu .delete-link {
-  color: red;
-}
-/* Base link/button styles */
-.navbar-link,
-.logout-button,
-.burger-button {
-  color: #fff;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s ease, text-shadow 0.3s ease;
-}
-
-/* Hover glow effect */
-.navbar-link:hover,
-.logout-button:hover,
-.burger-button:hover {
-  color: #ff4d4d; /* Soft red */
-  text-shadow: 0 0 8px rgba(255, 77, 77, 0.6); /* Reddish glow */
-}
-
-/* Special case for delete link */
-.delete-link:hover {
-  color: #ff1a1a;
-  text-shadow: 0 0 10px rgba(255, 26, 26, 0.8);
-}
-
-/* Burger menu container 
-.burger-menu {
-  position: absolute;
-  right: 0;
-  top: 100%;
-  background: #222;
-  border-radius: 4px;
-  padding: 0.5rem;
-  min-width: 150px;
-  opacity: 0;
-  transform: translateY(-10px);
-  animation: slideFadeIn 0.3s ease forwards;
-}
-
- Animation keyframes 
-@keyframes slideFadeIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.burger-menu a {
-  animation: fadeInLink 0.4s ease forwards;
-  opacity: 0;
-}
-
-@keyframes fadeInLink {
-  to {
-    opacity: 1;
-  }
-}
-  */
-
-  /* Burger menu container */
-.burger-menu {
-  position: absolute;
-  top: 65px; /* Just below the navbar */
-  right: 0;
-  width: 16.666%; /* 1/6 of the screen */
+  width: 100%;
   background: #222;
   border-radius: 4px 0 0 4px;
   padding: 1rem;
@@ -199,7 +135,21 @@
   box-shadow: -2px 0 10px rgba(255, 77, 77, 0.3);
 }
 
-/* Slide-in animation */
+@media (max-width: 768px) {
+  .burger-menu {
+    width: 80%;
+    border-radius: 4px 0 0 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .burger-menu {
+    width: 100%;
+    border-radius: 0;
+  }
+}
+
+/* Burger menu animation */
 @keyframes slideInFromRight {
   to {
     opacity: 1;
@@ -207,7 +157,7 @@
   }
 }
 
-/* Optional: glow effect on links inside menu */
+/* Burger menu links */
 .burger-menu a {
   display: block;
   margin-bottom: 0.5rem;
@@ -222,11 +172,30 @@
   text-shadow: 0 0 8px rgba(255, 77, 77, 0.6);
 }
 
+.burger-menu .delete-link {
+  color: red;
+}
+
+.delete-link:hover {
+  color: #ff1a1a;
+  text-shadow: 0 0 10px rgba(255, 26, 26, 0.8);
+}
+
+/* Hover glow effect */
+.navbar-link:hover,
+.logout-button:hover,
+.burger-button:hover {
+  color: #ff4d4d;
+  text-shadow: 0 0 8px rgba(255, 77, 77, 0.6);
+}
+
+/* Mobile layout adjustments */
 @media (max-width: 480px) {
   .navbar-header {
     flex-direction: column;
     height: auto;
     padding: 1rem;
+    align-items: stretch;
   }
 
   .navbar-nav {
@@ -235,9 +204,7 @@
     gap: 0.5rem;
   }
 
-  .search-bar.expanded,
-  .search-bar.collapsed {
-    width: 100%;
+  .search-form {
+    margin-top: 1rem;
   }
 }
-

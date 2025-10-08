@@ -12,12 +12,12 @@ export default function ContactPage() {
 
         <ul className="contact-list">
           <li>
-            <strong>Frontend & UI Issues – Veikka Koskinen</strong><br />
-            <a href="mailto:t3kove02@students.oamk.fi" className="contact-link">t3kove02@students.oamk.fi</a>
+            <strong>Frontend & UI Issues – Veikka</strong><br />
+            <a href="mailto:veikka@movietok.fi" className="contact-link">veikka@movietok.fi</a>
           </li>
           <li>
-            <strong>Backend & Database Issues – Martin Negin</strong><br />
-            <a href="mailto:t3nema00@students.oamk.fi" className="contact-link">t3nema00@students.oamk.fi</a>
+            <strong>Backend & Database Issues – Martin</strong><br />
+            <a href="mailto:martin@movietok.fi" className="contact-link">martin@movietok.fi</a>
           </li>
         </ul>
 

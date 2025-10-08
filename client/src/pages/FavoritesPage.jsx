@@ -1,11 +1,12 @@
 import { useParams, Link } from "react-router-dom";
 import { useFavorites } from "../hooks/useFavorites";
+import { useProfile } from "../hooks/useProfile";
 import MovieActionBar from "../components/MovieActionBar";
 import "../styles/FavoritesPage.css";
 
 export default function FavoritesPage() {
   const { userId } = useParams(); 
-
+  const { user, loading: profileLoading, error: profileError } = useProfile(userId);
   const { favorites: rawFavorites, loading, error } = useFavorites(userId, 2); // ✅ public favorites
   const { favorites: watchlist } = useFavorites(userId, 1); // ✅ public watchlist for cross-check
 
@@ -22,7 +23,9 @@ export default function FavoritesPage() {
     <div className="favorites-container max-w-6xl mx-auto px-6 py-8">
       <h2 className="favorites-header">
         <span className="favorites-star">★</span>
-        <span className="favorites-text">Favorites</span>
+        <span className="favorites-text">
+          {user?.username ? `${user.username}'s Favorites` : "Favorites"}
+        </span>
       </h2>
 
       {favorites.length === 0 ? (
@@ -30,29 +33,29 @@ export default function FavoritesPage() {
       ) : (
         <div className="favorites-grid">
           {favorites.map((fav) => (
-           <div key={fav.tmdb_id} className="relative group">
-  <Link to={`/movie/${fav.tmdb_id}`}>
-    <div className="movie-card rounded-xl overflow-hidden shadow-xl transform transition hover:scale-105 hover:shadow-2xl">
-      {fav.poster_url ? (
-        <img
-          src={`https://image.tmdb.org/t/p/w300${fav.poster_url}`}
-          alt={fav.original_title}
-          className="poster-image group-hover:brightness-75 transition duration-300"
-        />
-      ) : (
-        <div className="poster-placeholder">No image</div>
-      )}
+           <div key={fav.tmdb_id} className="movie-hover-wrapper group">
+            <Link to={`/movie/${fav.tmdb_id}`}>
+              <div className="movie-card rounded-xl overflow-hidden shadow-xl transform transition hover:scale-105 hover:shadow-2xl">
+                {fav.poster_url ? (
+                  <img
+                    src={`https://image.tmdb.org/t/p/w300${fav.poster_url}`}
+                    alt={fav.original_title}
+                    className="poster-image group-hover:brightness-75 transition duration-300"
+                  />
+                ) : (
+                  <div className="poster-placeholder">No image</div>
+                )}
 
-      <div className="poster-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center text-center">
-        <div className="overlay-header">
-          <p className="title">{fav.original_title}</p>
-          <p className="meta">{fav.release_year} • IMDb {fav.imdb_rating ?? "N/A"}</p>
-        </div>
-      </div>
-    </div>
-  </Link>
+                <div className="poster-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center text-center">
+                  <div className="overlay-header">
+                    <p className="title">{fav.original_title}</p>
+                    <p className="meta">{fav.release_year} • IMDb {fav.imdb_rating ?? "N/A"}</p>
+                  </div>
+                </div>
+              </div>
+            </Link>
 
-  <div className="actions-hover-wrapper opacity-0 group-hover:opacity-100 transition-opacity duration-0">
+  <div className="movie-actions-bar">
     <MovieActionBar
       tmdbId={fav.tmdb_id}
       type={2}

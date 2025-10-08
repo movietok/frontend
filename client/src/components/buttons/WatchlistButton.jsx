@@ -16,10 +16,7 @@ const WatchlistButton = ({ tmdbId, initialIsWatchlist = false, onStatusChange = 
     e.stopPropagation();
     e.preventDefault();
 
-    if (!user) {
-      alert("Please login to modify your watchlist");
-      return;
-    }
+    if (!user) return;
 
     setLoading(true);
     try {
@@ -40,6 +37,9 @@ const WatchlistButton = ({ tmdbId, initialIsWatchlist = false, onStatusChange = 
     }
   };
 
+  // ✅ Only render if user is logged in
+  if (!user) return null;
+
   return (
     <button
       onClick={handleToggle}
@@ -48,7 +48,7 @@ const WatchlistButton = ({ tmdbId, initialIsWatchlist = false, onStatusChange = 
       aria-label={isWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
     >
       <span className={`watchlist-icon ${isWatchlist ? "active" : ""}`}>
-        {loading ? "👁‍🗨" : "👁"}
+        {loading ? "👁" : "👁"}
       </span>
     </button>
   );

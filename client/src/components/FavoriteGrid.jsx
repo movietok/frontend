@@ -27,7 +27,7 @@ export default function FavoriteGrid({ favorites, type = 2, userId, limit = 4, w
     <div>
       <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 gap-4">
         {enhanced.map((fav) => (
-          <div key={fav.tmdb_id} className="relative group">
+          <div key={fav.tmdb_id} className="movie-hover-wrapper group">
             <Link to={`/movie/${fav.tmdb_id}`}>
               <div className="movie-card rounded-xl overflow-hidden shadow-xl transform transition hover:scale-105 hover:shadow-2xl">
                 {fav.poster_url ? (
@@ -49,7 +49,7 @@ export default function FavoriteGrid({ favorites, type = 2, userId, limit = 4, w
               </div>
             </Link>
 
-            <div className="actions-hover-wrapper opacity-0 group-hover:opacity-100 transition-opacity duration-0">
+            <div className="movie-actions-bar">
               <MovieActionsBar
                 tmdbId={fav.tmdb_id}
                 type={type}

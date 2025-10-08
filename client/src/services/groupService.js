@@ -41,15 +41,16 @@ export const deleteGroup = async (groupId) => {
 };
 
 export const getUserGroupsAPI = async (userId) => {
-  const token = requireToken();
   if (!userId) throw new Error("Missing user ID");
 
-  const res = await groupAPI.get(`/user/${userId}/groups`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const token = localStorage.getItem("token");
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+  const res = await groupAPI.get(`/user/${userId}/groups`, { headers });
 
   return res.data.groups || res.data || [];
 };
+
 
 /*
 // src/services/groupService.js

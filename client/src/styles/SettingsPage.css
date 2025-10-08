@@ -1,8 +1,9 @@
 /* Full-page wrapper with clean background */
 .settings-page-wrapper {
   background-color: #1b1b1e;
-  min-height: 1cap;
+  min-height: 100vh;
   display: flex;
+  width:70vw;
   justify-content: center;
   align-items: flex-start;
   padding: 4rem 0;
@@ -11,8 +12,8 @@
 /* Main container — now 80% wide */
 .settings-container {
   background-color: #2a2a2e;
-  width: 100%;
-  max-width: 1600px;
+  width: 75%;
+  max-width: 1800px;
   padding: 3rem 5rem;
   border-radius: 12px;
   box-shadow: 0 0 24px rgba(0, 0, 0, 0.5);
@@ -127,9 +128,27 @@
   cursor: pointer;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .settings-container {
-    width: 100%;
-    padding: 2rem 1rem;
+    padding: 2rem 3rem;
   }
 }
+
+@media (max-width: 768px) {
+  .settings-container {
+    padding: 2rem 1.5rem;
+  }
+
+  .settings-actions {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .delete-btn,
+  .logout-btn {
+    width: 100%;
+  }
+}
+
+

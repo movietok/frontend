@@ -33,13 +33,17 @@ const { favorites: watchlist, loading: watchlistLoading, error: watchlistError }
 
 const { favorites: rawFavorites, loading: favoritesLoading, error: favoritesError } = useFavorites(user?.id, 2);
 const { reviews, loading: reviewsLoading, error: reviewsError } = useUserReviews(user?.id);
-const { userGroups, groupsLoading, groupsError } = useUserGroups(user?.id);
+const userGroupsData = useUserGroups(user?.id);
+const userGroups = userGroupsData?.userGroups || [];
+const groupsLoading = userGroupsData?.loading;
+const groupsError = userGroupsData?.error;
+
 
   useEffect(() => {
-    if (isOwnProfile && !isLoggedIn) {
-      navigate("/login")
+    if (!userId && !isLoggedIn) {
+      navigate("/login");
     }
-  }, [isOwnProfile, isLoggedIn, navigate])
+  }, [userId, isLoggedIn, navigate]);
 
   if (loading) return <div className="profile-loading">Loading profile...</div>
   if (error) {
