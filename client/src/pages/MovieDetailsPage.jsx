@@ -143,6 +143,11 @@ function MovieDetailsPage() {
   if (loadingMovie) return <p>Loading...</p>;
   if (!movie) return <p>Movie not found</p>;
 
+  // ===== Conditional content flags =====
+  const showOverview = !!(movie?.overview && movie.overview.trim().length > 0);
+  // Adjust facts as needed if you add more fields later
+  const showFacts = !!(movie?.budget || movie?.revenue);
+
   return (
     <div className="movie-details-page">
       {/* ===== Top Section ===== */}
@@ -219,24 +224,31 @@ function MovieDetailsPage() {
         </div>
       </div>
 
-      {/* ===== Overview + Facts ===== */}
-      <div className="overview-facts">
-        <div className="overview">
-          <h2>Overview</h2>
-          <p>{movie.overview || "No overview available."}</p>
+      {/* ===== Overview + Facts (render only if content exists) ===== */}
+      {(showOverview || showFacts) && (
+        <div className="overview-facts">
+          {showOverview && (
+            <div className="overview">
+              <h2>Overview</h2>
+              <p>{movie.overview}</p>
+            </div>
+          )}
+
+          {showFacts && (
+            <div className="facts-box">
+              <h3>Facts</h3>
+              <ul>
+                {movie.budget ? (
+                  <li>Budget: ${movie.budget.toLocaleString()}</li>
+                ) : null}
+                {movie.revenue ? (
+                  <li>Revenue: ${movie.revenue.toLocaleString()}</li>
+                ) : null}
+              </ul>
+            </div>
+          )}
         </div>
-        <div className="facts-box">
-          <h3>Facts</h3>
-          <ul>
-            {movie.budget ? (
-              <li>Budget: ${movie.budget.toLocaleString()}</li>
-            ) : null}
-            {movie.revenue ? (
-              <li>Revenue: ${movie.revenue.toLocaleString()}</li>
-            ) : null}
-          </ul>
-        </div>
-      </div>
+      )}
 
       {/* ===== Cast Carousel ===== */}
       <section className="cast-section">
