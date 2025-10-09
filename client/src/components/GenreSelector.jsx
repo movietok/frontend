@@ -1,13 +1,22 @@
 function GenreSelector({ genres, selectedGenres, onToggle }) {
-  // inline styles override any global css that might be interfering
-  const activeStyle = { backgroundColor: "#2563eb", borderColor: "#2563eb", color: "#fff" };
-  const inactiveStyle = { backgroundColor: "transparent", borderColor: "#6b7280", color: "#e5e7eb" };
+  const activeStyle = { 
+    backgroundColor: "#22c55e",
+    borderColor: "#22c55e",
+    color: "#111"
+  };
+
+  const inactiveStyle = { 
+    backgroundColor: "transparent",
+    borderColor: "#6b7280",
+    color: "#e5e7eb"
+  };
 
   return (
     <div className="space-y-3">
       <h2 className="text-lg font-semibold">Genres</h2>
 
-      <div className="flex flex-wrap gap-3">
+      {/* Genres with proper spacing between items and bottom margin before buttons */}
+      <div className="flex flex-wrap mb-24">
         {genres.map((genre) => {
           const active = selectedGenres.includes(genre.id);
           return (
@@ -17,7 +26,7 @@ function GenreSelector({ genres, selectedGenres, onToggle }) {
               aria-pressed={active}
               onClick={() => onToggle(genre.id)}
               style={active ? activeStyle : inactiveStyle}
-              className="px-3 py-1 rounded-full border text-sm transition"
+              className="px-3 py-1.5 rounded-full border text-sm transition hover:border-gray-400 m-[2.5px]"
             >
               {genre.name}
             </button>

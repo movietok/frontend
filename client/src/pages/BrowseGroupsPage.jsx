@@ -130,7 +130,7 @@ function BrowseGroupsPage() {
             onToggle={toggleGenre}
           />
 
-          <div className="mt-4 space-y-2">
+          <div className="space-y-2" style={{ marginTop: "20px" }}>
   <button
     onClick={applySearch}
     className="w-full px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
