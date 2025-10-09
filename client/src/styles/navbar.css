@@ -23,8 +23,7 @@
 .navbar-logo {
   height: auto;
   max-height: var(--navbar-height);
-  margin-right: 1rem;
-  padding-left: 0;
+  margin: 0;
 }
 
 @media (min-width: 768px) {
@@ -42,10 +41,11 @@
 
 /* Search bar */
 .search-form {
-  justify-self: center;
-  width: 100%;
+  flex: 1;
   max-width: 400px;
-  padding-left: 15rem;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
 }
 
 
@@ -98,6 +98,7 @@
   display: flex;
   gap: 1rem;
   align-items: center;
+  
 }
 
 .navbar-link {
@@ -133,6 +134,7 @@
   transform: translateX(100%);
   animation: slideInFromRight 0.4s ease forwards;
   box-shadow: -2px 0 10px rgba(255, 77, 77, 0.3);
+  
 }
 
 @media (max-width: 768px) {

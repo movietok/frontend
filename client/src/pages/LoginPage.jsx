@@ -11,6 +11,7 @@ export default function Login() {
   const [showModal, setShowModal] = useState(false)
   const [modalTitle, setModalTitle] = useState("")
   const [modalMessage, setModalMessage] = useState("")
+  const [hideOkButton, setHideOkButton] = useState(false) // ✅ new state to control OK button visibility
   const navigate = useNavigate()
   const { login } = useAuth()
 
@@ -50,11 +51,19 @@ export default function Login() {
         
         setModalTitle("Login Successful!")
         setModalMessage("You have logged in successfully. Continue to homepage?")
+        setHideOkButton(true) // ✅ hide OK button during auto-close
         setShowModal(true)
+
+        // ✅ Auto-close modal after 2 seconds and navigate
+        setTimeout(() => {
+          setShowModal(false)
+          navigate("/")
+        }, 2000)
 
       } else {
         setModalTitle("Login Failed")
         setModalMessage(res.data?.message || "Login failed")
+        setHideOkButton(false) // ✅ show OK button for manual dismissal
         setShowModal(true)
       }
     } catch (err) {
@@ -62,6 +71,7 @@ export default function Login() {
       const errorMessage = err.response?.data?.message || err.message || "Something went wrong"
       setModalTitle("Login Failed")
       setModalMessage(errorMessage)
+      setHideOkButton(false) // ✅ show OK button for manual dismissal
       setShowModal(true)
     }
   }
@@ -109,6 +119,7 @@ export default function Login() {
         title={modalTitle}
         message={modalMessage}
         onOk={handleOk}
+        hideOkButton={true} // ✅ pass prop to control button visibility
       />
     </div>
   )
