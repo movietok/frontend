@@ -161,7 +161,10 @@ function MovieDetailsPage() {
           className="movie-poster"
         />
         <div className="movie-info">
-          <h1 className="movie-title">{movie.title}</h1>
+          <div className="movie-title-row">
+  <h1 className="movie-title">{movie.title}</h1>
+  <CopyLinkButton label="🔗" className="title-copy-btn" title="Copy Movie Link" />
+</div>
           {movie.tagline && (
             <p className="movie-tagline">"{movie.tagline}"</p>
           )}
@@ -184,16 +187,10 @@ function MovieDetailsPage() {
 
           {/* ===== Personal Actions (Watchlist + Favorites) ===== */}
           {user && (
-            <div className="personal-favorite-box">
-              <div className="action-item">
-                <WatchlistButton tmdbId={id} />
-                <span className="action-label">Add to Watchlist</span>
-              </div>
-              <div className="action-item">
-                <FavoriteButton tmdbId={id} type={2} />
-                <span className="action-label">Add to Favorites</span>
-              </div>
-            </div>
+         <div className="personal-favorite-box icon-only">
+  <WatchlistButton tmdbId={id} title="Add to Watchlist" />
+  <FavoriteButton tmdbId={id} type={2} title="Add to Favorites" />
+</div>
           )}
 
           {/* ===== Group Favorites Section (only owner/moderator groups) ===== */}
@@ -218,7 +215,6 @@ function MovieDetailsPage() {
               >
                 ➕ Add to Group Favorites
               </button>
-              <CopyLinkButton label="Copy Movie Link" />
             </div>
           )}
         </div>

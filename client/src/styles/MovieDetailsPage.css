@@ -31,6 +31,7 @@
 .movie-title {
   font-size: 2rem;
   font-weight: bold;
+  text-align: left;   
 }
 
 .movie-tagline {
@@ -51,18 +52,78 @@
 }
 
 .trailer-btn {
-  display: inline-block;
-  margin-top: 1rem;
-  background: #e50914;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #d33;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
   text-decoration: none;
-  transition: background 0.2s ease;
+  margin-top: 0.6rem;
+  transition: background 0.2s ease, transform 0.1s ease;
+  width: auto;            /* shrink width to fit text */
+  max-width: fit-content; /* ensures no overflow */
 }
 
 .trailer-btn:hover {
-  background: #bf0810;
+  background: #b52b27;
+  transform: scale(1.05);
+}
+
+/* ===== Title Row with Copy Link Button ===== */
+.movie-title-row {
+  display: flex;
+  align-items: baseline;   /* keeps text baseline alignment */
+  gap: 0.6rem;
+}
+
+/* When the copy button is used next to the title */
+.movie-title-row .copy-link-btn {
+  /* make sure we're styling the real button rendered by CopyLinkButton */
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  line-height: 1;           /* kill any emoji/line-height slack */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #2a2a2a;
+  color: #fff;
+  transition: transform 0.2s ease, background 0.2s ease;
+
+  /* ✅ optical lift so the bottom edge matches the title's baseline */
+  transform: translateY(-3px);
+}
+
+.movie-title-row .copy-link-btn:hover {
+  background: #3a3a3a;
+  transform: translateY(-6px) scale(1.07);
+}
+
+.title-copy-btn {
+  background: #2a2a2a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  width: 30px;            /* slightly smaller width */
+  height: 30px;           /* ✅ tighter vertical match to text height */
+  font-size: 0.95rem;     /* scales down emoji nicely */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  position: relative;
+  top: -2px;              /* ✅ nudges up to align optical baseline */
+}
+
+.title-copy-btn:hover {
+  background: #3a3a3a;
+  transform: scale(1.07);
 }
 
 /* ===== Overview + Facts ===== */
@@ -289,4 +350,53 @@
 
 .watchlist-icon.active {
   color: #3dd68c;
+}
+
+/* ===== Icon-Only Personal Buttons ===== */
+.personal-favorite-box.icon-only {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.personal-favorite-box.icon-only button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #2a2a2a;
+  color: #fff;
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+}
+
+.personal-favorite-box.icon-only button:hover {
+  background: #3a3a3a;
+  transform: scale(1.07);
+}
+
+/* ===== Copy Link Button (same sizing) ===== */
+.copy-link-btn,
+.copy-link-btn button {
+  width: 40px !important;
+  height: 40px !important;
+  background: #2a2a2a !important;
+  color: #fff !important;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+}
+
+.copy-link-btn:hover,
+.copy-link-btn button:hover {
+  background: #3a3a3a !important;
+  transform: scale(1.07);
 }

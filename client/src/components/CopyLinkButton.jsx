@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "../styles/CopyLinkButton.css";
 
-export default function CopyLinkButton({ label = "Copy Link" }) {
+export default function CopyLinkButton({ label = "Copy Link", className = "", title = "Copy link" }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -14,9 +14,16 @@ export default function CopyLinkButton({ label = "Copy Link" }) {
     }
   };
 
-  return (
-    <button className="share-btn" onClick={handleCopy}>
-      {copied ? "Copied!" : label}
+return (
+  <div className="copylink-wrapper">
+    <button
+      className={`share-btn ${className}`}
+      title={title}
+      onClick={handleCopy}
+    >
+      {label}
+      {copied && <span className="copy-tooltip">Copied!</span>}
     </button>
-  );
+  </div>
+);
 }
