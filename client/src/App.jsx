@@ -51,7 +51,7 @@ function App() {
             <Route path="/schedule" element={<ShowTimesPage />} />
             <Route path="/reviews" element={<ReviewsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/browse" element={<BrowsePage />} />   
+            <Route path="/browse" element={<BrowsePage key="browse" />} />   
             <Route path="/groups" element={<BrowseGroupsPage />} />       
             <Route path="/movie/:id" element={<MovieDetailsPage />} />
             <Route path="/groups/:id" element={<GroupDetailsPage />} />

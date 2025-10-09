@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation } from "react-router-dom"; // useLocation
 import { getGenres, discoverMovies } from "../services/tmdb";
 import { searchMovies } from "../services/api";
 import MovieCard from "../components/MovieCard";
@@ -11,6 +11,7 @@ import { useAuth } from "../context/AuthContext";
 
 function BrowsePage() {
   const [searchParams] = useSearchParams();
+  const location = useLocation(); //  used to detect navigation
   const [genres, setGenres] = useState([]);
   const [selectedGenresDraft, setSelectedGenresDraft] = useState([]);
   const [appliedGenres, setAppliedGenres] = useState([]);
@@ -29,6 +30,12 @@ function BrowsePage() {
   const { statuses = {}, loading: statusLoading = false, updateStatus } =
     useFavoriteStatuses(movieIds, user);
 
+  //  optional UX improvement: scroll to top when navigating
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  // search effect
   useEffect(() => {
     const fetchSearchResults = async () => {
       if (!query) {
@@ -54,6 +61,7 @@ function BrowsePage() {
     fetchSearchResults();
   }, [query]);
 
+  // fetch genres once
   useEffect(() => {
     getGenres()
       .then((data) => {
@@ -66,6 +74,7 @@ function BrowsePage() {
       .catch(console.error);
   }, []);
 
+  // main discover fetch (fixed infinite loop)
   useEffect(() => {
     if (isSearchMode) return;
 
@@ -78,7 +87,7 @@ function BrowsePage() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [appliedGenres, page, isSearchMode]);
+  }, [appliedGenres, page, isSearchMode, location.pathname]); // safe dependency list
 
   const toggleGenre = (genreId) => {
     const idStr = String(genreId);
@@ -181,12 +190,13 @@ function BrowsePage() {
                       };
 
                     return (
-                      <div
-                        className="movie-hover-wrapper mt-movie-tile group"
-                        key={movie.id}
-                        style={{ position: "relative" }}
-                      >
-                        <MovieCard movie={movie} />
+  <div
+    className="movie-hover-wrapper mt-movie-tile group"
+    key={`${movie.id}-${page}`} // unique key fix
+    style={{ position: "relative" }}
+  >
+    <MovieCard movie={movie} />
+
 
                         {(!user || !statusLoading) && (
                           <div className="actions-hover-wrapper">
