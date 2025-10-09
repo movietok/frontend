@@ -228,16 +228,21 @@ function ReviewCard({
           {/* ===== Owner Buttons ===== */}
           {isOwner && (
             <div className="review-actions-bottom">
-              <button className="edit-btn" onClick={() => setIsEditing(true)}>
-                Edit
-              </button>
-              <button
-                className="delete-btn"
-                onClick={() => setShowDeleteModal(true)}
-              >
-                Delete
-              </button>
-            </div>
+  <button
+    className="icon-btn edit-btn"
+    title="Edit review"
+    onClick={() => setIsEditing(true)}
+  >
+    ✏️
+  </button>
+  <button
+    className="icon-btn delete-btn"
+    title="Delete review"
+    onClick={() => setShowDeleteModal(true)}
+  >
+    🗑️
+  </button>
+</div>
           )}
         </div>
       )}
