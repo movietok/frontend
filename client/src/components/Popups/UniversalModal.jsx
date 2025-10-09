@@ -9,7 +9,8 @@ export default function UniversalModal({
   inputLabel,
   inputType = "text",
   inputValue,
-  onInputChange
+  onInputChange,
+  hideOkButton = false // ✅ new prop to optionally hide OK button
 }) {
   if (!isOpen) return null;
 
@@ -34,10 +35,15 @@ export default function UniversalModal({
         )}
 
         <div className="modal-actions">
+          {/* Optional Cancel button */}
           {onCancel && (
             <button className="btn cancel" onClick={onCancel}>Cancel</button>
           )}
-          <button className="btn confirm" onClick={onOk}>OK</button>
+
+          {/* OK button (conditionally hidden) */}
+          {!hideOkButton && (
+            <button className="btn confirm" onClick={onOk}>OK</button>
+          )}
         </div>
       </div>
     </div>

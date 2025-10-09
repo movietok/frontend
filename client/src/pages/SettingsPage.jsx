@@ -74,9 +74,15 @@ export default function SettingsPage() {
     }
 
     try {
-      const updated = await updateProfile(payload)
-      setUser(updated)
-      localStorage.setItem("user", JSON.stringify(updated))
+      const updatedUser = await updateProfile(payload)
+      console.log("✅ Update succeeded:", updatedUser)
+
+      if (!updatedUser || typeof updatedUser !== "object") {
+        throw new Error("No user data returned.")
+      }
+
+      setUser(updatedUser)
+      localStorage.setItem("user", JSON.stringify(updatedUser))
 
       setSuccessMessage(
         pendingPayload?.user_bio
@@ -86,7 +92,7 @@ export default function SettingsPage() {
       setShowSuccessModal(true)
       setMessage(null)
     } catch (err) {
-      setMessage(`❌ ${err.response?.data?.message || "Update failed."}`)
+      setMessage(`❌ ${err.response?.data?.message || err.message || "Update failed."}`)
     } finally {
       setShowPasswordModal(false)
       setCurrentPassword("")
