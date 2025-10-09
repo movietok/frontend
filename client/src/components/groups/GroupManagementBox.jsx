@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import EditGroupModal from "./EditGroupModal";
 import OnsitePopup from "../Popups/OnsitePopup";
 import AutoDismissToast from "../Popups/AutoDismissToast";
+import GroupMembersModal from "./GroupMembersModal";
 import {
   joinGroup,
   requestToJoinGroup,
@@ -57,6 +58,7 @@ function decodeUserIdFromToken() {
 
 export default function GroupManagementBox({ group, onGroupUpdated, onGroupDeleted }) {
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showMembersModal, setShowMembersModal] = useState(false);
 
   // Confirm popup (leave/delete)
   const [showPopup, setShowPopup] = useState(false);
@@ -113,6 +115,12 @@ export default function GroupManagementBox({ group, onGroupUpdated, onGroupDelet
   const isModerator = effectiveRole === "moderator";
   const isMember = isOwner || isModerator || effectiveRole === "member";
   const isPending = effectiveRole === "pending";
+
+  useEffect(() => {
+    if (showMembersModal && !(isMember || isOwner || isModerator)) {
+      setShowMembersModal(false);
+    }
+  }, [showMembersModal, isMember, isOwner, isModerator]);
 
   // Reconcile on mount/when group changes if backend is sparse
   useEffect(() => {
@@ -321,7 +329,11 @@ export default function GroupManagementBox({ group, onGroupUpdated, onGroupDelet
   };
 
   const handleViewMembers = () => {
-    pushToast("Members view will be available soon.", "info");
+    if (!isMember && !isModerator && !isOwner) {
+      pushToast("You need to be in the group to view members.", "info");
+      return;
+    }
+    setShowMembersModal(true);
   };
 
   if (!isLoggedIn) return null;
@@ -344,19 +356,14 @@ export default function GroupManagementBox({ group, onGroupUpdated, onGroupDelet
 
         {/* Pending */}
         {isPending && (
-  <>
-    <span className="px-3 py-1 bg-gray-500 text-white rounded inline-flex items-center">
-      Request Pending
-    </span>
-    <button
-      onClick={handleWithdrawRequest}
-      disabled={loadingAction}
-      className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-    >
-      Withdraw Request
-    </button>
-  </>
-)}
+          <button
+            onClick={handleWithdrawRequest}
+            disabled={loadingAction}
+            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            Withdraw Request
+          </button>
+        )}
 
         {/* Member & Moderator can leave */}
         {(effectiveRole === "member" || effectiveRole === "moderator") && (
@@ -424,6 +431,18 @@ export default function GroupManagementBox({ group, onGroupUpdated, onGroupDelet
           onCancel={popupCancelAction}
           confirmText={popupConfirmText}
           cancelText={popupCancelText}
+        />
+      )}
+
+      {showMembersModal && (
+        <GroupMembersModal
+          group={group}
+          currentUserId={currentUserId}
+          visible={showMembersModal}
+          onClose={() => setShowMembersModal(false)}
+          viewerRole={effectiveRole}
+          onGroupUpdated={onGroupUpdated}
+          pushToast={pushToast}
         />
       )}
 

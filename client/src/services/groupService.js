@@ -124,18 +124,48 @@ export const leaveGroup = async (groupId) => {
 
 export const removeMember = async (groupId, userId) => {
   const token = requireToken();
-  const res = await groupAPI.delete(`/${groupId}/members/${userId}/remove`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.data;
+  const headers = { Authorization: `Bearer ${token}` };
+
+  const attempts = [
+    `/${groupId}/members/${userId}`,
+    `/${groupId}/members/${userId}/remove`,
+  ];
+
+  let firstErr;
+  for (const path of attempts) {
+    try {
+      const res = await groupAPI.delete(path, { headers });
+      return res.data;
+    } catch (e) {
+      const status = e?.response?.status;
+      if (status && status !== 404) throw e;
+      if (!firstErr) firstErr = e;
+    }
+  }
+  throw firstErr || new Error('Failed to remove member');
 };
 
 export const approveJoinRequest = async (groupId, userId) => {
   const token = requireToken();
-  const res = await groupAPI.put(`/${groupId}/join-requests/${userId}/approve`, {}, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.data;
+  const headers = { Authorization: `Bearer ${token}` };
+
+  const attempts = [
+    `/${groupId}/members/${userId}/approve`,
+    `/${groupId}/join-requests/${userId}/approve`,
+  ];
+
+  let firstErr;
+  for (const path of attempts) {
+    try {
+      const res = await groupAPI.put(path, {}, { headers });
+      return res.data;
+    } catch (e) {
+      const status = e?.response?.status;
+      if (status && status !== 404) throw e;
+      if (!firstErr) firstErr = e;
+    }
+  }
+  throw firstErr || new Error('Failed to approve join request');
 };
 
 export const updateMemberRole = async (groupId, userId, newRole) => {
@@ -152,37 +182,46 @@ export const getPendingRequests = async (groupId) => {
   const token = requireToken();
   const headers = { Authorization: `Bearer ${token}` };
   const res = await groupAPI.get(`/${groupId}/pending-requests`, { headers });
-  // Support shapes: {requests:[...]}, {data:[...]}, [...]
-  const data = res.data?.requests ?? res.data?.data ?? res.data ?? [];
-  return Array.isArray(data) ? data : [];
+  const payload = res.data;
+  const candidates = [
+    payload?.pendingRequests,
+    payload?.requests,
+    payload?.data?.pendingRequests,
+    payload?.data?.requests,
+    payload?.data,
+    payload,
+  ];
+  const list = candidates.find((item) => Array.isArray(item)) || [];
+  return list;
 };
 
 export const declineJoinRequest = async (groupId, userId) => {
   const token = requireToken();
   const headers = { Authorization: `Bearer ${token}` };
 
-  // Likely complement to /join-requests/:userId/approve
   const attempts = [
-    { method: "put", path: `/${groupId}/join-requests/${userId}/decline` },
-    { method: "post", path: `/${groupId}/join-requests/${userId}/decline` },
-    { method: "delete", path: `/${groupId}/join-requests/${userId}` }, // delete request
+    { method: 'delete', path: `/${groupId}/members/${userId}` },
+    { method: 'delete', path: `/${groupId}/join-requests/${userId}` },
+    { method: 'put', path: `/${groupId}/join-requests/${userId}/decline` },
   ];
 
   let firstError;
   for (const a of attempts) {
     try {
       const res =
-        a.method === "put"
+        a.method === 'put'
           ? await groupAPI.put(a.path, {}, { headers })
-          : a.method === "post"
+          : a.method === 'post'
           ? await groupAPI.post(a.path, {}, { headers })
           : await groupAPI.delete(a.path, { headers });
       return res.data;
     } catch (e) {
+      const status = e?.response?.status;
+      if (status && status !== 404) throw e;
       if (!firstError) firstError = e;
     }
   }
-  throw firstError || new Error("Failed to decline join request");
+  throw firstError || new Error('Failed to decline join request');
 };
 
 // Try to delete group, but first clear pending requests if needed
