@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { getGroupDetails } from "../services/groups";
+import { getGroupDetails, getUserGroupsAPI } from "../services/groups";
 import { getGroupFavorites, removeFavorite } from "../services/favoriteService";
 import { getGroupReviews } from "../services/reviews";
 import GroupManagementBox from "../components/groups/GroupManagementBox";
@@ -32,7 +32,7 @@ function GroupDetailsPage() {
     }
   }, []);
 
-  // Helpers to normalize API responses
+  // Normalize API responses
   const extractArray = (payload, key) => {
     if (Array.isArray(payload)) return payload;
     if (payload && Array.isArray(payload[key])) return payload[key];
@@ -41,75 +41,167 @@ function GroupDetailsPage() {
     return [];
   };
 
+  // Member-only data (favorites + reviews).
+  // Accepts setter functions so caller can guard against stale updates.
+  async function loadMemberData(groupId, setFavoritesFn, setReviewsFn) {
+    // Favorites
+    const favRaw = await getGroupFavorites(groupId);
+    const favs = extractArray(favRaw, "favorites") || [];
+    setFavoritesFn(favs);
+
+    // Reviews (enrich from favorites if missing)
+    const favIndex = new Map(favs.map((m) => [String(m.tmdb_id), m]));
+    const revRaw = await getGroupReviews(groupId);
+    let list = extractArray(revRaw, "reviews") || [];
+
+    list = list.map((rev) => {
+      const movieId = String(rev.movie_id ?? rev.movieId ?? "");
+      const hasMovieMeta =
+        (rev.movie_name ?? rev.movieName) ||
+        (rev.poster_url ?? rev.posterUrl) ||
+        (rev.release_year ?? rev.releaseYear);
+      if (!movieId || hasMovieMeta) return rev;
+      const match = favIndex.get(movieId);
+      if (!match) return rev;
+      return {
+        ...rev,
+        movie_name: rev.movie_name ?? rev.movieName ?? match.original_title,
+        movieName: rev.movieName ?? rev.movie_name ?? match.original_title,
+        poster_url: rev.poster_url ?? rev.posterUrl ?? match.poster_url,
+        posterUrl: rev.posterUrl ?? rev.poster_url ?? match.poster_url,
+        release_year: rev.release_year ?? rev.releaseYear ?? match.release_year,
+        releaseYear: rev.releaseYear ?? rev.release_year ?? match.release_year,
+      };
+    });
+
+    setReviewsFn(list);
+  }
+
+  // Initial load: fetch group; if (or once) member, load member data.
+  // Also hard-clear member-only arrays when switching groups to prevent carry-over.
   useEffect(() => {
+    let cancelled = false;
+
+    // Clear previous group's member-only data immediately
+    setFavorites([]);
+    setReviews([]);
+    setLoading(true);
+
     async function fetchData() {
       try {
-        // 1) Group details
         const data = await getGroupDetails(id);
+        if (cancelled) return;
         const g = data?.group ?? data;
         setGroup(g);
 
-        const isMember =
-          g?.is_member || g?.is_owner || currentUserId === g?.owner_id;
+        const isMemberLike =
+          g?.role === "member" ||
+          g?.role === "moderator" ||
+          g?.role === "owner" ||
+          g?.is_member ||
+          g?.is_owner ||
+          (currentUserId != null && Number(currentUserId) === Number(g?.owner_id));
 
-        if (!isMember) return;
+        if (isMemberLike) {
+          await loadMemberData(
+            id,
+            (vals) => { if (!cancelled) setFavorites(vals); },
+            (vals) => { if (!cancelled) setReviews(vals); }
+          );
+          return;
+        }
 
-        // 2) Favorites (movies the group has favorited)
-        const favRaw = await getGroupFavorites(id);
-        const favs =
-          extractArray(favRaw, "favorites") ||
-          []; // safety
-        setFavorites(favs);
+        // Reconcile: backend didn't mark us as member, but we might be one.
+        if (currentUserId) {
+          try {
+            const myGroups = await getUserGroupsAPI(currentUserId);
+            if (cancelled) return;
+            const inGroup =
+              Array.isArray(myGroups) &&
+              myGroups.some((x) => Number(x.id ?? x.gID ?? x.group_id) === Number(id));
 
-        // Build quick lookup by tmdb_id for enrichment
-        const favIndex = new Map(
-          favs.map((m) => [String(m.tmdb_id), m])
-        );
-
-        // 3) Reviews (by group members)
-        const revRaw = await getGroupReviews(id);
-        // Support: array OR {reviews} OR {data:{reviews}}
-        let list =
-          extractArray(revRaw, "reviews") ||
-          [];
-
-        // 4) Enrich reviews with movie info from favorites if missing
-        list = list.map((rev) => {
-          const movieId = String(rev.movie_id ?? rev.movieId ?? "");
-          const hasMovieMeta =
-            (rev.movie_name ?? rev.movieName) ||
-            (rev.poster_url ?? rev.posterUrl) ||
-            (rev.release_year ?? rev.releaseYear);
-
-          if (!movieId || hasMovieMeta) return rev;
-
-          const match = favIndex.get(movieId);
-          if (!match) return rev;
-
-          // Add both snake_case and camelCase so any consumer can read it
-          return {
-            ...rev,
-            movie_name: rev.movie_name ?? rev.movieName ?? match.original_title,
-            movieName: rev.movieName ?? rev.movie_name ?? match.original_title,
-            poster_url: rev.poster_url ?? rev.posterUrl ?? match.poster_url,
-            posterUrl: rev.posterUrl ?? rev.poster_url ?? match.poster_url,
-            release_year: rev.release_year ?? rev.releaseYear ?? match.release_year,
-            releaseYear: rev.releaseYear ?? rev.release_year ?? match.release_year,
-          };
-        });
-
-        setReviews(list);
+            if (inGroup) {
+              const patched = { ...g, is_member: true, role: g.role ?? "member" };
+              setGroup(patched);
+              await loadMemberData(
+                id,
+                (vals) => { if (!cancelled) setFavorites(vals); },
+                (vals) => { if (!cancelled) setReviews(vals); }
+              );
+            } else {
+              // Ensure we don't show previous group's data
+              setFavorites([]);
+              setReviews([]);
+            }
+          } catch {
+            // ignore reconciliation errors
+            if (!cancelled) {
+              setFavorites([]);
+              setReviews([]);
+            }
+          }
+        } else {
+          // Not logged in or no membership—ensure arrays are empty
+          setFavorites([]);
+          setReviews([]);
+        }
       } catch (err) {
-        console.error("Error loading group details:", err);
+        if (!cancelled) console.error("Error loading group details:", err);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
+
     fetchData();
+    return () => { cancelled = true; };
   }, [id, currentUserId]);
 
+  // Refetch member data when role flips to member/mod/owner (e.g., after joining)
+  useEffect(() => {
+    if (!group) return;
+
+    const becameMember =
+      group.role === "member" ||
+      group.role === "moderator" ||
+      group.role === "owner" ||
+      group.is_member === true ||
+      group.is_owner === true;
+
+    if (becameMember) {
+      let cancelled = false;
+      (async () => {
+        try {
+          await loadMemberData(
+            id,
+            (vals) => { if (!cancelled) setFavorites(vals); },
+            (vals) => { if (!cancelled) setReviews(vals); }
+          );
+        } catch (e) {
+          console.error("Error loading member data:", e);
+        }
+      })();
+      return () => { cancelled = true; };
+    } else {
+      // If role flips away from member, clear member-only data
+      setFavorites([]);
+      setReviews([]);
+    }
+  }, [group?.role, group?.is_member, group?.is_owner, id]);
+
   const handleGroupUpdated = (updatedGroup) => {
-    setGroup(updatedGroup?.group ?? updatedGroup);
+    const g = updatedGroup?.group ?? updatedGroup;
+    setGroup(g);
+
+    // If not a member after update, clear member-only data
+    const notMember =
+      !(g?.role === "member" || g?.role === "moderator" || g?.role === "owner") &&
+      !g?.is_member &&
+      !g?.is_owner;
+
+    if (notMember) {
+      setFavorites([]);
+      setReviews([]);
+    }
   };
 
   const handleGroupDeleted = () => {
@@ -136,10 +228,16 @@ function GroupDetailsPage() {
   if (!group) return <p>Group not found</p>;
 
   const isOwner =
+    group?.role === "owner" ||
     group?.is_owner === true ||
     (currentUserId != null && Number(currentUserId) === Number(group?.owner_id));
 
-  const isMember = group?.is_member || isOwner;
+  const isMember =
+    group?.role === "member" ||
+    group?.role === "moderator" ||
+    group?.role === "owner" ||
+    group?.is_member === true ||
+    isOwner;
 
   return (
     <div className={`group-details-page group-theme ${group.theme_class || ""}`}>
@@ -155,7 +253,7 @@ function GroupDetailsPage() {
         />
         <div className="group-info">
           <h1 className="group-title">{group.name}</h1>
-          <CopyLinkButton label="Copy Group Link" />
+        <CopyLinkButton label="Copy Group Link" />
           <p className="group-meta">
             Owner: <span>{group.owner_name || "Unknown"}</span> • Members:{" "}
             <span>{group.member_count || 0}</span>
@@ -254,7 +352,6 @@ function GroupDetailsPage() {
                       prev.map((r) => (r.id === updated.id ? updated : r))
                     )
                   }
-                  // Show movie indicator only on this page
                   showMovieHeader={true}
                 />
               ))}
@@ -263,8 +360,8 @@ function GroupDetailsPage() {
         </section>
       )}
 
-      {/* Owner-only Management */}
-      {isOwner && (
+      {/* Membership & Management (visible to any logged-in user) */}
+      {Boolean(currentUserId) && (
         <GroupManagementBox
           group={group}
           onGroupUpdated={handleGroupUpdated}
