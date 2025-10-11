@@ -24,7 +24,7 @@ export default function FavoritesPage() {
       <h2 className="favorites-header">
         <span className="favorites-star">★</span>
         <span className="favorites-text">
-          {user?.username ? `${user.username}'s Favorites` : "Favorites"}
+          {user?.username ? `Favorites of ${user.username}` : "Favorites"}
         </span>
       </h2>
 
