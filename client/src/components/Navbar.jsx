@@ -87,16 +87,10 @@ export default function Navbar() {
 
               {menuOpen && (
                 <div className="burger-menu" ref={menuRef}>
-                  <Link to={`/profile/${user?.id || ''}`} className="navbar-link" onClick={() => setMenuOpen(false)}>Profile</Link><br />
+                  <Link to={`/profile/${user?.id || ""}`} className="navbar-link" onClick={() => setMenuOpen(false)}>Profile</Link><br />
                   <Link to="/settings" className="navbar-link" onClick={() => setMenuOpen(false)}>Settings</Link><br />
                   <Link to={`/favorites/${user?.id}`} className="navbar-link" onClick={() => setMenuOpen(false)}>Favorites</Link><br />
-                  <Link
-                    to={`/profile/${user?.id}?tab=watchlist`}
-                    className="navbar-link"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Watchlist
-                  </Link>
+                  <Link to="/watchlist" className="navbar-link" onClick={() => setMenuOpen(false)}>Watchlist</Link>
                 </div>
               )}
             </div>

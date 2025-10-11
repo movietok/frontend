@@ -163,12 +163,61 @@
   border-radius: 1px;
 }
 
+.watchlist-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #00bcd4;
+  margin-bottom: 2rem;
+  text-shadow: 0 0 12px rgba(0, 188, 212, 0.5), 0 0 24px rgba(0, 188, 212, 0.3);
+  letter-spacing: 1px;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(0, 188, 212, 0.6);
+  position: relative;
+}
+
+.watchlist-header::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 2px;
+  background: rgba(0, 188, 212, 0.8);
+  box-shadow: 0 0 8px rgba(0, 188, 212, 0.6), 0 0 16px rgba(0, 188, 212, 0.4);
+  border-radius: 1px;
+}
+
+.watchlist-eye {
+  font-size: 2rem;
+  color: #00bcd4;
+  text-shadow: 0 0 6px rgba(0, 188, 212, 0.6);
+}
+
 .favorites-star {
   font-size: 2rem;
   color: gold;
   text-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
 }
 
+.watchlist-text {
+  font-size: 2.2rem;
+  color: #00bcd4;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .favorites-text {
   font-size: 2.2rem;
+  color: gold;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

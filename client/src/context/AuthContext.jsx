@@ -5,7 +5,7 @@ export const AuthContext = createContext()
 
 export function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"))
-const [user, setUser] = useState(() => {
+  const [user, setUser] = useState(() => {
   try {
     const stored = localStorage.getItem("user")
     return stored && stored !== "undefined" ? JSON.parse(stored) : null
@@ -13,6 +13,23 @@ const [user, setUser] = useState(() => {
     return null
   }
 })
+
+/*
+  export function LogChecker ({}) {
+  const loginCheck = () => {
+    const token = localStorage.getItem("token")    
+    const storedUser = localStorage.getItem("user")
+    setIsLoggedIn(!!token)
+    setUser(storedUser ? JSON.parse(storedUser) : null)
+    try {
+      setIsLoggedIn(!!token)
+      logout()
+    } catch (err) {
+      alert ("failed to redirect")
+    }
+  }
+}
+*/
 
   // Sync with localStorage on external tab changes
   useEffect(() => {
