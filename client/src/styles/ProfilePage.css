@@ -23,6 +23,10 @@
   display: flex;
   align-items: flex-start;
   margin-bottom: 24px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .profile-avatar img {
@@ -161,6 +165,10 @@
   box-shadow: 0 1px 4px rgba(110,231,247,0.12);
 }
 
+.favorite-films-content{
+  padding-bottom: 2rem;
+}
+
 .favorite-films-content,
 .my-groups-content,
 .my-reviews-content {
@@ -173,7 +181,7 @@
 /* Review Grid */
 .review-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: 1fr;
   gap: var(--profile-gap);
   margin-top: 1.5rem;
   word-break: break-word;
@@ -256,6 +264,7 @@
     padding: 10px 2vw;
     margin: 0;
     border-radius: 0;
+    padding-top: 14rem;
   }
 
   .profile-header {
