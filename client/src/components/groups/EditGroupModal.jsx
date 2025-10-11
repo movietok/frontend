@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { updateGroup } from "../../services/groupService";
 import { getAllGroupThemes } from "../../services/groups";
 import { getGenres } from "../../services/tmdb";
@@ -12,18 +12,18 @@ export default function EditGroupModal({ group, onClose, onSave }) {
     console.log("group prop in modal:", group);
   }, []);
 
-  // Base fields
+  // === Base fields ===
   const [name, setName] = useState(group.name || "");
   const [description, setDescription] = useState(group.description || "");
   const [visibility, setVisibility] = useState(group.visibility || "public");
 
-  // Themes
+  // === Themes ===
   const [themes, setThemes] = useState([]); // [{ id, name, theme }]
   const [themeId, setThemeId] = useState(
     group.theme_id == null ? "" : String(group.theme_id)
   );
 
-  // Genres
+  // === Genres ===
   const [genres, setGenres] = useState([]); // [{ id:"28", name:"Action" }, ...]
   const [selectedGenres, setSelectedGenres] = useState([]); // ["28","99"]
 
@@ -32,13 +32,24 @@ export default function EditGroupModal({ group, onClose, onSave }) {
     [group]
   );
 
-  // === On-site Popup states ===
+  // === Popup and timeout management ===
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
   const [popupType, setPopupType] = useState("info");
+  const timeoutRef = useRef(null);
 
+  // === Cleanup timeout on unmount ===
   useEffect(() => {
-    // Load genres (TMDB) and seed selected genres
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, []);
+
+  // === Load genres and themes ===
+  useEffect(() => {
     getGenres()
       .then((data) => {
         const normalized = (data.genres || []).map((g) => ({
@@ -47,7 +58,6 @@ export default function EditGroupModal({ group, onClose, onSave }) {
         }));
         setGenres(normalized);
 
-        // Seed from ids first; else try mapping names -> ids
         if (Array.isArray(group.tags) && group.tags.length) {
           setSelectedGenres(group.tags.map((n) => String(n)));
         } else if (Array.isArray(group.genre_tags) && group.genre_tags.length) {
@@ -64,12 +74,12 @@ export default function EditGroupModal({ group, onClose, onSave }) {
       })
       .catch(console.error);
 
-    // Load themes
     getAllGroupThemes()
       .then((data) => setThemes(data.themes || []))
       .catch(console.error);
   }, [group]);
 
+  // === Genre toggling ===
   const toggleGenre = (gid) => {
     const idStr = String(gid);
     setSelectedGenres((prev) =>
@@ -77,10 +87,10 @@ export default function EditGroupModal({ group, onClose, onSave }) {
     );
   };
 
+  // === Form submission ===
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Build minimal updates — only send changed fields
     const updates = {};
     const safeTrim = (s) => (typeof s === "string" ? s.trim() : s);
 
@@ -89,17 +99,17 @@ export default function EditGroupModal({ group, onClose, onSave }) {
     const oldName = safeTrim(group.name ?? "");
     if (newName && newName !== oldName) updates.name = newName;
 
-    // description (allow empty string to clear)
+    // description
     const newDesc = description ?? "";
     const oldDesc = group.description ?? "";
     if (newDesc !== oldDesc) updates.description = newDesc;
 
-    // visibility (only "public" | "private" in UI)
+    // visibility
     if (visibility && visibility !== group.visibility) {
       updates.visibility = visibility;
     }
 
-    // theme_id: number or null; never send ""
+    // theme_id
     const oldTheme = group.theme_id == null ? null : Number(group.theme_id);
     const newTheme =
       themeId === ""
@@ -109,26 +119,21 @@ export default function EditGroupModal({ group, onClose, onSave }) {
         : Number(themeId);
     if (newTheme !== oldTheme) updates.theme_id = newTheme;
 
-    // tags: send only if they actually changed (including clearing)
+    // tags
     const numericTags = selectedGenres
       .map((id) => Number(id))
       .filter((n) => Number.isInteger(n) && n > 0);
-
     const currentTags =
       Array.isArray(group.tags) && group.tags.length
         ? group.tags.map((n) => Number(n)).filter(Number.isInteger)
         : [];
-
     const eqSets = (a, b) => {
       if (a.length !== b.length) return false;
       const A = new Set(a);
       for (const v of b) if (!A.has(v)) return false;
       return true;
     };
-
-    if (!eqSets(numericTags, currentTags)) {
-      updates.tags = numericTags; // [] means "clear all" intentionally
-    }
+    if (!eqSets(numericTags, currentTags)) updates.tags = numericTags;
 
     // Nothing changed?
     if (Object.keys(updates).length === 0) {
@@ -139,17 +144,20 @@ export default function EditGroupModal({ group, onClose, onSave }) {
     try {
       const updated = await updateGroup(groupId, updates);
 
-      // ✅ Replace alert with styled popup
+      // ✅ Clear any old timer before starting new
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
       setPopupMessage("Group updated successfully!");
       setPopupType("success");
       setShowPopup(true);
 
       onSave?.(updated?.group ?? updated);
-
       onClose();
-      setTimeout(() => {
+
+      // ✅ Start fresh popup timer
+      timeoutRef.current = setTimeout(() => {
         setShowPopup(false);
-        onClose();
+        timeoutRef.current = null;
       }, 2000);
     } catch (err) {
       const status = err?.response?.status;
@@ -161,109 +169,104 @@ export default function EditGroupModal({ group, onClose, onSave }) {
         err?.message ||
         "Failed to update group.";
 
-      // ❌ Replace alert with styled popup
       setPopupMessage(msg);
       setPopupType("error");
       setShowPopup(true);
     }
   };
 
+  // === JSX ===
   return (
-  <div className="edit-group-overlay">
-    <div className="edit-group-modal">
-      <h3>Edit Group</h3>
+    <div className="edit-group-overlay">
+      <div className="edit-group-modal">
+        <h3>Edit Group</h3>
 
-      <form onSubmit={handleSubmit}>
-        {/* === Group Name === */}
-        <div>
-          <label>Group Name</label>
-          <input
-            name="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Group name"
-            required
-          />
-        </div>
+        <form onSubmit={handleSubmit}>
+          {/* === Group Name === */}
+          <div>
+            <label>Group Name</label>
+            <input
+              name="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Group name"
+              required
+            />
+          </div>
 
-        {/* === Description === */}
-        <div>
-          <label>Description</label>
-          <textarea
-            name="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Group description"
-          />
-        </div>
+          {/* === Description === */}
+          <div>
+            <label>Description</label>
+            <textarea
+              name="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Group description"
+            />
+          </div>
 
-        {/* === Theme === */}
-        <div>
-          <label>Theme</label>
-          <select
-            value={themeId}
-            onChange={(e) => setThemeId(e.target.value)}
-          >
-            <option value="">-- No theme --</option>
-            {themes.map((t) => (
-              <option key={t.id} value={String(t.id)}>
-                {t.name}
-              </option>
-            ))}
-          </select>
-        </div>
+          {/* === Theme === */}
+          <div>
+            <label>Theme</label>
+            <select
+              value={themeId}
+              onChange={(e) => setThemeId(e.target.value)}
+            >
+              <option value="">-- No theme --</option>
+              {themes.map((t) => (
+                <option key={t.id} value={String(t.id)}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        {/* === Genres === */}
-        <div>
-          <GenreSelector
-            genres={genres}
-            selectedGenres={selectedGenres}
-            onToggle={toggleGenre}
-          />
-        </div>
+          {/* === Genres === */}
+          <div>
+            <GenreSelector
+              genres={genres}
+              selectedGenres={selectedGenres}
+              onToggle={toggleGenre}
+              showTitle={false}
+              compact={true}
+            />
+          </div>
 
-        {/* === Visibility === */}
-<div className="visibility-field">
-  <label htmlFor="visibility">Visibility</label>
-  <select
-    id="visibility"
-    name="visibility"
-    value={visibility}
-    onChange={(e) => setVisibility(e.target.value)}
-  >
-    <option value="public">Public</option>
-    <option value="private">Private</option>
-  </select>
-</div>
+          {/* === Visibility === */}
+          <div className="visibility-field">
+            <label htmlFor="visibility">Visibility</label>
+            <select
+              id="visibility"
+              name="visibility"
+              value={visibility}
+              onChange={(e) => setVisibility(e.target.value)}
+            >
+              <option value="public">Public</option>
+              <option value="private">Private</option>
+            </select>
+          </div>
 
-        {/* === Actions === */}
-        <div className="edit-group-actions">
-          <button
-            type="button"
-            onClick={onClose}
-            className="cancel-btn"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="save-btn"
-          >
-            Save
-          </button>
-        </div>
-      </form>
+          {/* === Actions === */}
+          <div className="edit-group-actions">
+            <button type="button" onClick={onClose} className="cancel-btn">
+              Cancel
+            </button>
+            <button type="submit" className="save-btn">
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* === Popup === */}
+      {showPopup && (
+        <OnsitePopup
+          message={popupMessage}
+          type={popupType}
+          onConfirm={() => setShowPopup(false)}
+          confirmText="OK"
+        />
+      )}
     </div>
-
-    {/* === On-site Popup integration === */}
-    {showPopup && (
-      <OnsitePopup
-        message={popupMessage}
-        type={popupType}
-        onConfirm={() => setShowPopup(false)}
-        confirmText="OK"
-      />
-    )}
-  </div>
-);
+  );
 }
