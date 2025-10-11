@@ -1,8 +1,14 @@
 /* ===== Base Layout ===== */
 .group-details-page {
   padding: 2rem;
-  color: #eee;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* Default (fallback theme) */
+.group-details-page.default,
+.group-details-page:not([class*="pastel-"]) {
   background: #111;
+  color: #eee;
 }
 
 /* ===== Header Section ===== */
@@ -438,4 +444,44 @@
 
 .bg-black.bg-opacity-40 {
   background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+/* ===============================
+   GROUP THEMES
+   =============================== */
+
+/* === Pastel Blue === */
+.group-details-page.pastel-blue {
+  background: linear-gradient(135deg, #a8caff, #6fa8ff);
+  color: #0f182e;
+}
+
+.group-details-page.pastel-blue h1,
+.group-details-page.pastel-blue h2,
+.group-details-page.pastel-blue h3 {
+  color: #0f182e;
+}
+
+/* === Pastel Pink === */
+.group-details-page.pastel-pink {
+  background: linear-gradient(135deg, #ffc1d6, #ff9fc2);
+  color: #30111c;
+}
+
+.group-details-page.pastel-pink h1,
+.group-details-page.pastel-pink h2,
+.group-details-page.pastel-pink h3 {
+  color: #30111c;
+}
+
+/* === Pastel Green === */
+.group-details-page.pastel-green {
+  background: linear-gradient(135deg, #b8f2c9, #8de6a7);
+  color: #10291b;
+}
+
+.group-details-page.pastel-green h1,
+.group-details-page.pastel-green h2,
+.group-details-page.pastel-green h3 {
+  color: #10291b;
 }

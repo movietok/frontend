@@ -18,6 +18,9 @@ function GroupDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [removing, setRemoving] = useState(false);
 
+  console.log("Rendered group object:", group);
+
+
   // Decode user ID from JWT
   const currentUserId = useMemo(() => {
     try {
@@ -240,7 +243,22 @@ function GroupDetailsPage() {
     isOwner;
 
   return (
-    <div className={`group-details-page group-theme ${group.theme_class || ""}`}>
+
+    <div
+  className={`group-details-page group-theme ${
+    group
+      ? group.theme_class ||
+        (group.theme_id === 1
+          ? "pastel-blue"
+          : group.theme_id === 2
+          ? "pastel-pink"
+          : group.theme_id === 3
+          ? "pastel-green"
+          : "default")
+      : ""
+  }`}
+>
+
       {/* Header */}
       <div className="group-header">
         <img

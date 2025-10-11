@@ -4,6 +4,7 @@ import { getAllGroupThemes } from "../../services/groups";
 import { getGenres } from "../../services/tmdb";
 import GenreSelector from "../GenreSelector";
 import OnsitePopup from "../Popups/OnsitePopup";
+import "../../styles/EditGroupModal.css";
 
 export default function EditGroupModal({ group, onClose, onSave }) {
   useEffect(() => {
@@ -166,106 +167,100 @@ export default function EditGroupModal({ group, onClose, onSave }) {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-[9999]">
-      <div className="bg-white text-black p-6 rounded shadow-lg w-[32rem] max-w-[95vw]">
-        <h3 className="text-lg font-semibold mb-4">Edit Group</h3>
+  <div className="edit-group-overlay">
+    <div className="edit-group-modal">
+      <h3>Edit Group</h3>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Group Name</label>
-            <input
-              name="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full border p-2 rounded"
-              placeholder="Group name"
-              required
-            />
-          </div>
+      <form onSubmit={handleSubmit}>
+        {/* === Group Name === */}
+        <div>
+          <label>Group Name</label>
+          <input
+            name="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Group name"
+            required
+          />
+        </div>
 
-          {/* Description */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Description
-            </label>
-            <textarea
-              name="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full border p-2 rounded"
-              placeholder="Group description"
-            />
-          </div>
+        {/* === Description === */}
+        <div>
+          <label>Description</label>
+          <textarea
+            name="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Group description"
+          />
+        </div>
 
-          {/* Theme */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Theme</label>
-            <select
-              value={themeId}
-              onChange={(e) => setThemeId(e.target.value)}
-              className="w-full border p-2 rounded"
-            >
-              <option value="">-- No theme --</option>
-              {themes.map((t) => (
-                <option key={t.id} value={String(t.id)}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
-          </div>
+        {/* === Theme === */}
+        <div>
+          <label>Theme</label>
+          <select
+            value={themeId}
+            onChange={(e) => setThemeId(e.target.value)}
+          >
+            <option value="">-- No theme --</option>
+            {themes.map((t) => (
+              <option key={t.id} value={String(t.id)}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-          {/* Genres */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Genres</label>
-            <GenreSelector
-              genres={genres}
-              selectedGenres={selectedGenres}
-              onToggle={toggleGenre}
-            />
-          </div>
+        {/* === Genres === */}
+        <div>
+          <label>Genres</label>
+          <GenreSelector
+            genres={genres}
+            selectedGenres={selectedGenres}
+            onToggle={toggleGenre}
+          />
+        </div>
 
-          {/* Visibility */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Visibility</label>
-            <select
-              value={visibility}
-              onChange={(e) => setVisibility(e.target.value)}
-              className="w-full border p-2 rounded"
-            >
-              <option value="public">Public</option>
-              <option value="private">Private</option>
-            </select>
-          </div>
+        {/* === Visibility === */}
+        <div>
+          <label>Visibility</label>
+          <select
+            value={visibility}
+            onChange={(e) => setVisibility(e.target.value)}
+          >
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+          </select>
+        </div>
 
-          {/* Actions */}
-          <div className="flex justify-end gap-2 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-3 py-1 bg-gray-300 rounded"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-3 py-1 bg-green-600 text-white rounded"
-            >
-              Save
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {/* === On-site Popup integration === */}
-      {showPopup && (
-        <OnsitePopup
-          message={popupMessage}
-          type={popupType}
-          onConfirm={() => setShowPopup(false)}
-          confirmText="OK"
-        />
-      )}
+        {/* === Actions === */}
+        <div className="edit-group-actions">
+          <button
+            type="button"
+            onClick={onClose}
+            className="cancel-btn"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="save-btn"
+          >
+            Save
+          </button>
+        </div>
+      </form>
     </div>
-  );
+
+    {/* === On-site Popup integration === */}
+    {showPopup && (
+      <OnsitePopup
+        message={popupMessage}
+        type={popupType}
+        onConfirm={() => setShowPopup(false)}
+        confirmText="OK"
+      />
+    )}
+  </div>
+);
 }
