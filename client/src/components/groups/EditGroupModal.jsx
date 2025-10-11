@@ -145,6 +145,8 @@ export default function EditGroupModal({ group, onClose, onSave }) {
       setShowPopup(true);
 
       onSave?.(updated?.group ?? updated);
+
+      onClose();
       setTimeout(() => {
         setShowPopup(false);
         onClose();
@@ -213,7 +215,6 @@ export default function EditGroupModal({ group, onClose, onSave }) {
 
         {/* === Genres === */}
         <div>
-          <label>Genres</label>
           <GenreSelector
             genres={genres}
             selectedGenres={selectedGenres}
@@ -222,16 +223,18 @@ export default function EditGroupModal({ group, onClose, onSave }) {
         </div>
 
         {/* === Visibility === */}
-        <div>
-          <label>Visibility</label>
-          <select
-            value={visibility}
-            onChange={(e) => setVisibility(e.target.value)}
-          >
-            <option value="public">Public</option>
-            <option value="private">Private</option>
-          </select>
-        </div>
+<div className="visibility-field">
+  <label htmlFor="visibility">Visibility</label>
+  <select
+    id="visibility"
+    name="visibility"
+    value={visibility}
+    onChange={(e) => setVisibility(e.target.value)}
+  >
+    <option value="public">Public</option>
+    <option value="private">Private</option>
+  </select>
+</div>
 
         {/* === Actions === */}
         <div className="edit-group-actions">

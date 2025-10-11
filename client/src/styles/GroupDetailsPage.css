@@ -447,41 +447,58 @@
 }
 
 /* ===============================
-   GROUP THEMES
+   GROUP THEMES (with white text)
    =============================== */
 
+/* === Shared text override === */
+.group-details-page.theme-blue,
+.group-details-page.theme-green,
+.group-details-page.theme-orange,
+.group-details-page.theme-purple {
+  color: #fff; /* Force general text to white */
+}
+
+/* Make sure dark panels still look correct */
+.group-details-page.theme-blue .info-box,
+.group-details-page.theme-green .info-box,
+.group-details-page.theme-orange .info-box,
+.group-details-page.theme-purple .info-box {
+  background: #111;
+  color: #eee;
+}
+
 /* === Pastel Blue === */
-.group-details-page.pastel-blue {
+.group-details-page.theme-blue {
   background: linear-gradient(135deg, #a8caff, #6fa8ff);
-  color: #0f182e;
-}
-
-.group-details-page.pastel-blue h1,
-.group-details-page.pastel-blue h2,
-.group-details-page.pastel-blue h3 {
-  color: #0f182e;
-}
-
-/* === Pastel Pink === */
-.group-details-page.pastel-pink {
-  background: linear-gradient(135deg, #ffc1d6, #ff9fc2);
-  color: #30111c;
-}
-
-.group-details-page.pastel-pink h1,
-.group-details-page.pastel-pink h2,
-.group-details-page.pastel-pink h3 {
-  color: #30111c;
 }
 
 /* === Pastel Green === */
-.group-details-page.pastel-green {
+.group-details-page.theme-green {
   background: linear-gradient(135deg, #b8f2c9, #8de6a7);
-  color: #10291b;
 }
 
-.group-details-page.pastel-green h1,
-.group-details-page.pastel-green h2,
-.group-details-page.pastel-green h3 {
-  color: #10291b;
+/* === Pastel Orange === */
+.group-details-page.theme-orange {
+  background: linear-gradient(135deg, #ffe1b0, #ffb347);
+}
+
+/* === Pastel Purple === */
+.group-details-page.theme-purple {
+  background: linear-gradient(135deg, #d9b8ff, #b88cff);
+}
+
+/* Optional: ensure headings stay white */
+.group-details-page.theme-blue h1,
+.group-details-page.theme-blue h2,
+.group-details-page.theme-blue h3,
+.group-details-page.theme-green h1,
+.group-details-page.theme-green h2,
+.group-details-page.theme-green h3,
+.group-details-page.theme-orange h1,
+.group-details-page.theme-orange h2,
+.group-details-page.theme-orange h3,
+.group-details-page.theme-purple h1,
+.group-details-page.theme-purple h2,
+.group-details-page.theme-purple h3 {
+  color: #fff;
 }

@@ -242,23 +242,16 @@ function GroupDetailsPage() {
     group?.is_member === true ||
     isOwner;
 
+  const themeMap = {
+  1: "theme-blue",
+  2: "theme-green",
+  3: "theme-purple",
+  4: "theme-orange",
+  };
+
   return (
 
-    <div
-  className={`group-details-page group-theme ${
-    group
-      ? group.theme_class ||
-        (group.theme_id === 1
-          ? "pastel-blue"
-          : group.theme_id === 2
-          ? "pastel-pink"
-          : group.theme_id === 3
-          ? "pastel-green"
-          : "default")
-      : ""
-  }`}
->
-
+    <div className={`group-details-page ${themeMap[group?.theme_id] || ""}`}>
       {/* Header */}
       <div className="group-header">
         <img
