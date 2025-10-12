@@ -14,29 +14,15 @@ function ReviewCard({
   onUpdated,
   showMovieHeader = false, // Only true in GroupDetailsPage
 }) {
-  console.log("🎬 ReviewCard props check:", {
-  id: review?.id,
-  movie_id: review?.movie_id,
-  movieId: review?.movieId,
-  movie_name: review?.movie_name,
-  movieName: review?.movieName,
-  poster_url: review?.poster_url,
-  posterUrl: review?.posterUrl,
-  release_year: review?.release_year,
-  releaseYear: review?.releaseYear,
-  showMovieHeader
-});
-
   const [isEditing, setIsEditing] = useState(false);
   const [rating, setRating] = useState(review?.rating ?? 0);
   const [comment, setComment] = useState(review?.content ?? "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [temporaryInteraction, setTemporaryInteraction] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
-
   const [expanded, setExpanded] = useState(false);
+  const [userInteraction, setUserInteraction] = useState(null); // "like" | "dislike" | null
   const maxPreviewLength = 300;
 
   // Ownership detection
@@ -46,6 +32,16 @@ function ReviewCard({
     const normalizedCurrent = Number(currentUserId);
     setIsOwner(reviewUserId === normalizedCurrent);
   }, [review?.userId, review?.user_id, currentUserId]);
+
+  // Detect if current user has liked/disliked this review
+  useEffect(() => {
+    if (review?.interactions && currentUserId) {
+      const userInt = review.interactions.find(
+        (i) => i.user_id === Number(currentUserId)
+      );
+      setUserInteraction(userInt ? userInt.type : null);
+    }
+  }, [review?.interactions, currentUserId]);
 
   if (!review) return <div className="review-card">Loading review...</div>;
 
@@ -76,13 +72,18 @@ function ReviewCard({
     }
   };
 
+  // Handles persistent like/dislike toggling
   const handleInteraction = async (type) => {
+    if (!review?.id) return;
     try {
-      if (!review?.id) throw new Error("Review ID missing on interaction");
-      setTemporaryInteraction(type);
-      const updated = await addReviewInteraction(review.id, type);
-      if (updated && updated.id) onUpdated(updated);
-      setTimeout(() => setTemporaryInteraction(null), 500);
+      // Determine new state: clicking same type again = remove
+      const newType = userInteraction === type ? null : type;
+      setUserInteraction(newType);
+
+      const updated = await addReviewInteraction(review.id, newType);
+      if (updated && updated.id) {
+        onUpdated?.(updated);
+      }
     } catch (err) {
       setError(err.message);
     }
@@ -97,7 +98,6 @@ function ReviewCard({
 
   // Inline Movie Header (for GroupDetailsPage only)
   const MovieHeader = () => {
-    // Handle both snake_case and camelCase keys
     const movieId = review.movie_id ?? review.movieId;
     const movieTitle = review.movie_name ?? review.movieName;
     const moviePoster = review.poster_url ?? review.posterUrl;
@@ -186,7 +186,7 @@ function ReviewCard({
             <div className="review-interactions">
               <button
                 className={`dislike-btn ${
-                  temporaryInteraction === "dislike" ? "active" : ""
+                  userInteraction === "dislike" ? "active" : ""
                 }`}
                 disabled={isOwner}
                 onClick={() => handleInteraction("dislike")}
@@ -202,7 +202,7 @@ function ReviewCard({
               </span>
               <button
                 className={`like-btn ${
-                  temporaryInteraction === "like" ? "active" : ""
+                  userInteraction === "like" ? "active" : ""
                 }`}
                 disabled={isOwner}
                 onClick={() => handleInteraction("like")}
@@ -228,21 +228,21 @@ function ReviewCard({
           {/* ===== Owner Buttons ===== */}
           {isOwner && (
             <div className="review-actions-bottom">
-  <button
-    className="icon-btn edit-btn"
-    title="Edit review"
-    onClick={() => setIsEditing(true)}
-  >
-    ✏️
-  </button>
-  <button
-    className="icon-btn delete-btn"
-    title="Delete review"
-    onClick={() => setShowDeleteModal(true)}
-  >
-    🗑️
-  </button>
-</div>
+              <button
+                className="icon-btn edit-btn"
+                title="Edit review"
+                onClick={() => setIsEditing(true)}
+              >
+                ✏️
+              </button>
+              <button
+                className="icon-btn delete-btn"
+                title="Delete review"
+                onClick={() => setShowDeleteModal(true)}
+              >
+                🗑️
+              </button>
+            </div>
           )}
         </div>
       )}

@@ -8,12 +8,13 @@ const normalizeReview = (r) => ({
   movieId: r?.movie_id,
   userId: r?.user_id,
   username: r?.username ?? `User ${r?.user_id}`,
-  content: r?.content ?? r?.body ?? "", // always a string
+  content: r?.content ?? r?.body ?? "",
   rating: Number(r?.rating ?? 0),
   likes: Number(r?.likes ?? 0),
   dislikes: Number(r?.dislikes ?? 0),
   created_at: r?.created_at,
   updated_at: r?.updated_at,
+  interactions: Array.isArray(r?.interactions) ? r.interactions : [], //  Keep backend interaction data
 });
 
 // Create a new review
