@@ -19,6 +19,9 @@ function GroupDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [removing, setRemoving] = useState(false);
   const [showFullAbout, setShowFullAbout] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [showAllGenres, setShowAllGenres] = useState(false);
+
 
   // --- Pagination for Reviews ---
   const [currentPage, setCurrentPage] = useState(1);
@@ -299,41 +302,86 @@ if (isMemberLike) {
 
   <div className="group-info">
     <div className="group-title-row">
-  <h1 className="group-title">{group.name}</h1>
-  <CopyLinkButton label="Copy Group Link" />
+  <h1 className="group-title">
+    {group.name}
+    <button
+      className={`copylink-btn-inline ${copied ? "copied" : ""}`}
+      onClick={() => {
+        navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      }}
+      title="Copy group link"
+    >
+      {copied ? "✓" : "🔗"}
+    </button>
+  </h1>
 </div>
+
     {group.genre_tags && (
       <p className="group-genres">{group.genre_tags.join(", ")}</p>
     )}
 
     <div className="facts-management-row">
       {/* Facts Section */}
-      <div className="facts-box">
+<div className="facts-box">
   <h3>Facts</h3>
   <ul>
     <li>
-      Owner: <span>{group.owner_name || "Unknown"}</span>
+      Owner:{" "}
+      <Link to={`/profile/${group.owner_id}`} className="owner-link">
+        {group.owner_name || "Unknown"}
+      </Link>
     </li>
+
     <li>
       Members: <span>{group.member_count || 0}</span>
     </li>
+
     {group.created_at && (
       <li>Created: {new Date(group.created_at).toLocaleDateString("en-GB")}</li>
     )}
+
     {group.visibility && <li>Visibility: {group.visibility}</li>}
+
+    {/* ✅ Genres block added here */}
+    {group.genres?.length > 0 && (
+  <li className="group-genres-list">
+    Genres:
+    <div className={`genre-tags ${showAllGenres ? "expanded" : ""}`}>
+      {group.genres.map((g) => (
+        <span key={g.genre_id} className="genre-tag">
+          {g.genre_name}
+        </span>
+      ))}
+    </div>
+    {group.genres.length > 8 && (
+      <button
+        className="toggle-genres-btn"
+        onClick={() => setShowAllGenres(!showAllGenres)}
+      >
+        {showAllGenres ? "Hide" : "Show all"}
+      </button>
+    )}
+  </li>
+)}
   </ul>
 </div>
 
       {/* Management Box (if logged in) */}
       {Boolean(currentUserId) && (
-        <div className="management-box-wrapper">
-          <GroupManagementBox
-            group={group}
-            onGroupUpdated={handleGroupUpdated}
-            onGroupDeleted={handleGroupDeleted}
-          />
-        </div>
-      )}
+  <div className="management-box-wrapper styled-management-box">
+ 
+  <div className="management-buttons">
+    <GroupManagementBox
+      group={group}
+      onGroupUpdated={handleGroupUpdated}
+      onGroupDeleted={handleGroupDeleted}
+    />
+  </div>
+</div>
+)}
+
     </div>
   </div>
 </div>

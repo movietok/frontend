@@ -864,3 +864,175 @@
 .theme-orange .reviews-title {
   text-shadow: 0 0 6px rgba(255, 160, 60, 0.4);
 }
+
+/* --- INLINE COPY LINK BUTTON (ENHANCED VISIBILITY) --- */
+.copylink-btn-inline {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ccc;
+  font-size: 0.95rem;
+  margin-left: 0.6rem;
+  border-radius: 50%;
+  padding: 0.25rem 0.35rem;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: all 0.2s ease;
+}
+
+.copylink-btn-inline:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.copylink-btn-inline.copied {
+  color: #6f6;
+  background: rgba(0, 255, 0, 0.15);
+  border-color: rgba(0, 255, 0, 0.25);
+}
+
+/* --- OWNER LINK --- */
+.owner-link {
+  color: #89c4ff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.owner-link:hover {
+  color: #cde6ff;
+  text-decoration: underline;
+}
+
+/* --- GENRE TAGS --- */
+.group-genres-list {
+  margin-top: 0.5rem;
+}
+
+.genre-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+}
+
+.genre-tag {
+  background: #222;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  color: #ccc;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.genre-tag:hover {
+  background: #333;
+  border-color: #666;
+}
+
+/* --- MANAGEMENT BOX UPGRADE --- */
+.styled-management-box {
+  background: linear-gradient(180deg, #1b1b1b 0%, #121212 100%);
+  border: 1px solid #2c2c2c;
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  flex: 1;
+  max-width: 320px;
+}
+
+.management-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #f1f1f1;
+  margin-bottom: 0.6rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.4rem;
+}
+
+.management-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.management-buttons button {
+  width: 100%;
+  background: #222;
+  border: 1px solid #444;
+  color: #ddd;
+  padding: 0.4rem 0;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.management-buttons button:hover {
+  background: #333;
+  color: #fff;
+  border-color: #666;
+}
+
+/* Thematic glow for logged-in boxes */
+.theme-blue .styled-management-box {
+  border-color: rgba(60, 130, 255, 0.4);
+  box-shadow: 0 0 10px rgba(60, 130, 255, 0.15);
+}
+.theme-green .styled-management-box {
+  border-color: rgba(90, 200, 90, 0.4);
+  box-shadow: 0 0 10px rgba(90, 200, 90, 0.15);
+}
+.theme-purple .styled-management-box {
+  border-color: rgba(150, 90, 255, 0.4);
+  box-shadow: 0 0 10px rgba(150, 90, 255, 0.15);
+}
+.theme-orange .styled-management-box {
+  border-color: rgba(255, 160, 60, 0.4);
+  box-shadow: 0 0 10px rgba(255, 160, 60, 0.15);
+}
+
+
+.genre-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+  max-height: 72px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.genre-tags.expanded {
+  max-height: none;
+}
+
+.toggle-genres-btn {
+  background: transparent;
+  border: 1px solid #444;
+  color: #ccc;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  padding: 0.2rem 0.6rem;
+  margin-top: 0.4rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggle-genres-btn:hover {
+  background: #333;
+  color: #fff;
+  border-color: #666;
+}
+
+/* Center the Management title inside the outlined box */
+.styled-management-box h3,
+.styled-management-box .management-title {
+  text-align: center !important;
+  width: 100%;
+  margin: 0 0 0.8rem 0;
+}
+
+/* In case the inner framed container uses its own header element */
+.styled-management-box > div > h3 {
+  text-align: center !important;
+}
