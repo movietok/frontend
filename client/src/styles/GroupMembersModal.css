@@ -1,0 +1,145 @@
+/* Overlay unchanged */
+.group-members-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* Make the modal a proper window with capped size */
+.group-members-modal {
+  background: #121212;
+  color: #f1f1f1;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  width: min(720px, 95vw);
+  max-height: 80vh;              /* ⬅️ cap height */
+  overflow: hidden;              /* ⬅️ prevent the shell from expanding */
+  display: flex;                 /* ⬅️ stack header/tabs/content */
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,.55);
+}
+
+/* Header stays fixed height at top */
+.group-members-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+/* Tabs bar below header, also fixed in the modal shell */
+.group-members-modal__tabs {
+  display: flex;
+  gap: .6rem;
+  padding: .7rem 1.1rem;
+  border-bottom: 1px solid #242424;
+}
+.group-members-modal__tabs button {
+  background: #1e1e1e;
+  color: #ddd;
+  border: 1px solid #343434;
+  border-radius: 8px;
+  padding: .45rem .8rem;
+  font-weight: 600;
+  font-size: .9rem;
+}
+.group-members-modal__tabs button.active {
+  background: #3a2df5;
+  border-color: #3a2df5;
+  color: #fff;
+}
+
+/* The scrollable area — only this scrolls */
+.group-members-modal__content {
+  flex: 1;                       /* ⬅️ fill remaining height */
+  overflow: auto;                /* ⬅️ scroll inside */
+  padding: 1rem 1.1rem 1.2rem;
+}
+
+/* List layout tidy */
+.group-members-modal__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .7rem;
+}
+
+/* Member rows keep compact height */
+.member-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #181818;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  padding: .75rem .9rem;
+}
+
+/* Left side */
+.member-info { display: flex; flex-direction: column; gap: .25rem; }
+.member-link { color: #fff; text-decoration: none; font-weight: 600; }
+.member-link:hover { text-decoration: underline; }
+.member-joined { color: #9a9a9a; font-size: .82rem; }
+
+/* Role badges (subtle) */
+.member-role {
+  display: inline-block;
+  font-size: .78rem;
+  padding: .15rem .5rem;
+  border-radius: 6px;
+  margin-right: .5rem;
+  text-transform: capitalize;
+  font-weight: 600;
+}
+.member-role.owner     { background: rgba(255,215,100,.14); color: #ffd764; }
+.member-role.moderator { background: rgba(100,140,255,.14); color: #9db7ff; }
+.member-role.member    { background: rgba(120,255,140,.12); color: #a6e6b0; }
+
+/* Right side actions — lighter, compact buttons */
+.member-actions { display: flex; gap: .45rem; align-items: center; }
+.member-actions button {
+  border: 1px solid #3b3b3b;
+  background: #202020;
+  color: #ddd;
+  border-radius: 8px;
+  font-size: .82rem;
+  padding: .36rem .7rem;
+  font-weight: 600;
+  transition: background .15s ease, border-color .15s ease, transform .1s;
+}
+.member-actions button:hover { background: #2a2a2a; border-color: #4a4a4a; transform: translateY(-1px); }
+.promote-btn { color: #9ec4ff; border-color: #324b70; }
+.promote-btn:hover { background: rgba(120,160,255,.14); }
+.demote-btn  { color: #c8a3ff; border-color: #513b78; }
+.demote-btn:hover  { background: rgba(180,130,255,.12); }
+.remove-btn  { color: #ff9a9a; border-color: #6a3c3c; }
+.remove-btn:hover  { background: rgba(255,100,100,.12); }
+
+/* Close button */
+.close-btn {
+  background: transparent;
+  border: none;
+  color: #cfcfcf;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.close-btn:hover { color: #fff; }
+
+.member-role.pending {
+  background: rgba(255, 255, 120, 0.12);
+  color: #e2d16b;
+}
+
+
+/* Mobile tweak: a bit taller if needed */
+@media (max-width: 560px) {
+  .group-members-modal { max-height: 85vh; width: 95vw; }
+}

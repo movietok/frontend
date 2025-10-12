@@ -44,7 +44,10 @@ export const getUserFavorites = async (user_id, type) => {
 
 // Get group favorites
 export const getGroupFavorites = async (group_id) => {
-  const res = await favoritesAPI.get(`/group/${group_id}`);
+  const token = localStorage.getItem("token");
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+  const res = await favoritesAPI.get(`/group/${group_id}`, { headers });
   return res.data.data;
 };
 
@@ -58,3 +61,4 @@ export const checkFavoriteStatus = async (tmdb_ids) => {
   });
   return res.data;
 };
+

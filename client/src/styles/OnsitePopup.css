@@ -1,0 +1,64 @@
+/* Reuse from ReviewCard */
+.inline-delete-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.inline-delete-modal {
+  background: #1c1c1c;
+  padding: 1.5rem 2rem;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Buttons */
+.delete-modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.confirm-delete {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.cancel-delete {
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+}
+
+.confirm-delete:hover {
+  background: #c0392b;
+}
+
+.cancel-delete:hover {
+  background: #444;
+}
+
+/* Add type variations */
+.modal-success {
+  border-left: 4px solid #2ecc71;
+}
+.modal-error {
+  border-left: 4px solid #e74c3c;
+}
+.modal-info {
+  border-left: 4px solid #3dd68c;
+}

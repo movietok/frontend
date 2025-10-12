@@ -219,6 +219,39 @@
 }
 
 /* ===== Bottom Edit/Delete Buttons ===== */
+/* ===== Unified Icon Buttons (Edit / Delete) ===== */
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #fff;
+}
+
+.icon-btn.edit-btn {
+  background: #4a90e2;
+}
+
+.icon-btn.edit-btn:hover {
+  background: #357ab8;
+  transform: scale(1.05);
+}
+
+.icon-btn.delete-btn {
+  background: #d9534f;
+}
+
+.icon-btn.delete-btn:hover {
+  background: #b52b27;
+  transform: scale(1.05);
+}
+
 .review-actions-bottom {
   display: flex;
   gap: 0.6rem;
@@ -227,32 +260,6 @@
   margin-top: 1rem;
   padding-top: 0.4rem;
   border-top: 1px solid #333;
-}
-
-.edit-btn {
-  background: #4a90e2;
-  color: white;
-  border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.edit-btn:hover {
-  background: #357ab8;
-}
-
-.delete-btn {
-  background: #d9534f;
-  color: white;
-  border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.delete-btn:hover {
-  background: #b52b27;
 }
 
 /* ===== Inline Delete Modal ===== */
@@ -375,7 +382,7 @@
 .reviews-section .read-more-btn {
   background: none;
   border: none;
-  color: #4da6ff;
+  color: #3dd68c;
   font-weight: 600;
   margin-left: 0.3rem;
   cursor: pointer;

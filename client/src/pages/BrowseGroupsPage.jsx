@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom"; 
-import { getGenres } from "../services/tmdb"
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { getGenres } from "../services/tmdb";
 import { discoverGroups, searchGroups } from "../services/groups";
 import GroupCard from "../components/GroupCard";
 import GenreSelector from "../components/GenreSelector";
@@ -9,6 +9,7 @@ import "../styles/BrowseGroupsPage.css";
 function BrowseGroupsPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+
   const [genres, setGenres] = useState([]);
   const [selectedGenresDraft, setSelectedGenresDraft] = useState([]);
   const [appliedGenres, setAppliedGenres] = useState([]);
@@ -60,34 +61,36 @@ function BrowseGroupsPage() {
       .catch(console.error);
   }, []);
 
-  // 📡 Fetch groups by genres
- useEffect(() => {
-  if (isSearchMode) return;
+  // 📡 Fetch *all* groups once (no backend pagination)
+  useEffect(() => {
+    if (isSearchMode) return;
 
-  setLoading(true);
-  setGroups([]);
-  discoverGroups({ withGenres: appliedGenres, page })
-    .then((data) => {
-      if (data && Array.isArray(data.groups)) {
-        data.groups.forEach((g) =>
-          console.log(`Group: ${g.name}, Members: ${g.member_count}`)
-        );
-      }
+    setLoading(true);
+    setGroups([]);
 
-      setGroups(data.groups || []);
-      setTotalPages(1); // keep simple for now
-    })
-    .catch((err) => {
-      console.error("Error fetching groups:", err);
-    })
-    .finally(() => setLoading(false));
-}, [appliedGenres, page, isSearchMode]);
-
+    discoverGroups({ withGenres: appliedGenres })
+      .then((data) => {
+        if (data && Array.isArray(data.groups)) {
+          setGroups(data.groups);
+          const total = Math.ceil(data.groups.length / 16);
+          setTotalPages(total);
+        } else {
+          setGroups([]);
+          setTotalPages(1);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching groups:", err);
+      })
+      .finally(() => setLoading(false));
+  }, [appliedGenres, isSearchMode]);
 
   const toggleGenre = (genreId) => {
     const idStr = String(genreId);
     setSelectedGenresDraft((prev) =>
-      prev.includes(idStr) ? prev.filter((id) => id !== idStr) : [...prev, idStr]
+      prev.includes(idStr)
+        ? prev.filter((id) => id !== idStr)
+        : [...prev, idStr]
     );
   };
 
@@ -105,6 +108,21 @@ function BrowseGroupsPage() {
     setSelectedGenresDraft([]);
     setAppliedGenres([]);
   };
+
+  // 🔢 Pagination logic (frontend-only)
+  const itemsPerPage = 16;
+  const startIndex = (page - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const visibleGroups = (isSearchMode ? searchResults : groups).slice(
+    startIndex,
+    endIndex
+  );
+
+  // update total pages when search results change
+  useEffect(() => {
+    const source = isSearchMode ? searchResults : groups;
+    setTotalPages(Math.max(1, Math.ceil(source.length / itemsPerPage)));
+  }, [groups, searchResults, isSearchMode]);
 
   // Sidebar + content layout
   const layoutStyle = {
@@ -130,34 +148,33 @@ function BrowseGroupsPage() {
             onToggle={toggleGenre}
           />
 
-          <div className="mt-4 space-y-2">
-  <button
-    onClick={applySearch}
-    className="w-full px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-  >
-    Search
-  </button>
-  <button
-    onClick={clearFilters}
-    disabled={
-      selectedGenresDraft.length === 0 && appliedGenres.length === 0
-    }
-    className="w-full px-3 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition"
-  >
-    Clear Filters
-  </button>
-</div>
+          <div className="space-y-2" style={{ marginTop: "20px" }}>
+            <button
+              onClick={applySearch}
+              className="w-full px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            >
+              Search
+            </button>
+            <button
+              onClick={clearFilters}
+              disabled={
+                selectedGenresDraft.length === 0 && appliedGenres.length === 0
+              }
+              className="w-full px-3 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition"
+            >
+              Clear Filters
+            </button>
+          </div>
 
-{/* Separated Create Group section */}
-<div className="create-group-section">
-  <button
-    onClick={() => navigate("/groups/create")}
-    className="create-group-btn"
-  >
-    + Create Group
-  </button>
-</div>
-
+          {/* Create Group section */}
+          <div className="create-group-section">
+            <button
+              onClick={() => navigate("/groups/create")}
+              className="create-group-btn"
+            >
+              + Create Group
+            </button>
+          </div>
         </aside>
 
         {/* Groups */}
@@ -165,7 +182,11 @@ function BrowseGroupsPage() {
           {isSearchMode && (
             <div style={{ marginBottom: "2rem" }}>
               <h2
-                style={{ fontSize: "1.5rem", marginBottom: "1rem", color: "#333" }}
+                style={{
+                  fontSize: "1.5rem",
+                  marginBottom: "1rem",
+                  color: "#333",
+                }}
               >
                 Results for: "{query}" ({searchResults.length} found)
               </h2>
@@ -176,13 +197,15 @@ function BrowseGroupsPage() {
             <p>Loading...</p>
           ) : (
             <>
-              {isSearchMode && searchResults.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "2rem", color: "#666" }}>
-                  <p>No results for "{query}"</p>
+              {visibleGroups.length === 0 ? (
+                <div
+                  style={{ textAlign: "center", padding: "2rem", color: "#666" }}
+                >
+                  <p>No results found.</p>
                 </div>
               ) : (
                 <div className="mt-groups-wrap">
-                  {(isSearchMode ? searchResults : groups).slice(0, 16).map((group) => (
+                  {visibleGroups.map((group) => (
                     <div className="mt-group-tile" key={group.id}>
                       <GroupCard group={group} />
                     </div>
@@ -190,29 +213,28 @@ function BrowseGroupsPage() {
                 </div>
               )}
 
-              {/* spacer */}
               <div style={{ height: 48 }} />
-            </>
-          )}
 
-          {/* Pagination (optional later) */}
-          {!isSearchMode && (
-            <div className="flex justify-center gap-3 pb-8">
-              <button
-                disabled={page === 1}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-              >
-                Prev
-              </button>
-              <button
-                disabled={page === totalPages}
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex justify-center gap-3 pb-8">
+                  <button
+                    disabled={page === 1}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+                  >
+                    Prev
+                  </button>
+                  <button
+                    disabled={page === totalPages}
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </main>
       </div>

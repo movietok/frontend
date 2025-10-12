@@ -1,8 +1,14 @@
 /* ===== Base Layout ===== */
 .group-details-page {
   padding: 2rem;
-  color: #eee;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* Default (fallback theme) */
+.group-details-page.default,
+.group-details-page:not([class*="pastel-"]) {
   background: #111;
+  color: #eee;
 }
 
 /* ===== Header Section ===== */
@@ -438,4 +444,602 @@
 
 .bg-black.bg-opacity-40 {
   background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+/* ===============================
+   GROUP THEMES (with white text)
+   =============================== */
+
+/* === Shared text override === */
+.group-details-page.theme-blue,
+.group-details-page.theme-green,
+.group-details-page.theme-orange,
+.group-details-page.theme-purple {
+  color: #fff; /* Force general text to white */
+}
+
+/* Make sure dark panels still look correct */
+.group-details-page.theme-blue .info-box,
+.group-details-page.theme-green .info-box,
+.group-details-page.theme-orange .info-box,
+.group-details-page.theme-purple .info-box {
+  background: #111;
+  color: #eee;
+}
+
+/* === Pastel Blue === */
+.group-details-page.theme-blue {
+  background: linear-gradient(135deg, #a8caff, #6fa8ff);
+}
+
+/* === Pastel Green === */
+.group-details-page.theme-green {
+  background: linear-gradient(135deg, #b8f2c9, #8de6a7);
+}
+
+/* === Pastel Orange === */
+.group-details-page.theme-orange {
+  background: linear-gradient(135deg, #ffe1b0, #ffb347);
+}
+
+/* === Pastel Purple === */
+.group-details-page.theme-purple {
+  background: linear-gradient(135deg, #d9b8ff, #b88cff);
+}
+
+/* Optional: ensure headings stay white */
+.group-details-page.theme-blue h1,
+.group-details-page.theme-blue h2,
+.group-details-page.theme-blue h3,
+.group-details-page.theme-green h1,
+.group-details-page.theme-green h2,
+.group-details-page.theme-green h3,
+.group-details-page.theme-orange h1,
+.group-details-page.theme-orange h2,
+.group-details-page.theme-orange h3,
+.group-details-page.theme-purple h1,
+.group-details-page.theme-purple h2,
+.group-details-page.theme-purple h3 {
+  color: #fff;
+}
+
+.review-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* --- PAGINATION BUTTONS (shared for reviews + favorites) --- */
+.pagination-btn {
+  background: #222;
+  border: 1px solid #444;
+  color: #ddd;
+  padding: 0.5rem 1.2rem;
+  min-width: 100px; /* ensures consistent button width */
+  text-align: center;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #333;
+  color: #fff;
+  border-color: #666;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-indicator {
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+/* --- FAVORITES GRID PAGINATION --- */
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+  justify-items: center;
+}
+
+.fav-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fav-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+
+.fav-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Hover title appears only on hover */
+.hover-title {
+  opacity: 0;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 0.9rem;
+  padding: 0.3rem 0.5rem;
+  text-align: center;
+  transition: opacity 0.3s ease;
+}
+
+.fav-card:hover .hover-title {
+  opacity: 1;
+}
+
+.fav-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* Reuse pagination-btn from reviews */
+.pagination-btn {
+  background: #222;
+  border: 1px solid #444;
+  color: #ddd;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #333;
+  color: #fff;
+  border-color: #666;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --- FAVORITES CONTAINER BACKGROUND --- */
+.favorites-container {
+  background: linear-gradient(180deg, #1b1b1b 0%, #121212 100%);
+  border: 1px solid #2c2c2c;
+  border-radius: 12px;
+  padding: 1.8rem 1.5rem;
+  margin-top: 1.2rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+/* --- THEME COLOR INTEGRATION --- */
+.theme-blue .favorites-container {
+  border-color: rgba(60, 130, 255, 0.5);
+  box-shadow: 0 0 12px rgba(60, 130, 255, 0.15);
+}
+
+.theme-green .favorites-container {
+  border-color: rgba(90, 200, 90, 0.5);
+  box-shadow: 0 0 12px rgba(90, 200, 90, 0.15);
+}
+
+.theme-purple .favorites-container {
+  border-color: rgba(150, 90, 255, 0.5);
+  box-shadow: 0 0 12px rgba(150, 90, 255, 0.15);
+}
+
+.theme-orange .favorites-container {
+  border-color: rgba(255, 160, 60, 0.5);
+  box-shadow: 0 0 12px rgba(255, 160, 60, 0.15);
+}
+
+/* --- FIX FAVORITES CONTAINER HEIGHT --- */
+.favorites-container {
+  min-height: 540px; /* ensures two full rows always fit */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.favorites-title, .reviews-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #f1f1f1;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.4rem;
+  text-align: center;
+}
+
+/* --- HEADER LAYOUT FIX --- */
+.group-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.group-poster {
+  width: 200px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.group-info {
+  flex: 1;
+}
+
+/* --- FACTS + MANAGEMENT ROW --- */
+.facts-management-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.facts-box {
+  background: #1a1a1a;
+  border: 1px solid #2c2c2c;
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  flex: 1;
+}
+
+.management-box-wrapper {
+  flex: 1;
+  max-width: 320px;
+}
+
+/* --- ABOUT SECTION (FULL WIDTH) --- */
+.about-section-wide {
+  background: linear-gradient(180deg, #1b1b1b 0%, #121212 100%);
+  border: 1px solid #2c2c2c;
+  border-radius: 12px;
+  padding: 1.8rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.about-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #f1f1f1;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.about-text {
+  color: #ddd;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* --- THEME INTEGRATION --- */
+.theme-blue .facts-box,
+.theme-blue .about-section-wide {
+  border-color: rgba(60, 130, 255, 0.4);
+  box-shadow: 0 0 10px rgba(60, 130, 255, 0.1);
+}
+.theme-green .facts-box,
+.theme-green .about-section-wide {
+  border-color: rgba(90, 200, 90, 0.4);
+  box-shadow: 0 0 10px rgba(90, 200, 90, 0.1);
+}
+.theme-purple .facts-box,
+.theme-purple .about-section-wide {
+  border-color: rgba(150, 90, 255, 0.4);
+  box-shadow: 0 0 10px rgba(150, 90, 255, 0.1);
+}
+.theme-orange .facts-box,
+.theme-orange .about-section-wide {
+  border-color: rgba(255, 160, 60, 0.4);
+  box-shadow: 0 0 10px rgba(255, 160, 60, 0.1);
+}
+
+/* --- TITLE ROW --- */
+.group-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.group-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #f1f1f1;
+}
+
+/* --- FACTS BOX UPDATE --- */
+.facts-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.facts-box li {
+  color: #ddd;
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+}
+
+/* --- ABOUT SECTION TOGGLE --- */
+.about-section-wide {
+  position: relative;
+  overflow: hidden;
+}
+
+.about-text {
+  color: #ddd;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  transition: max-height 0.35s ease, mask-image 0.35s ease;
+  -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  max-height: 6.5rem; /* collapsed height */
+  text-align: center;
+}
+
+.about-text.expanded {
+  max-height: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.readmore-btn {
+  display: inline-block;
+  margin-top: 0.8rem;
+  background: transparent;
+  border: 1px solid #555;
+  color: #ddd;
+  padding: 0.3rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.readmore-btn:hover {
+  background: #333;
+  border-color: #777;
+}
+
+/* --- CENTERED ABOUT TITLE (MATCH THEME) --- */
+.about-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #f1f1f1;
+  text-align: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.4rem;
+}
+
+/* unify all titles across page */
+.favorites-title,
+.reviews-title,
+.about-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #f1f1f1;
+  text-align: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.4rem;
+}
+
+.theme-blue .about-title,
+.theme-blue .favorites-title,
+.theme-blue .reviews-title {
+  text-shadow: 0 0 6px rgba(60, 130, 255, 0.4);
+}
+.theme-green .about-title,
+.theme-green .favorites-title,
+.theme-green .reviews-title {
+  text-shadow: 0 0 6px rgba(90, 200, 90, 0.4);
+}
+.theme-purple .about-title,
+.theme-purple .favorites-title,
+.theme-purple .reviews-title {
+  text-shadow: 0 0 6px rgba(150, 90, 255, 0.4);
+}
+.theme-orange .about-title,
+.theme-orange .favorites-title,
+.theme-orange .reviews-title {
+  text-shadow: 0 0 6px rgba(255, 160, 60, 0.4);
+}
+
+/* --- INLINE COPY LINK BUTTON (ENHANCED VISIBILITY) --- */
+.copylink-btn-inline {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ccc;
+  font-size: 0.95rem;
+  margin-left: 0.6rem;
+  border-radius: 50%;
+  padding: 0.25rem 0.35rem;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: all 0.2s ease;
+}
+
+.copylink-btn-inline:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.copylink-btn-inline.copied {
+  color: #6f6;
+  background: rgba(0, 255, 0, 0.15);
+  border-color: rgba(0, 255, 0, 0.25);
+}
+
+/* --- OWNER LINK --- */
+.owner-link {
+  color: #89c4ff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.owner-link:hover {
+  color: #cde6ff;
+  text-decoration: underline;
+}
+
+/* --- GENRE TAGS --- */
+.group-genres-list {
+  margin-top: 0.5rem;
+}
+
+.genre-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+}
+
+.genre-tag {
+  background: #222;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  color: #ccc;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.genre-tag:hover {
+  background: #333;
+  border-color: #666;
+}
+
+/* --- MANAGEMENT BOX UPGRADE --- */
+.styled-management-box {
+  background: linear-gradient(180deg, #1b1b1b 0%, #121212 100%);
+  border: 1px solid #2c2c2c;
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  flex: 1;
+  max-width: 320px;
+}
+
+.management-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #f1f1f1;
+  margin-bottom: 0.6rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.4rem;
+}
+
+.management-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.management-buttons button {
+  width: 100%;
+  background: #222;
+  border: 1px solid #444;
+  color: #ddd;
+  padding: 0.4rem 0;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.management-buttons button:hover {
+  background: #333;
+  color: #fff;
+  border-color: #666;
+}
+
+/* Thematic glow for logged-in boxes */
+.theme-blue .styled-management-box {
+  border-color: rgba(60, 130, 255, 0.4);
+  box-shadow: 0 0 10px rgba(60, 130, 255, 0.15);
+}
+.theme-green .styled-management-box {
+  border-color: rgba(90, 200, 90, 0.4);
+  box-shadow: 0 0 10px rgba(90, 200, 90, 0.15);
+}
+.theme-purple .styled-management-box {
+  border-color: rgba(150, 90, 255, 0.4);
+  box-shadow: 0 0 10px rgba(150, 90, 255, 0.15);
+}
+.theme-orange .styled-management-box {
+  border-color: rgba(255, 160, 60, 0.4);
+  box-shadow: 0 0 10px rgba(255, 160, 60, 0.15);
+}
+
+
+.genre-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+  max-height: 72px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.genre-tags.expanded {
+  max-height: none;
+}
+
+.toggle-genres-btn {
+  background: transparent;
+  border: 1px solid #444;
+  color: #ccc;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  padding: 0.2rem 0.6rem;
+  margin-top: 0.4rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggle-genres-btn:hover {
+  background: #333;
+  color: #fff;
+  border-color: #666;
+}
+
+/* Center the Management title inside the outlined box */
+.styled-management-box h3,
+.styled-management-box .management-title {
+  text-align: center !important;
+  width: 100%;
+  margin: 0 0 0.8rem 0;
+}
+
+/* In case the inner framed container uses its own header element */
+.styled-management-box > div > h3 {
+  text-align: center !important;
+}
+
+.restricted {
+  text-align: center;
+  color: #aaa;
+  margin: 2rem 0;
+  font-style: italic;
 }

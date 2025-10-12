@@ -1,0 +1,33 @@
+.mt-toast {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  z-index: 1100;
+  background: #222;
+  color: #fff;
+  border: 1px solid #444;
+  padding: 10px 14px;
+  border-radius: 10px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  pointer-events: none;          /* never blocks clicks */
+  opacity: 0;
+  transition: opacity 180ms ease, transform 180ms ease;
+  font-size: 0.95rem;
+}
+
+.mt-toast.enter {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.mt-toast.exit {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-8px);
+}
+
+.mt-toast.success { border-color: #22c55e; } /* green-500 */
+.mt-toast.error   { border-color: #ef4444; } /* red-500   */
+.mt-toast.info    { border-color: #3b82f6; } /* blue-500  */
+
+.mt-toast__text { white-space: pre-line; }

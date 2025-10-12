@@ -1,38 +1,55 @@
-// src/components/groups/EditGroupModal.jsx
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { updateGroup } from "../../services/groupService";
 import { getAllGroupThemes } from "../../services/groups";
 import { getGenres } from "../../services/tmdb";
 import GenreSelector from "../GenreSelector";
+import OnsitePopup from "../Popups/OnsitePopup";
+import "../../styles/EditGroupModal.css";
 
 export default function EditGroupModal({ group, onClose, onSave }) {
   useEffect(() => {
-  console.log("🟣 EditGroupModal mounted");
-  console.log("group prop in modal:", group);
-}, []);
+    console.log("🟣 EditGroupModal mounted");
+    console.log("group prop in modal:", group);
+  }, []);
 
-  // Base fields
+  // === Base fields ===
   const [name, setName] = useState(group.name || "");
   const [description, setDescription] = useState(group.description || "");
   const [visibility, setVisibility] = useState(group.visibility || "public");
+  const [posterUrl, setPosterUrl] = useState(group.poster_url || ""); // NEW
 
-  // Themes
-  const [themes, setThemes] = useState([]); // [{ id, name, theme }]
+  // === Themes ===
+  const [themes, setThemes] = useState([]);
   const [themeId, setThemeId] = useState(
     group.theme_id == null ? "" : String(group.theme_id)
   );
 
-  // Genres
-  const [genres, setGenres] = useState([]); // [{ id:"28", name:"Action" }, ...]
-  const [selectedGenres, setSelectedGenres] = useState([]); // ["28","99"]
+  // === Genres ===
+  const [genres, setGenres] = useState([]);
+  const [selectedGenres, setSelectedGenres] = useState([]);
 
   const groupId = useMemo(
     () => group?.id || group?.gID || group?.group?.id,
     [group]
   );
 
+  // === Popup management ===
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState("info");
+  const timeoutRef = useRef(null);
+
   useEffect(() => {
-    // Load genres (TMDB) and seed selected genres
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, []);
+
+  // === Load genres and themes ===
+  useEffect(() => {
     getGenres()
       .then((data) => {
         const normalized = (data.genres || []).map((g) => ({
@@ -41,7 +58,6 @@ export default function EditGroupModal({ group, onClose, onSave }) {
         }));
         setGenres(normalized);
 
-        // Seed from ids first; else try mapping names -> ids
         if (Array.isArray(group.tags) && group.tags.length) {
           setSelectedGenres(group.tags.map((n) => String(n)));
         } else if (Array.isArray(group.genre_tags) && group.genre_tags.length) {
@@ -58,7 +74,6 @@ export default function EditGroupModal({ group, onClose, onSave }) {
       })
       .catch(console.error);
 
-    // Load themes
     getAllGroupThemes()
       .then((data) => setThemes(data.themes || []))
       .catch(console.error);
@@ -71,10 +86,9 @@ export default function EditGroupModal({ group, onClose, onSave }) {
     );
   };
 
+  // === Submit handler ===
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Build minimal updates — only send changed fields
     const updates = {};
     const safeTrim = (s) => (typeof s === "string" ? s.trim() : s);
 
@@ -83,42 +97,46 @@ export default function EditGroupModal({ group, onClose, onSave }) {
     const oldName = safeTrim(group.name ?? "");
     if (newName && newName !== oldName) updates.name = newName;
 
-    // description (allow empty string to clear)
+    // description
     const newDesc = description ?? "";
     const oldDesc = group.description ?? "";
     if (newDesc !== oldDesc) updates.description = newDesc;
 
-    // visibility (only "public" | "private" in UI)
+    // visibility
     if (visibility && visibility !== group.visibility) {
       updates.visibility = visibility;
     }
 
-    // theme_id: number or null; never send ""
+    // theme_id
     const oldTheme = group.theme_id == null ? null : Number(group.theme_id);
     const newTheme =
-      themeId === "" ? null : Number.isNaN(Number(themeId)) ? oldTheme : Number(themeId);
+      themeId === ""
+        ? null
+        : Number.isNaN(Number(themeId))
+        ? oldTheme
+        : Number(themeId);
     if (newTheme !== oldTheme) updates.theme_id = newTheme;
 
-    // tags: send only if they actually changed (including clearing)
+    // poster_url (NEW)
+    const newPoster = safeTrim(posterUrl);
+    const oldPoster = safeTrim(group.poster_url ?? "");
+    if (newPoster !== oldPoster) updates.poster_url = newPoster;
+
+    // tags
     const numericTags = selectedGenres
       .map((id) => Number(id))
       .filter((n) => Number.isInteger(n) && n > 0);
-
     const currentTags =
       Array.isArray(group.tags) && group.tags.length
         ? group.tags.map((n) => Number(n)).filter(Number.isInteger)
         : [];
-
     const eqSets = (a, b) => {
       if (a.length !== b.length) return false;
       const A = new Set(a);
       for (const v of b) if (!A.has(v)) return false;
       return true;
     };
-
-    if (!eqSets(numericTags, currentTags)) {
-      updates.tags = numericTags; // [] means "clear all" intentionally
-    }
+    if (!eqSets(numericTags, currentTags)) updates.tags = numericTags;
 
     // Nothing changed?
     if (Object.keys(updates).length === 0) {
@@ -128,60 +146,99 @@ export default function EditGroupModal({ group, onClose, onSave }) {
 
     try {
       const updated = await updateGroup(groupId, updates);
-      alert("Group updated successfully");
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+      setPopupMessage("Group updated successfully!");
+      setPopupType("success");
+      setShowPopup(true);
+
       onSave?.(updated?.group ?? updated);
       onClose();
+
+      timeoutRef.current = setTimeout(() => {
+        setShowPopup(false);
+        timeoutRef.current = null;
+      }, 2000);
     } catch (err) {
-      const status = err?.response?.status;
-      const data = err?.response?.data;
-      console.error("Update failed:", status, data, err?.message);
       const msg =
-        data?.error ||
-        data?.message ||
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
         err?.message ||
         "Failed to update group.";
-      alert(msg);
+      setPopupMessage(msg);
+      setPopupType("error");
+      setShowPopup(true);
     }
   };
 
+  // === JSX ===
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-[9999]">
-  <div className="bg-white text-black p-6 rounded shadow-lg w-[32rem] max-w-[95vw]">
-        <h3 className="text-lg font-semibold mb-4">Edit Group</h3>
+    <div className="edit-group-overlay">
+      <div className="edit-group-modal">
+        <h3>Edit Group</h3>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name */}
+        <form onSubmit={handleSubmit}>
+          {/* === Group Name === */}
           <div>
-            <label className="block text-sm font-medium mb-1">Group Name</label>
+            <label>Group Name</label>
             <input
               name="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full border p-2 rounded"
               placeholder="Group name"
               required
             />
           </div>
 
-          {/* Description */}
+          {/* === Description === */}
           <div>
-            <label className="block text-sm font-medium mb-1">Description</label>
+            <label>Description</label>
             <textarea
               name="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full border p-2 rounded"
               placeholder="Group description"
             />
           </div>
 
-          {/* Theme */}
+          {/* === Group Image URL === */}
           <div>
-            <label className="block text-sm font-medium mb-1">Theme</label>
+            <label>Group Image URL</label>
+            <input
+              type="url"
+              name="poster_url"
+              value={posterUrl}
+              onChange={(e) => setPosterUrl(e.target.value)}
+              placeholder="https://example.com/image.jpg"
+            />
+            {posterUrl && (
+              <div className="image-preview">
+                <img
+                  src={posterUrl}
+                  alt="Group preview"
+                  style={{
+                    width: "120px",
+                    height: "120px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                    marginTop: "8px",
+                    border: "1px solid #555",
+                  }}
+                  onError={(e) => {
+                    e.target.src =
+                      "https://via.placeholder.com/120x120?text=Invalid+URL";
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* === Theme === */}
+          <div>
+            <label>Theme</label>
             <select
               value={themeId}
               onChange={(e) => setThemeId(e.target.value)}
-              className="w-full border p-2 rounded"
             >
               <option value="">-- No theme --</option>
               {themes.map((t) => (
@@ -192,47 +249,52 @@ export default function EditGroupModal({ group, onClose, onSave }) {
             </select>
           </div>
 
-          {/* Genres */}
+          {/* === Genres === */}
           <div>
-            <label className="block text-sm font-medium mb-1">Genres</label>
             <GenreSelector
               genres={genres}
               selectedGenres={selectedGenres}
               onToggle={toggleGenre}
+              showTitle={false}
+              compact={true}
             />
           </div>
 
-          {/* Visibility (no 'closed') */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Visibility</label>
+          {/* === Visibility === */}
+          <div className="visibility-field">
+            <label htmlFor="visibility">Visibility</label>
             <select
+              id="visibility"
+              name="visibility"
               value={visibility}
               onChange={(e) => setVisibility(e.target.value)}
-              className="w-full border p-2 rounded"
             >
               <option value="public">Public</option>
               <option value="private">Private</option>
             </select>
           </div>
 
-          {/* Actions */}
-          <div className="flex justify-end gap-2 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-3 py-1 bg-gray-300 rounded"
-            >
+          {/* === Actions === */}
+          <div className="edit-group-actions">
+            <button type="button" onClick={onClose} className="cancel-btn">
               Cancel
             </button>
-            <button
-              type="submit"
-              className="px-3 py-1 bg-green-600 text-white rounded"
-            >
+            <button type="submit" className="save-btn">
               Save
             </button>
           </div>
         </form>
       </div>
+
+      {/* === Popup === */}
+      {showPopup && (
+        <OnsitePopup
+          message={popupMessage}
+          type={popupType}
+          onConfirm={() => setShowPopup(false)}
+          confirmText="OK"
+        />
+      )}
     </div>
   );
 }

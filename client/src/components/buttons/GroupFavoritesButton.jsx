@@ -18,20 +18,21 @@ export default function GroupFavoritesButton({
 
     const payload = {
       movie_id: tmdbId,
-      type: 2,
+      type: 3,
       group_id: groupId,
       original_title: movieData.original_title || movieData.title || "Unknown",
       release_year: movieData.release_year || movieData.release_date?.split("-")[0] || null,
+      poster_url: movieData.poster_url || movieData.poster_path || null,
       poster_path: movieData.poster_path || null
     };
 
     try {
       if (isFavorite) {
-        await removeFavorite(tmdbId, 2, groupId);
+        await removeFavorite(tmdbId, 3, groupId);
         setIsFavorite(false);
         onStatusChange?.(tmdbId, false);
       } else {
-        await addFavorite(tmdbId, 2, groupId, payload);
+        await addFavorite(tmdbId, 3, groupId, payload);
         setIsFavorite(true);
         onStatusChange?.(tmdbId, true);
       }

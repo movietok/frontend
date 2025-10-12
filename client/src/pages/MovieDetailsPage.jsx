@@ -1,14 +1,17 @@
-// src/pages/MovieDetailsPage.jsx
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getMovieDetails } from "../services/tmdb";
 import { getMovieReviews } from "../services/reviews";
 import { addFavorite } from "../services/favoriteService";
-import { getUserGroupsAPI } from "../services/groups"; // or create this if not existing
+import { getUserGroupsAPI } from "../services/groups";
 import Carousel from "../components/Carousel";
 import CreateReview from "../components/CreateReview";
 import ReviewCard from "../components/ReviewCard";
+import CopyLinkButton from "../components/CopyLinkButton";
+import OnsitePopup from "../components/Popups/OnsitePopup";
+import FavoriteButton from "../components/buttons/FavoriteButton";
+import WatchlistButton from "../components/buttons/WatchlistButton";
 import "../styles/MovieDetailsPage.css";
 
 function MovieDetailsPage() {
@@ -26,6 +29,17 @@ function MovieDetailsPage() {
   // ✅ Group favorites feature
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("");
+
+  // ✅ On-site popup state
+  const [popup, setPopup] = useState(null);
+
+  // Auto-dismiss popup after 2.5s
+  useEffect(() => {
+    if (popup) {
+      const timer = setTimeout(() => setPopup(null), 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [popup]);
 
   useEffect(() => {
     getMovieDetails(id)
@@ -50,18 +64,42 @@ function MovieDetailsPage() {
     fetchReviews();
   }, [id]);
 
-  // ✅ Fetch user groups (for dropdown)
- useEffect(() => {
-  if (!user?.id && !user?.user_id) return;
-  const uid = user.id || user.user_id;
+  // Helper: normalize rank/role from API response
+  const getRank = (g) =>
+    String(
+      g?.rank ??
+        g?.role ??
+        g?.user_role ??
+        g?.membership_role ??
+        g?.membership?.role ??
+        g?.membership?.rank ??
+        ""
+    ).toLowerCase();
 
-  getUserGroupsAPI(uid)
-    .then((data) => {
-      console.log("Fetched user groups:", data); // optional debug
-      setGroups(data);
-    })
-    .catch(console.error);
-}, [user]);
+  // Only owner/moderator can add to group favorites
+  const hasManagePermission = (g) => {
+    const rank = getRank(g);
+    return rank === "owner" || rank === "moderator" || rank === "mod" || rank === "admin";
+  };
+
+  // ✅ Fetch user groups (filter to owner/moderator)
+  useEffect(() => {
+    if (!user?.id && !user?.user_id) return;
+    const uid = user.id || user.user_id;
+
+    getUserGroupsAPI(uid)
+      .then((data) => {
+        const list = Array.isArray(data) ? data : data?.groups || [];
+        const eligible = list.filter(hasManagePermission);
+        setGroups(eligible);
+
+        // Reset selection if it’s no longer valid
+        setSelectedGroup((prev) =>
+          eligible.some((g) => String(g.id) === String(prev)) ? prev : ""
+        );
+      })
+      .catch(console.error);
+  }, [user]);
 
   const handleReviewAdded = (review) => {
     setReviews((prev) => [review, ...prev]);
@@ -78,18 +116,37 @@ function MovieDetailsPage() {
 
   // ✅ Add movie to group favorites
   async function handleAddToGroupFavorites() {
-    if (!selectedGroup) return alert("Please select a group first.");
+    if (!selectedGroup) {
+      setPopup({
+        message: "Please select a group first.",
+        type: "info",
+      });
+      return;
+    }
+
     try {
       const res = await addFavorite(id, 3, selectedGroup);
-      alert(res.message || "Added to group favorites!");
+      setPopup({
+        message: res.message || "Added to group favorites!",
+        type: "success",
+      });
     } catch (err) {
       console.error(err);
-      alert(err.message || "Failed to add movie to group favorites.");
+      const msg =
+        err?.response?.status === 403
+          ? "You don’t have permission to add favorites for this group."
+          : err?.message || "Failed to add movie to group favorites.";
+      setPopup({ message: msg, type: "error" });
     }
   }
 
   if (loadingMovie) return <p>Loading...</p>;
   if (!movie) return <p>Movie not found</p>;
+
+  // ===== Conditional content flags =====
+  const showOverview = !!(movie?.overview && movie.overview.trim().length > 0);
+  // Adjust facts as needed if you add more fields later
+  const showFacts = !!(movie?.budget || movie?.revenue);
 
   return (
     <div className="movie-details-page">
@@ -104,7 +161,10 @@ function MovieDetailsPage() {
           className="movie-poster"
         />
         <div className="movie-info">
-          <h1 className="movie-title">{movie.title}</h1>
+          <div className="movie-title-row">
+  <h1 className="movie-title">{movie.title}</h1>
+  <CopyLinkButton label="🔗" className="title-copy-btn" title="Copy Movie Link" />
+</div>
           {movie.tagline && (
             <p className="movie-tagline">"{movie.tagline}"</p>
           )}
@@ -125,7 +185,15 @@ function MovieDetailsPage() {
             </a>
           )}
 
-          {/* ✅ Add-to-group-favorites UI */}
+          {/* ===== Personal Actions (Watchlist + Favorites) ===== */}
+          {user && (
+         <div className="personal-favorite-box icon-only">
+  <WatchlistButton tmdbId={id} title="Add to Watchlist" />
+  <FavoriteButton tmdbId={id} type={2} title="Add to Favorites" />
+</div>
+          )}
+
+          {/* ===== Group Favorites Section (only owner/moderator groups) ===== */}
           {user && groups.length > 0 && (
             <div className="group-favorite-box">
               <select
@@ -152,24 +220,31 @@ function MovieDetailsPage() {
         </div>
       </div>
 
-      {/* ===== Overview + Facts ===== */}
-      <div className="overview-facts">
-        <div className="overview">
-          <h2>Overview</h2>
-          <p>{movie.overview || "No overview available."}</p>
+      {/* ===== Overview + Facts (render only if content exists) ===== */}
+      {(showOverview || showFacts) && (
+        <div className="overview-facts">
+          {showOverview && (
+            <div className="overview">
+              <h2>Overview</h2>
+              <p>{movie.overview}</p>
+            </div>
+          )}
+
+          {showFacts && (
+            <div className="facts-box">
+              <h3>Facts</h3>
+              <ul>
+                {movie.budget ? (
+                  <li>Budget: ${movie.budget.toLocaleString()}</li>
+                ) : null}
+                {movie.revenue ? (
+                  <li>Revenue: ${movie.revenue.toLocaleString()}</li>
+                ) : null}
+              </ul>
+            </div>
+          )}
         </div>
-        <div className="facts-box">
-          <h3>Facts</h3>
-          <ul>
-            {movie.budget ? (
-              <li>Budget: ${movie.budget.toLocaleString()}</li>
-            ) : null}
-            {movie.revenue ? (
-              <li>Revenue: ${movie.revenue.toLocaleString()}</li>
-            ) : null}
-          </ul>
-        </div>
-      </div>
+      )}
 
       {/* ===== Cast Carousel ===== */}
       <section className="cast-section">
@@ -239,6 +314,16 @@ function MovieDetailsPage() {
           </div>
         )}
       </section>
+
+      {/* ✅ On-site popup */}
+      {popup && (
+        <OnsitePopup
+          message={popup.message}
+          type={popup.type}
+          confirmText="OK"
+          onConfirm={() => setPopup(null)}
+        />
+      )}
     </div>
   );
 }

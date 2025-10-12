@@ -144,9 +144,7 @@ function HomePage() {
         setFinnkino(mockFinnkino); // Fallback to mock data
       });
 
-  // -------------------------------
-    // ✅ REAL DATA FOR OTHER SECTIONS
-    // -------------------------------
+
     // Recent Reviews
     getRecentReviews()
       .then((data) => {

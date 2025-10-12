@@ -50,7 +50,7 @@ export default function Login() {
         login(token, userData)
         
         setModalTitle("Login Successful!")
-        setModalMessage("You have logged in successfully. Continue to homepage?")
+        setModalMessage("You have logged in successfully. Redirecting to homepage.")
         setHideOkButton(true) // ✅ hide OK button during auto-close
         setShowModal(true)
 
