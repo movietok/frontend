@@ -20,7 +20,7 @@ export default function FavoritesPage() {
   if (error) return <div className="favorites-error">Error loading favorites.</div>;
 
   return (
-    <div className="favorites-container max-w-6xl mx-auto px-6 py-8">
+    <div className="favorites-container">
       <h2 className="favorites-header">
         <span className="favorites-star">★</span>
         <span className="favorites-text">
