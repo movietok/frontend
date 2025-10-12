@@ -7,37 +7,43 @@ export default function AboutPage() {
         <h1 className="about-title">About This Project</h1>
 
         <p>
-          This movie web application was developed as part of a school project at <strong>Oulu University of Applied Sciences (Oamk)</strong>, for the course <em>Web Application Project</em> in Autumn 2024, led by instructor <strong>Jouni Juntunen</strong>.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam dictum, urna nec
+          hendrerit ultrices, justo mauris tincidunt sapien, non vehicula lorem leo in neque.
+          Aliquam erat volutpat. Sed facilisis, nulla sed convallis egestas, justo odio bibendum
+          eros, vel ultricies massa turpis a neque.
         </p>
 
         <p>
-          The goal was to create a responsive platform for movie enthusiasts using modern technologies:
-          <strong> React</strong> for the frontend, <strong>Node.js</strong> for the backend, and <strong>PostgreSQL</strong> as the database.
-          The app integrates open data APIs including:
+          Vivamus ac ex nec ipsum vulputate convallis. Integer at odio nec lacus eleifend porta.
+          Proin faucibus, justo sit amet gravida vulputate, nunc erat aliquet est, et faucibus
+          libero ipsum nec erat. In hac habitasse platea dictumst.
         </p>
 
         <ul className="about-list">
-          <li><strong>The Movie Database (TMDb)</strong> – for movie metadata and posters</li>
-          <li><strong>Finnkino API</strong> – for real-time showtimes across Finnish theaters</li>
+          <li><strong>Lorem Ipsum API</strong> – sed ut perspiciatis unde omnis iste natus error</li>
+          <li><strong>Dolor Sit API</strong> – ut enim ad minima veniam, quis nostrum exercitationem</li>
         </ul>
 
         <h2 className="about-subtitle">Our Team</h2>
-        <p>We were a group of four developers, each contributing across different areas of the stack:</p>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur sodales ligula in
+          libero. Sed dignissim lacinia nunc, vitae fermentum arcu efficitur non.
+        </p>
 
         <ul className="about-list">
-          <li><strong>Topias Perälä</strong> – focused on frontend development</li>
-          <li><strong>Veikka Koskinen</strong> – led frontend architecture and UI refinement</li>
-          <li><strong>Martin Negin</strong> – worked across backend, frontend, and database design</li>
-          <li><strong>Samu Lyhty</strong> – specialized in backend logic and database implementation</li>
+          <li><strong>Lorem Ipsum</strong> – lorem ipsum dolor sit amet</li>
+          <li><strong>Dolor Sit</strong> – consectetur adipiscing elit</li>
+          <li><strong>Amet Consectetur</strong> – sed do eiusmod tempor incididunt ut labore</li>
+          <li><strong>Adipiscing Elit</strong> – ut enim ad minim veniam, quis nostrud exercitation</li>
         </ul>
 
         <p>
-          We collaborated using <strong>GitHub</strong> for version control and <strong>Discord</strong> for communication and coordination.
-          The project emphasized clean architecture, reusable components, and a feature-rich user experience.
+          Mauris non tempor quam, et lacinia sapien. Integer nec ante non orci consectetur tempor.
+          Donec ac odio tempor orci dapibus ultrices in iaculis nunc.
         </p>
 
         <p className="about-footer">
-          Built with teamwork, code, and a shared love for movies 🎬
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit 🎬
         </p>
       </div>
     </div>
