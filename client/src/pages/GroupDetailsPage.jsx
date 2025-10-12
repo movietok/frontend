@@ -17,6 +17,7 @@ function GroupDetailsPage() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [removing, setRemoving] = useState(false);
+  const [showFullAbout, setShowFullAbout] = useState(false);
 
   // --- Pagination for Reviews ---
   const [currentPage, setCurrentPage] = useState(1);
@@ -285,41 +286,72 @@ const handlePrevFavPage = () => {
   return (
     <div className={`group-details-page ${themeMap[group?.theme_id] || ""}`}>
       {/* Header */}
-      <div className="group-header">
-        <img
-          src={group.poster_url || "https://via.placeholder.com/200x300?text=No+Image"}
-          alt={group.name}
-          className="group-poster"
-        />
-        <div className="group-info">
-          <h1 className="group-title">{group.name}</h1>
-          <CopyLinkButton label="Copy Group Link" />
-          <p className="group-meta">
-            Owner: <span>{group.owner_name || "Unknown"}</span> • Members:{" "}
-            <span>{group.member_count || 0}</span>
-          </p>
-          {group.genre_tags && (
-            <p className="group-genres">{group.genre_tags.join(", ")}</p>
-          )}
-        </div>
-      </div>
+<div className="group-header">
+  <img
+    src={group.poster_url || "https://via.placeholder.com/200x300?text=No+Image"}
+    alt={group.name}
+    className="group-poster"
+  />
 
-      {/* Overview + Facts */}
-      <div className="overview-facts">
-        <div className="overview">
-          <h2>About this Group</h2>
-          <p>{group.description || "No description available."}</p>
+  <div className="group-info">
+    <div className="group-title-row">
+  <h1 className="group-title">{group.name}</h1>
+  <CopyLinkButton label="Copy Group Link" />
+</div>
+    {group.genre_tags && (
+      <p className="group-genres">{group.genre_tags.join(", ")}</p>
+    )}
+
+    <div className="facts-management-row">
+      {/* Facts Section */}
+      <div className="facts-box">
+  <h3>Facts</h3>
+  <ul>
+    <li>
+      Owner: <span>{group.owner_name || "Unknown"}</span>
+    </li>
+    <li>
+      Members: <span>{group.member_count || 0}</span>
+    </li>
+    {group.created_at && (
+      <li>Created: {new Date(group.created_at).toLocaleDateString("en-GB")}</li>
+    )}
+    {group.visibility && <li>Visibility: {group.visibility}</li>}
+  </ul>
+</div>
+
+      {/* Management Box (if logged in) */}
+      {Boolean(currentUserId) && (
+        <div className="management-box-wrapper">
+          <GroupManagementBox
+            group={group}
+            onGroupUpdated={handleGroupUpdated}
+            onGroupDeleted={handleGroupDeleted}
+          />
         </div>
-        <div className="facts-box">
-          <h3>Facts</h3>
-          <ul>
-            {group.created_at && (
-              <li>Created: {new Date(group.created_at).toLocaleDateString("en-GB")}</li>
-            )}
-            {group.visibility && <li>Visibility: {group.visibility}</li>}
-          </ul>
-        </div>
-      </div>
+      )}
+    </div>
+  </div>
+</div>
+
+{/* About Section */}
+<section className="about-section-wide">
+  <h2 className="about-title">About this Group</h2>
+  <p
+    className={`about-text ${showFullAbout ? "expanded" : "collapsed"}`}
+  >
+    {group.description || "No description available."}
+  </p>
+  {group.description && group.description.length > 200 && (
+    <button
+      className="readmore-btn"
+      onClick={() => setShowFullAbout(!showFullAbout)}
+    >
+      {showFullAbout ? "Read less" : "Read more"}
+    </button>
+  )}
+</section>
+
 
       {/* Group Favorites */}
       {isMember && (

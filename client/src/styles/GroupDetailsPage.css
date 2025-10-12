@@ -666,3 +666,201 @@
   padding-bottom: 0.4rem;
   text-align: center;
 }
+
+/* --- HEADER LAYOUT FIX --- */
+.group-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.group-poster {
+  width: 200px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.group-info {
+  flex: 1;
+}
+
+/* --- FACTS + MANAGEMENT ROW --- */
+.facts-management-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.facts-box {
+  background: #1a1a1a;
+  border: 1px solid #2c2c2c;
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  flex: 1;
+}
+
+.management-box-wrapper {
+  flex: 1;
+  max-width: 320px;
+}
+
+/* --- ABOUT SECTION (FULL WIDTH) --- */
+.about-section-wide {
+  background: linear-gradient(180deg, #1b1b1b 0%, #121212 100%);
+  border: 1px solid #2c2c2c;
+  border-radius: 12px;
+  padding: 1.8rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.about-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #f1f1f1;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.about-text {
+  color: #ddd;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* --- THEME INTEGRATION --- */
+.theme-blue .facts-box,
+.theme-blue .about-section-wide {
+  border-color: rgba(60, 130, 255, 0.4);
+  box-shadow: 0 0 10px rgba(60, 130, 255, 0.1);
+}
+.theme-green .facts-box,
+.theme-green .about-section-wide {
+  border-color: rgba(90, 200, 90, 0.4);
+  box-shadow: 0 0 10px rgba(90, 200, 90, 0.1);
+}
+.theme-purple .facts-box,
+.theme-purple .about-section-wide {
+  border-color: rgba(150, 90, 255, 0.4);
+  box-shadow: 0 0 10px rgba(150, 90, 255, 0.1);
+}
+.theme-orange .facts-box,
+.theme-orange .about-section-wide {
+  border-color: rgba(255, 160, 60, 0.4);
+  box-shadow: 0 0 10px rgba(255, 160, 60, 0.1);
+}
+
+/* --- TITLE ROW --- */
+.group-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.group-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #f1f1f1;
+}
+
+/* --- FACTS BOX UPDATE --- */
+.facts-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.facts-box li {
+  color: #ddd;
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+}
+
+/* --- ABOUT SECTION TOGGLE --- */
+.about-section-wide {
+  position: relative;
+  overflow: hidden;
+}
+
+.about-text {
+  color: #ddd;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  transition: max-height 0.35s ease, mask-image 0.35s ease;
+  -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  max-height: 6.5rem; /* collapsed height */
+  text-align: center;
+}
+
+.about-text.expanded {
+  max-height: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.readmore-btn {
+  display: inline-block;
+  margin-top: 0.8rem;
+  background: transparent;
+  border: 1px solid #555;
+  color: #ddd;
+  padding: 0.3rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.readmore-btn:hover {
+  background: #333;
+  border-color: #777;
+}
+
+/* --- CENTERED ABOUT TITLE (MATCH THEME) --- */
+.about-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #f1f1f1;
+  text-align: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.4rem;
+}
+
+/* unify all titles across page */
+.favorites-title,
+.reviews-title,
+.about-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #f1f1f1;
+  text-align: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.4rem;
+}
+
+.theme-blue .about-title,
+.theme-blue .favorites-title,
+.theme-blue .reviews-title {
+  text-shadow: 0 0 6px rgba(60, 130, 255, 0.4);
+}
+.theme-green .about-title,
+.theme-green .favorites-title,
+.theme-green .reviews-title {
+  text-shadow: 0 0 6px rgba(90, 200, 90, 0.4);
+}
+.theme-purple .about-title,
+.theme-purple .favorites-title,
+.theme-purple .reviews-title {
+  text-shadow: 0 0 6px rgba(150, 90, 255, 0.4);
+}
+.theme-orange .about-title,
+.theme-orange .favorites-title,
+.theme-orange .reviews-title {
+  text-shadow: 0 0 6px rgba(255, 160, 60, 0.4);
+}
