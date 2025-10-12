@@ -13,6 +13,7 @@ function GroupDetailsPage() {
   const navigate = useNavigate();
 
   const [group, setGroup] = useState(null);
+  const [isMemberCached, setIsMemberCached] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -142,21 +143,23 @@ const handlePrevFavPage = () => {
         setGroup(g);
 
         const isMemberLike =
-          g?.role === "member" ||
-          g?.role === "moderator" ||
-          g?.role === "owner" ||
-          g?.is_member ||
-          g?.is_owner ||
-          (currentUserId != null && Number(currentUserId) === Number(g?.owner_id));
+  g?.role === "member" ||
+  g?.role === "moderator" ||
+  g?.role === "owner" ||
+  g?.is_member ||
+  g?.is_owner ||
+  (currentUserId != null && Number(currentUserId) === Number(g?.owner_id));
 
-        if (isMemberLike) {
-          await loadMemberData(
-            id,
-            (vals) => { if (!cancelled) setFavorites(vals); },
-            (vals) => { if (!cancelled) setReviews(vals); }
-          );
-          return;
-        }
+if (isMemberLike) {
+  setIsMemberCached(true);
+  await loadMemberData(
+    id,
+    (vals) => { if (!cancelled) setFavorites(vals); },
+    (vals) => { if (!cancelled) setReviews(vals); }
+  );
+  return;
+}
+
 
         if (currentUserId) {
           try {
@@ -270,6 +273,7 @@ const handlePrevFavPage = () => {
     (currentUserId != null && Number(currentUserId) === Number(group?.owner_id));
 
   const isMember =
+   isMemberCached ||
     group?.role === "member" ||
     group?.role === "moderator" ||
     group?.role === "owner" ||
@@ -431,10 +435,22 @@ const handlePrevFavPage = () => {
                       setReviews((prev) => prev.filter((r) => r.id !== rid))
                     }
                     onUpdated={(updated) =>
-                      setReviews((prev) =>
-                        prev.map((r) => (r.id === updated.id ? updated : r))
-                      )
-                    }
+  setReviews((prev) =>
+    prev.map((r) =>
+      r.id === updated.id
+        ? {
+            ...r,
+            ...updated,
+            movie_id: r.movie_id ?? updated.movie_id,
+            movie_name: r.movie_name ?? updated.movie_name,
+            poster_url: r.poster_url ?? updated.poster_url,
+            release_year: r.release_year ?? updated.release_year,
+          }
+        : r
+    )
+  )
+}
+
                     showMovieHeader={true}
                   />
                 ))}
