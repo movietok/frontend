@@ -221,3 +221,65 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* === HARD CLAMP: keep posters inside the rounded container === */
+.favorites-container {
+  position: relative;
+  background: #181a1b;      /* visible box */
+  border-radius: 12px;
+  border: 1px solid #2a2a2a;
+  overflow: hidden;          /* <-- key line: children cannot spill outside */
+  box-shadow: 0 0 20px rgba(0,0,0,0.45);
+}
+
+/* Make the grid responsive but contained */
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 24px;
+  margin-top: 1.25rem;
+}
+
+/* Neutralize any stray margins/padding from other files */
+.movie-hover-wrapper,
+.movie-card {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Posters fill their card; no weird overflow */
+.poster-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+/* === FIX BUTTON POSITIONING === */
+.movie-hover-wrapper {
+  position: relative; /* gives local coordinate system for buttons */
+}
+
+
+.movie-actions-bar {
+  position: absolute;
+  top: 6px;                   /* near the top edge */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 6;
+  pointer-events: auto;
+}
+
+
+
+/* ensure buttons stay visible but not overflow outside card */
+.movie-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.movie-actions-bar > * {
+  margin: 0 !important;
+}
