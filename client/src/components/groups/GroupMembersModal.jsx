@@ -269,12 +269,8 @@ const handleDemote = async (userId) => {
               <ul className="group-members-modal__list">
                 {members.map((member) => {
   const { id, username, role, joined_at } = member;
-  const label = roleLabels[role] || role;
-  const joined = joined_at
-    ? new Date(joined_at).toLocaleDateString()
-    : "";
-  const isSelf =
-    currentUserId && Number(currentUserId) === Number(id);
+  const joined = joined_at ? new Date(joined_at).toLocaleDateString() : "";
+  const isSelf = currentUserId && Number(currentUserId) === Number(id);
 
   const canRemove =
     (isOwner || (isModerator && role === "member")) &&
@@ -286,46 +282,49 @@ const handleDemote = async (userId) => {
 
   return (
     <div key={id} className="member-row">
-      {/* ⬇️ Replace the plain username with a clickable Link */}
-      <Link
-        to={`/profile/${id}`}
-        className="member-link"
-        onClick={onClose} // optional: close modal when clicked
-      >
-        {username}
-      </Link>
+      <div className="member-info">
+        <Link to={`/profile/${id}`} className="member-link" onClick={onClose}>
+          {username}
+        </Link>
+        <div>
+          <span className={`member-role ${role}`}>{roleLabels[role]}</span>
+          <span className="member-joined"> Joined: {joined}</span>
+        </div>
+      </div>
 
-      <span className="member-role"> – {label}</span>
-      <span className="member-joined">Joined: {joined}</span>
-
-      {/* existing management buttons below */}
-      {canPromoteMember && (
-  <button
-    className="promote-btn"
-    disabled={busyId === `role-${id}`}
-    onClick={() => handlePromote(id)}
-  >
-    Promote
-  </button>
-)}
-{canDemote && (
-  <button
-    className="demote-btn"
-    disabled={busyId === `role-${id}`}
-    onClick={() => handleDemote(id)}
-  >
-    Demote
-  </button>
-)}
-
-      {canRemove && (
-        <button className="remove-btn" onClick={() => handleRemove(id)}>
-          Remove
-        </button>
-      )}
+      <div className="member-actions">
+        {canPromoteMember && (
+          <button
+            className="promote-btn"
+            disabled={busyId === `role-${id}`}
+            onClick={() => handlePromote(id)}
+          >
+            Promote to Moderator
+          </button>
+        )}
+        {canDemote && (
+          <button
+            className="demote-btn"
+            disabled={busyId === `role-${id}`}
+            onClick={() => handleDemote(id)}
+          >
+            Demote to Member
+          </button>
+        )}
+        {canRemove && (
+          <button
+            className="remove-btn"
+            disabled={busyId === `remove-${id}`}
+            onClick={() => handleRemove(id)}
+          >
+            Remove
+          </button>
+        )}
+      </div>
     </div>
   );
 })}
+
               </ul>
             )
           ) : showRequestsTab ? (

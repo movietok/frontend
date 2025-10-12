@@ -1,266 +1,139 @@
-/* ==========================
-   GROUP MEMBERS MODAL STYLES
-   ========================== */
-
+/* Overlay unchanged */
 .group-members-modal__backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.55);
+  background: rgba(0,0,0,.7);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 50;
-  padding: 1.5rem;
+  z-index: 9999;
 }
 
+/* Make the modal a proper window with capped size */
 .group-members-modal {
-  background: #fff;
-  border-radius: 0.75rem;
-  width: min(720px, 100%);
-  max-height: 90vh;
-  display: flex;
+  background: #121212;
+  color: #f1f1f1;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  width: min(720px, 95vw);
+  max-height: 80vh;              /* ⬅️ cap height */
+  overflow: hidden;              /* ⬅️ prevent the shell from expanding */
+  display: flex;                 /* ⬅️ stack header/tabs/content */
   flex-direction: column;
-  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.25);
-  overflow: hidden;
-  position: relative; /* for absolute X positioning */
+  box-shadow: 0 20px 60px rgba(0,0,0,.55);
 }
 
-/* ---------- HEADER ---------- */
+/* Header stays fixed height at top */
 .group-members-modal__header {
   display: flex;
   align-items: center;
-  justify-content: center; /* center the title visually */
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  background: #f8fafc;
-  position: relative;
+  justify-content: space-between;
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid #2a2a2a;
 }
 
-.group-members-modal__header h2 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  margin: 0;
-  color: #0f172a;
-}
-
-/* ---------- CLOSE BUTTON ---------- */
-.close-btn {
-  position: absolute;
-  top: 8px;        /* was 14px */
-  right: 18px;
-  background: none;
-  border: none;
-  color: #ef4444;
-  font-size: 1.8rem;
-  cursor: pointer;
-  line-height: 1;
-  transition: transform 0.15s ease, color 0.15s ease;
-}
-
-.close-btn:hover {
-  transform: scale(1.1);
-  color: #b91c1c;
-}
-
-/* ---------- TABS ---------- */
+/* Tabs bar below header, also fixed in the modal shell */
 .group-members-modal__tabs {
   display: flex;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  background: #fff;
+  gap: .6rem;
+  padding: .7rem 1.1rem;
+  border-bottom: 1px solid #242424;
 }
-
 .group-members-modal__tabs button {
-  border: none;
-  background: #e2e8f0;
-  color: #1e293b;
-  padding: 0.35rem 0.9rem;
-  border-radius: 9999px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background 0.2s ease;
+  background: #1e1e1e;
+  color: #ddd;
+  border: 1px solid #343434;
+  border-radius: 8px;
+  padding: .45rem .8rem;
+  font-weight: 600;
+  font-size: .9rem;
 }
-
-.group-members-modal__tabs button:hover {
-  background: #cbd5f5;
-}
-
 .group-members-modal__tabs button.active {
-  background: #4f46e5;
+  background: #3a2df5;
+  border-color: #3a2df5;
   color: #fff;
 }
 
-/* ---------- CONTENT ---------- */
+/* The scrollable area — only this scrolls */
 .group-members-modal__content {
-  padding: 1rem 1.5rem 1.5rem;
-  overflow-y: auto;
+  flex: 1;                       /* ⬅️ fill remaining height */
+  overflow: auto;                /* ⬅️ scroll inside */
+  padding: 1rem 1.1rem 1.2rem;
 }
 
-/* ---------- LIST ---------- */
+/* List layout tidy */
 .group-members-modal__list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: .7rem;
 }
 
-.group-members-modal__row {
+/* Member rows keep compact height */
+.member-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #f8fafc;
-  border-radius: 0.75rem;
-  padding: 0.9rem 1rem;
-  gap: 1rem;
+  background: #181818;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  padding: .75rem .9rem;
 }
 
-.group-members-modal__name {
-  font-weight: 600;
-  color: #0f172a;
-}
+/* Left side */
+.member-info { display: flex; flex-direction: column; gap: .25rem; }
+.member-link { color: #fff; text-decoration: none; font-weight: 600; }
+.member-link:hover { text-decoration: underline; }
+.member-joined { color: #9a9a9a; font-size: .82rem; }
 
-.group-members-modal__meta {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  font-size: 0.85rem;
-  color: #475569;
-}
-
-/* ---------- ROLE BADGES ---------- */
-.role {
-  padding: 0.15rem 0.6rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: capitalize;
-}
-
-.role-owner {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.role-moderator {
-  background: #dbeafe;
-  color: #1d4ed8;
-}
-
-.role-member {
-  background: #dcfce7;
-  color: #15803d;
-}
-
-.role-pending {
-  background: #ede9fe;
-  color: #7c3aed;
-}
-
-/* ---------- ACTION BUTTONS ---------- */
-.group-members-modal__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: flex-end;
-}
-
-.btn-primary,
-.btn-secondary,
-.btn-danger {
-  border: none;
-  cursor: pointer;
-  padding: 0.4rem 0.9rem;
-  border-radius: 0.5rem;
-  font-size: 0.85rem;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-
-.btn-primary {
-  background: #4f46e5;
-  color: #fff;
-}
-
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 18px rgba(79, 70, 229, 0.25);
-}
-
-.btn-secondary {
-  background: #e2e8f0;
-  color: #1e293b;
-}
-
-.btn-secondary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 18px rgba(148, 163, 184, 0.25);
-}
-
-.btn-danger {
-  background: #ef4444;
-  color: #fff;
-}
-
-.btn-danger:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 18px rgba(239, 68, 68, 0.25);
-}
-
-.btn-primary:disabled,
-.btn-secondary:disabled,
-.btn-danger:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-/* ---------- EMPTY STATE ---------- */
-.group-members-modal__empty {
-  text-align: center;
-  color: #6b7280;
-  padding: 2rem 0;
-}
-
-/* ---------- MOBILE ---------- */
-@media (max-width: 640px) {
-  .group-members-modal {
-    width: 100%;
-    max-height: 95vh;
-  }
-
-  .group-members-modal__row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .group-members-modal__actions {
-    width: 100%;
-    justify-content: flex-start;
-  }
-}
-
-.member-link {
-  color: #7fc9ff;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
-}
-
-.member-link:hover {
-  color: #a9e2ff;
-  text-decoration: underline;
-}
-
+/* Role badges (subtle) */
 .member-role {
-  color: #aaa;
-  margin-left: 0.4rem;
+  display: inline-block;
+  font-size: .78rem;
+  padding: .15rem .5rem;
+  border-radius: 6px;
+  margin-right: .5rem;
+  text-transform: capitalize;
+  font-weight: 600;
 }
+.member-role.owner     { background: rgba(255,215,100,.14); color: #ffd764; }
+.member-role.moderator { background: rgba(100,140,255,.14); color: #9db7ff; }
+.member-role.member    { background: rgba(120,255,140,.12); color: #a6e6b0; }
 
-.member-joined {
-  color: #888;
-  margin-left: 0.8rem;
-  font-size: 0.85rem;
+/* Right side actions — lighter, compact buttons */
+.member-actions { display: flex; gap: .45rem; align-items: center; }
+.member-actions button {
+  border: 1px solid #3b3b3b;
+  background: #202020;
+  color: #ddd;
+  border-radius: 8px;
+  font-size: .82rem;
+  padding: .36rem .7rem;
+  font-weight: 600;
+  transition: background .15s ease, border-color .15s ease, transform .1s;
+}
+.member-actions button:hover { background: #2a2a2a; border-color: #4a4a4a; transform: translateY(-1px); }
+.promote-btn { color: #9ec4ff; border-color: #324b70; }
+.promote-btn:hover { background: rgba(120,160,255,.14); }
+.demote-btn  { color: #c8a3ff; border-color: #513b78; }
+.demote-btn:hover  { background: rgba(180,130,255,.12); }
+.remove-btn  { color: #ff9a9a; border-color: #6a3c3c; }
+.remove-btn:hover  { background: rgba(255,100,100,.12); }
+
+/* Close button */
+.close-btn {
+  background: transparent;
+  border: none;
+  color: #cfcfcf;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.close-btn:hover { color: #fff; }
+
+/* Mobile tweak: a bit taller if needed */
+@media (max-width: 560px) {
+  .group-members-modal { max-height: 85vh; width: 95vw; }
 }

@@ -398,26 +398,35 @@ useEffect(() => {
   if (!group) return <p>Group not found</p>;
 
   const isOwner =
-    group?.role === "owner" ||
-    group?.is_owner === true ||
-    (currentUserId != null && Number(currentUserId) === Number(group?.owner_id));
+  group?.role === "owner" ||
+  group?.is_owner === true ||
+  (currentUserId != null && Number(currentUserId) === Number(group?.owner_id));
 
   // 🧠 Membership: cache always wins over temporary undefined states
-const isMember =
-  isMemberCached ||
-  group?.role === "member" ||
-  group?.role === "moderator" ||
-  group?.role === "owner" ||
-  group?.is_member === true ||
-  group?.is_owner === true ||
-  isOwner;
+const role = (group?.role || "").toLowerCase();
+const isPending = role === "pending";
 
-  const themeMap = {
-    1: "theme-blue",
-    2: "theme-green",
-    3: "theme-purple",
-    4: "theme-orange",
-  };
+const isMember =
+  !isPending && (
+    isMemberCached ||
+    role === "member" ||
+    role === "moderator" ||
+    role === "owner" ||
+    group?.is_member === true ||
+    group?.is_owner === true ||
+    isOwner
+  );
+
+const canViewPrivateContent =
+  isMember || isOwner || role === "moderator";
+
+const themeMap = {
+  1: "theme-blue",
+  2: "theme-green",
+  3: "theme-purple",
+  4: "theme-orange",
+};
+
 
   return (
     <div className={`group-details-page ${themeMap[group?.theme_id] || ""}`}>
@@ -536,128 +545,133 @@ const isMember =
 </section>
 
 
-      {/* Group Favorites */}
-      {isMember && (
-        <section className="favorites-section">
-  {favorites.length === 0 ? (
-    <p className="empty-text">No movies yet in favorites.</p>
-  ) : (
-    <div className="favorites-container">
-      <h2 className="favorites-title">Group Favorites</h2>
+      {/* Group Favorites & Reviews */}
+{canViewPrivateContent ? (
+  <>
+    {/* Group Favorites */}
+    <section className="favorites-section">
+      {favorites.length === 0 ? (
+        <p className="empty-text">No movies yet in favorites.</p>
+      ) : (
+        <div className="favorites-container">
+          <h2 className="favorites-title">Group Favorites</h2>
 
-      <div className="favorites-grid">
-        {currentFavorites.map((movie) => (
-          <div key={movie.tmdb_id} className="fav-card-wrapper">
-            <Link to={`/movie/${movie.tmdb_id}`} className="fav-card-link">
-              <div className="fav-card hover-reveal">
-                <img
-                  src={movie.poster_url || "https://via.placeholder.com/150x225"}
-                  alt={movie.original_title}
-                />
-                <div className="fav-info hover-title">
-                  <p className="fav-title">{movie.original_title}</p>
-                </div>
+          <div className="favorites-grid">
+            {currentFavorites.map((movie) => (
+              <div key={movie.tmdb_id} className="fav-card-wrapper">
+                <Link to={`/movie/${movie.tmdb_id}`} className="fav-card-link">
+                  <div className="fav-card hover-reveal">
+                    <img
+                      src={movie.poster_url || "https://via.placeholder.com/150x225"}
+                      alt={movie.original_title}
+                    />
+                    <div className="fav-info hover-title">
+                      <p className="fav-title">{movie.original_title}</p>
+                    </div>
+                  </div>
+                </Link>
+
+                {isOwner && (
+                  <button
+                    className="remove-fav-btn"
+                    onClick={() => handleRemoveFavorite(movie.tmdb_id)}
+                    disabled={removing}
+                    title="Remove from favorites"
+                  >
+                    ✖
+                  </button>
+                )}
               </div>
-            </Link>
-
-            {isOwner && (
-              <button
-                className="remove-fav-btn"
-                onClick={() => handleRemoveFavorite(movie.tmdb_id)}
-                disabled={removing}
-                title="Remove from favorites"
-              >
-                ✖
-              </button>
-            )}
+            ))}
           </div>
-        ))}
-      </div>
 
-      <div className="fav-pagination">
-        <button
-          className="pagination-btn"
-          onClick={handlePrevFavPage}
-          disabled={favPage === 1}
-        >
-          ← Prev
-        </button>
+          <div className="fav-pagination">
+            <button
+              className="pagination-btn"
+              onClick={handlePrevFavPage}
+              disabled={favPage === 1}
+            >
+              ← Prev
+            </button>
 
-        <button
-          className="pagination-btn"
-          onClick={handleNextFavPage}
-          disabled={indexOfLastFav >= favorites.length}
-        >
-          Next →
-        </button>
-      </div>
-    </div>
-  )}
-</section>
+            <button
+              className="pagination-btn"
+              onClick={handleNextFavPage}
+              disabled={indexOfLastFav >= favorites.length}
+            >
+              Next →
+            </button>
+          </div>
+        </div>
       )}
+    </section>
 
-      {/* Group Reviews / Activity */}
-      {isMember && (
-        <section className="reviews-section">
-          <h2 className="reviews-title">Group Activity</h2>
-          {reviews.length === 0 ? (
-            <p className="empty-text">No reviews yet from group members.</p>
-          ) : (
-            <>
-              <div className="reviews-list">
-                {currentReviews.map((rev) => (
-                  <ReviewCard
-                    key={rev.id}
-                    review={rev}
-                    currentUserId={currentUserId}
-                    onDeleted={(rid) =>
-                      setReviews((prev) => prev.filter((r) => r.id !== rid))
-                    }
-                    onUpdated={(updated) =>
-  setReviews((prev) =>
-    prev.map((r) =>
-      r.id === updated.id
-        ? {
-            ...r,
-            ...updated,
-            movie_id: r.movie_id ?? updated.movie_id,
-            movie_name: r.movie_name ?? updated.movie_name,
-            poster_url: r.poster_url ?? updated.poster_url,
-            release_year: r.release_year ?? updated.release_year,
-          }
-        : r
-    )
-  )
-}
+    {/* Group Reviews / Activity */}
+    <section className="reviews-section">
+      <h2 className="reviews-title">Group Activity</h2>
+      {reviews.length === 0 ? (
+        <p className="empty-text">No reviews yet from group members.</p>
+      ) : (
+        <>
+          <div className="reviews-list">
+            {currentReviews.map((rev) => (
+              <ReviewCard
+                key={rev.id}
+                review={rev}
+                currentUserId={currentUserId}
+                onDeleted={(rid) =>
+                  setReviews((prev) => prev.filter((r) => r.id !== rid))
+                }
+                onUpdated={(updated) =>
+                  setReviews((prev) =>
+                    prev.map((r) =>
+                      r.id === updated.id
+                        ? {
+                            ...r,
+                            ...updated,
+                            movie_id: r.movie_id ?? updated.movie_id,
+                            movie_name: r.movie_name ?? updated.movie_name,
+                            poster_url: r.poster_url ?? updated.poster_url,
+                            release_year: r.release_year ?? updated.release_year,
+                          }
+                        : r
+                    )
+                  )
+                }
+                showMovieHeader={true}
+              />
+            ))}
+          </div>
 
-                    showMovieHeader={true}
-                  />
-                ))}
-              </div>
+          <div className="review-pagination">
+            <button
+              className="pagination-btn"
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+            >
+              ← Prev
+            </button>
 
-              <div className="review-pagination">
-                <button
-                  className="pagination-btn"
-                  onClick={handlePrevPage}
-                  disabled={currentPage === 1}
-                >
-                  ← Prev
-                </button>
-
-                <button
-                  className="pagination-btn"
-                  onClick={handleNextPage}
-                  disabled={indexOfLastReview >= reviews.length}
-                >
-                  Next →
-                </button>
-              </div>
-            </>
-          )}
-        </section>
+            <button
+              className="pagination-btn"
+              onClick={handleNextPage}
+              disabled={indexOfLastReview >= reviews.length}
+            >
+              Next →
+            </button>
+          </div>
+        </>
       )}
-    </div>
-  );
+    </section>
+  </>
+) : (
+  <p className="empty-text restricted">
+    This group’s favorites and activity are visible to members only.
+  </p>
+)}
+
+</div>
+);
 }
 
 export default GroupDetailsPage;

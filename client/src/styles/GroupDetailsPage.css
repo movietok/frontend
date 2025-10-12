@@ -1036,3 +1036,10 @@
 .styled-management-box > div > h3 {
   text-align: center !important;
 }
+
+.restricted {
+  text-align: center;
+  color: #aaa;
+  margin: 2rem 0;
+  font-style: italic;
+}
