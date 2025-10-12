@@ -17,9 +17,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-main{
-  padding-top: 80px;
-}
 
 html, body, #root {
   height: 100%;

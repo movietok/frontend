@@ -87,6 +87,15 @@ export default function Navbar() {
 
               {menuOpen && (
                 <div className="burger-menu" ref={menuRef}>
+                  {/* Mobile: Show navigation links in burger menu */}
+                  <div className="mobile-nav-links">
+                    <Link to="/homepage" className="navbar-link" onClick={() => setMenuOpen(false)}>Home</Link><br />
+                    <Link to="/schedule" className="navbar-link" onClick={() => setMenuOpen(false)}>Showtimes</Link><br />
+                    <Link to="/groups" className="navbar-link" onClick={() => setMenuOpen(false)}>Groups</Link><br />
+                    <Link to="/browse" className="navbar-link" onClick={() => setMenuOpen(false)}>Browse</Link><br />
+                    <br />
+                  </div>
+                  {/* User menu items (always visible in burger) */}
                   <Link to={`/profile/${user?.id || ""}`} className="navbar-link" onClick={() => setMenuOpen(false)}>Profile</Link><br />
                   <Link to="/settings" className="navbar-link" onClick={() => setMenuOpen(false)}>Settings</Link><br />
                   <Link to={`/favorites/${user?.id}`} className="navbar-link" onClick={() => setMenuOpen(false)}>Favorites</Link><br />

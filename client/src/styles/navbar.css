@@ -21,29 +21,16 @@
 
 /* Logo */
 .navbar-logo {
-  height: auto;
-  max-height: var(--navbar-height);
-  margin-left: 5rem;
-}
-
-@media (min-width: 768px) {
-  .navbar-logo {
-    padding-left: 100px;
-  }
-}
-
-@media (max-width: 480px) {
-  .navbar-logo {
-    margin: 0 auto;
-    padding-left: 0;
-  }
+  height: 50px;
+  width: auto;
+  flex-shrink: 0;
 }
 
 /* Search bar */
 .search-form {
   flex: 1;
-  max-width: 350px;
-  margin-left: 13rem;
+  max-width: 400px;
+  margin: 0 2rem;
   display: flex;
   justify-content: center;
 }
@@ -52,7 +39,8 @@
 .search-bar {
   display: flex;
   align-items: center;
-  transition: width 0.3s ease;
+  width: 100%;
+  transition: all 0.3s ease;
   background-color: #fff;
   border-radius: 4px;
   border: 1px solid #ccc;
@@ -61,18 +49,11 @@
 }
 
 .search-bar.expanded {
-  width: 120%;
+  width: 100%;
 }
 
 .search-bar.collapsed {
-  width: 70%;
-}
-
-@media (max-width: 768px) {
-  .search-bar.expanded,
-  .search-bar.collapsed {
-    width: 100%;
-  }
+  width: 100%;
 }
 
 .search-icon {
@@ -90,21 +71,22 @@
   color: #000;
   pointer-events: auto;
   cursor: text;
-  min-width: 100px;
+  min-width: 0;
 }
 
 /* Navigation links */
 .navbar-nav {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   align-items: center;
-  
+  flex-shrink: 0;
 }
 
 .navbar-link {
   color: #fff;
   text-decoration: none;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 /* Buttons */
@@ -115,10 +97,17 @@
   color: white;
   font-weight: 600;
   cursor: pointer;
+  padding: 0.5rem;
 }
 
 .burger-button {
   font-size: 1.5rem;
+  display: block; /* Always visible */
+}
+
+/* Mobile navigation links in burger menu (hidden on desktop) */
+.mobile-nav-links {
+  display: none;
 }
 
 /* Burger menu dropdown */
@@ -126,7 +115,7 @@
   position: absolute;
   top: var(--navbar-height);
   right: 0;
-  width: 100%;
+  width: 250px;
   background: #222;
   border-radius: 4px 0 0 4px;
   padding: 1rem;
@@ -134,21 +123,6 @@
   transform: translateX(100%);
   animation: slideInFromRight 0.4s ease forwards;
   box-shadow: -2px 0 10px rgba(255, 77, 77, 0.3);
-  
-}
-
-@media (max-width: 768px) {
-  .burger-menu {
-    width: 80%;
-    border-radius: 4px 0 0 4px;
-  }
-}
-
-@media (max-width: 480px) {
-  .burger-menu {
-    width: 100%;
-    border-radius: 0;
-  }
 }
 
 /* Burger menu animation */
@@ -162,7 +136,7 @@
 /* Burger menu links */
 .burger-menu a {
   display: block;
-  margin-bottom: 0;
+  margin-bottom: 0.8rem;
   color: #fff;
   text-decoration: none;
   font-weight: 500;
@@ -191,22 +165,88 @@
   text-shadow: 0 0 8px rgba(255, 77, 77, 0.6);
 }
 
-/* Mobile layout adjustments */
-@media (max-width: 480px) {
+/* MOBILE RESPONSIVE */
+
+/* Tablet and below */
+@media (max-width: 1024px) {
   .navbar-header {
-    flex-direction: column;
-    height: auto;
-    padding: 1rem;
-    align-items: stretch;
+    padding: 0 1rem;
+  }
+  
+  .search-form {
+    max-width: 300px;
+    margin: 0 1rem;
+  }
+  
+  .navbar-nav {
+    gap: 1rem;
+  }
+}
+
+/* Mobile landscape and below */
+@media (max-width: 768px) {
+  .navbar-header {
+    padding: 0 1rem;
+    height: var(--navbar-height);
   }
 
-  .navbar-nav {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem;
+  /* Hide desktop navigation links on mobile (but keep logout and burger button) */
+  .navbar-nav > .navbar-link {
+    display: none;
+  }
+
+  /* Show mobile navigation links in burger menu */
+  .mobile-nav-links {
+    display: block;
   }
 
   .search-form {
-    margin-top: 1rem;
+    max-width: 250px;
+    margin: 0 1rem;
+  }
+
+  .burger-menu {
+    width: 280px; /* Increased width for mobile */
+    max-width: 90vw; /* Don't exceed 90% of viewport width */
+  }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+  .navbar-header {
+    padding: 0 0.5rem;
+  }
+
+  .navbar-logo {
+    height: 40px;
+  }
+
+  .search-form {
+    max-width: 150px;
+    margin: 0 0.5rem;
+  }
+
+  .search-bar {
+    padding: 0.4rem;
+  }
+
+  .search-input {
+    font-size: 0.9rem;
+  }
+
+  .burger-menu {
+    width: 100%;
+    max-width: 100vw;
+    border-radius: 0;
+    padding: 1.5rem; /* More padding for better readability */
+  }
+
+  .navbar-nav {
+    gap: 0.5rem;
+  }
+
+  /* Ensure burger menu links don't wrap on small screens */
+  .burger-menu a {
+    font-size: 0.75rem;
   }
 }
