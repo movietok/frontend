@@ -502,3 +502,37 @@
 .group-details-page.theme-purple h3 {
   color: #fff;
 }
+
+.review-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.pagination-btn {
+  background: #222;
+  border: 1px solid #444;
+  color: #ddd;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #333;
+  color: #fff;
+  border-color: #666;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-indicator {
+  color: #ccc;
+  font-size: 0.9rem;
+}

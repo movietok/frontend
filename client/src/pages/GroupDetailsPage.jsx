@@ -18,8 +18,33 @@ function GroupDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [removing, setRemoving] = useState(false);
 
-  console.log("Rendered group object:", group);
+  // --- Pagination for Reviews ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const reviewsPerPage = 5;
 
+  // Compute current page slice
+  const indexOfLastReview = currentPage * reviewsPerPage;
+  const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
+  const currentReviews = reviews.slice(indexOfFirstReview, indexOfLastReview);
+
+  const handleNextPage = () => {
+    if (indexOfLastReview < reviews.length) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
+  // Reset to first page when review count changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [reviews.length]);
+
+  console.log("Rendered group object:", group);
 
   // Decode user ID from JWT
   const currentUserId = useMemo(() => {
@@ -44,15 +69,12 @@ function GroupDetailsPage() {
     return [];
   };
 
-  // Member-only data (favorites + reviews).
-  // Accepts setter functions so caller can guard against stale updates.
+  // Member-only data (favorites + reviews)
   async function loadMemberData(groupId, setFavoritesFn, setReviewsFn) {
-    // Favorites
     const favRaw = await getGroupFavorites(groupId);
     const favs = extractArray(favRaw, "favorites") || [];
     setFavoritesFn(favs);
 
-    // Reviews (enrich from favorites if missing)
     const favIndex = new Map(favs.map((m) => [String(m.tmdb_id), m]));
     const revRaw = await getGroupReviews(groupId);
     let list = extractArray(revRaw, "reviews") || [];
@@ -80,12 +102,9 @@ function GroupDetailsPage() {
     setReviewsFn(list);
   }
 
-  // Initial load: fetch group; if (or once) member, load member data.
-  // Also hard-clear member-only arrays when switching groups to prevent carry-over.
+  // Initial load: fetch group
   useEffect(() => {
     let cancelled = false;
-
-    // Clear previous group's member-only data immediately
     setFavorites([]);
     setReviews([]);
     setLoading(true);
@@ -114,7 +133,6 @@ function GroupDetailsPage() {
           return;
         }
 
-        // Reconcile: backend didn't mark us as member, but we might be one.
         if (currentUserId) {
           try {
             const myGroups = await getUserGroupsAPI(currentUserId);
@@ -132,19 +150,16 @@ function GroupDetailsPage() {
                 (vals) => { if (!cancelled) setReviews(vals); }
               );
             } else {
-              // Ensure we don't show previous group's data
               setFavorites([]);
               setReviews([]);
             }
           } catch {
-            // ignore reconciliation errors
             if (!cancelled) {
               setFavorites([]);
               setReviews([]);
             }
           }
         } else {
-          // Not logged in or no membership—ensure arrays are empty
           setFavorites([]);
           setReviews([]);
         }
@@ -159,7 +174,7 @@ function GroupDetailsPage() {
     return () => { cancelled = true; };
   }, [id, currentUserId]);
 
-  // Refetch member data when role flips to member/mod/owner (e.g., after joining)
+  // Refetch when role changes
   useEffect(() => {
     if (!group) return;
 
@@ -185,7 +200,6 @@ function GroupDetailsPage() {
       })();
       return () => { cancelled = true; };
     } else {
-      // If role flips away from member, clear member-only data
       setFavorites([]);
       setReviews([]);
     }
@@ -194,13 +208,10 @@ function GroupDetailsPage() {
   const handleGroupUpdated = (updatedGroup) => {
     const g = updatedGroup?.group ?? updatedGroup;
     setGroup(g);
-
-    // If not a member after update, clear member-only data
     const notMember =
       !(g?.role === "member" || g?.role === "moderator" || g?.role === "owner") &&
       !g?.is_member &&
       !g?.is_owner;
-
     if (notMember) {
       setFavorites([]);
       setReviews([]);
@@ -211,10 +222,8 @@ function GroupDetailsPage() {
     navigate("/groups");
   };
 
-  // Remove movie from favorites
   const handleRemoveFavorite = async (tmdb_id) => {
     if (!window.confirm("Remove this movie from group favorites?")) return;
-
     setRemoving(true);
     try {
       await removeFavorite(tmdb_id, 3, id);
@@ -243,28 +252,24 @@ function GroupDetailsPage() {
     isOwner;
 
   const themeMap = {
-  1: "theme-blue",
-  2: "theme-green",
-  3: "theme-purple",
-  4: "theme-orange",
+    1: "theme-blue",
+    2: "theme-green",
+    3: "theme-purple",
+    4: "theme-orange",
   };
 
   return (
-
     <div className={`group-details-page ${themeMap[group?.theme_id] || ""}`}>
       {/* Header */}
       <div className="group-header">
         <img
-          src={
-            group.poster_url ||
-            "https://via.placeholder.com/200x300?text=No+Image"
-          }
+          src={group.poster_url || "https://via.placeholder.com/200x300?text=No+Image"}
           alt={group.name}
           className="group-poster"
         />
         <div className="group-info">
           <h1 className="group-title">{group.name}</h1>
-        <CopyLinkButton label="Copy Group Link" />
+          <CopyLinkButton label="Copy Group Link" />
           <p className="group-meta">
             Owner: <span>{group.owner_name || "Unknown"}</span> • Members:{" "}
             <span>{group.member_count || 0}</span>
@@ -285,10 +290,7 @@ function GroupDetailsPage() {
           <h3>Facts</h3>
           <ul>
             {group.created_at && (
-              <li>
-                Created:{" "}
-                {new Date(group.created_at).toLocaleDateString("en-GB")}
-              </li>
+              <li>Created: {new Date(group.created_at).toLocaleDateString("en-GB")}</li>
             )}
             {group.visibility && <li>Visibility: {group.visibility}</li>}
           </ul>
@@ -305,16 +307,10 @@ function GroupDetailsPage() {
             <div className="favorites-grid">
               {favorites.map((movie) => (
                 <div key={movie.tmdb_id} className="fav-card-wrapper">
-                  <Link
-                    to={`/movie/${movie.tmdb_id}`}
-                    className="fav-card-link"
-                  >
+                  <Link to={`/movie/${movie.tmdb_id}`} className="fav-card-link">
                     <div className="fav-card">
                       <img
-                        src={
-                          movie.poster_url ||
-                          "https://via.placeholder.com/150x225"
-                        }
+                        src={movie.poster_url || "https://via.placeholder.com/150x225"}
                         alt={movie.original_title}
                       />
                       <div className="fav-info">
@@ -324,7 +320,6 @@ function GroupDetailsPage() {
                     </div>
                   </Link>
 
-                  {/* Hover-visible remove button (owner only) */}
                   {isOwner && (
                     <button
                       className="remove-fav-btn"
@@ -349,29 +344,49 @@ function GroupDetailsPage() {
           {reviews.length === 0 ? (
             <p className="empty-text">No reviews yet from group members.</p>
           ) : (
-            <div className="reviews-list">
-              {reviews.map((rev) => (
-                <ReviewCard
-                  key={rev.id}
-                  review={rev}
-                  currentUserId={currentUserId}
-                  onDeleted={(rid) =>
-                    setReviews((prev) => prev.filter((r) => r.id !== rid))
-                  }
-                  onUpdated={(updated) =>
-                    setReviews((prev) =>
-                      prev.map((r) => (r.id === updated.id ? updated : r))
-                    )
-                  }
-                  showMovieHeader={true}
-                />
-              ))}
-            </div>
+            <>
+              <div className="reviews-list">
+                {currentReviews.map((rev) => (
+                  <ReviewCard
+                    key={rev.id}
+                    review={rev}
+                    currentUserId={currentUserId}
+                    onDeleted={(rid) =>
+                      setReviews((prev) => prev.filter((r) => r.id !== rid))
+                    }
+                    onUpdated={(updated) =>
+                      setReviews((prev) =>
+                        prev.map((r) => (r.id === updated.id ? updated : r))
+                      )
+                    }
+                    showMovieHeader={true}
+                  />
+                ))}
+              </div>
+
+              <div className="review-pagination">
+                <button
+                  className="pagination-btn"
+                  onClick={handlePrevPage}
+                  disabled={currentPage === 1}
+                >
+                  ← Previous
+                </button>
+
+                <button
+                  className="pagination-btn"
+                  onClick={handleNextPage}
+                  disabled={indexOfLastReview >= reviews.length}
+                >
+                  Next →
+                </button>
+              </div>
+            </>
           )}
         </section>
       )}
 
-      {/* Membership & Management (visible to any logged-in user) */}
+      {/* Management Box */}
       {Boolean(currentUserId) && (
         <GroupManagementBox
           group={group}
