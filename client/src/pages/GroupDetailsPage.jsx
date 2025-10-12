@@ -134,16 +134,41 @@ const handlePrevFavPage = () => {
   // Initial load: fetch group
   useEffect(() => {
     let cancelled = false;
-    setFavorites([]);
-    setReviews([]);
+    /* setFavorites([]);
+    setReviews([]); */
     setLoading(true);
 
     async function fetchData() {
+
       try {
         const data = await getGroupDetails(id);
         if (cancelled) return;
         const g = data?.group ?? data;
-        setGroup(g);
+        console.log("[fetchData] raw group from API:", {
+  id: g?.id,
+  role: g?.role,
+  is_member: g?.is_member,
+  is_owner: g?.is_owner,
+  owner_id: g?.owner_id,
+});
+
+        // Normalize membership flags from members[] if backend didn't include them
+const normalized = (() => {
+  const n = { ...g };
+  if (currentUserId && Array.isArray(g?.members)) {
+    const me = g.members.find((m) => Number(m.id) === Number(currentUserId));
+    n.role = n.role ?? me?.role ?? null;
+    n.is_member = n.is_member ?? Boolean(me);
+    n.is_owner = n.is_owner ?? (Number(g.owner_id) === Number(currentUserId));
+  } else {
+    // still keep owner flag if possible
+    n.is_owner = n.is_owner ?? (Number(g?.owner_id) === Number(currentUserId));
+  }
+  return n;
+})();
+
+setGroup(normalized);
+
 
         const isMemberLike =
   g?.role === "member" ||
@@ -160,6 +185,15 @@ if (isMemberLike) {
     (vals) => { if (!cancelled) setFavorites(vals); },
     (vals) => { if (!cancelled) setReviews(vals); }
   );
+
+  console.log("[render] membership flags:", {
+  cached: isMemberCached,
+  role: group?.role,
+  is_member: group?.is_member,
+  is_owner: group?.is_owner,
+  computed_isMember: isMember,
+});
+
   return;
 }
 
@@ -205,6 +239,19 @@ if (isMemberLike) {
     return () => { cancelled = true; };
   }, [id, currentUserId]);
 
+  // 🧠 Preserve membership cache between refetches or transient clears
+useEffect(() => {
+  if (
+    group?.role === "member" ||
+    group?.role === "moderator" ||
+    group?.role === "owner" ||
+    group?.is_member ||
+    group?.is_owner
+  ) {
+    if (!isMemberCached) setIsMemberCached(true);
+  }
+}, [group]);
+
   // Refetch when role changes
   useEffect(() => {
     if (!group) return;
@@ -236,18 +283,97 @@ if (isMemberLike) {
     }
   }, [group?.role, group?.is_member, group?.is_owner, id]);
 
-  const handleGroupUpdated = (updatedGroup) => {
-    const g = updatedGroup?.group ?? updatedGroup;
-    setGroup(g);
-    const notMember =
-      !(g?.role === "member" || g?.role === "moderator" || g?.role === "owner") &&
-      !g?.is_member &&
-      !g?.is_owner;
-    if (notMember) {
-      setFavorites([]);
-      setReviews([]);
+ const handleGroupUpdated = async (updatedGroup) => {
+  // The object Edit Group Modal sends back
+  const g = updatedGroup?.group ?? updatedGroup;
+
+  // 🧩 Normalize immediate update (the modal may omit members[] and flags)
+  const normalizedImmediate = (() => {
+    const n = { ...g };
+    if (currentUserId) {
+      n.is_owner =
+        n.is_owner ??
+        Number(n.owner_id) === Number(currentUserId) ??
+        false;
+      n.is_member =
+        n.is_member ??
+        (Array.isArray(n.members)
+          ? n.members.some((m) => Number(m.id) === Number(currentUserId))
+          : true); // assume still member after editing
+      n.role =
+        n.role ??
+        (Array.isArray(n.members)
+          ? n.members.find((m) => Number(m.id) === Number(currentUserId))?.role
+          : group?.role ?? "member");
     }
-  };
+    return n;
+  })();
+
+  // Merge the immediate normalized object so UI doesn’t flicker
+  setGroup((prev) => ({
+    ...prev,
+    ...normalizedImmediate,
+    genres: normalizedImmediate.genres ?? prev.genres,
+    role: normalizedImmediate.role ?? prev.role,
+    is_member: normalizedImmediate.is_member ?? prev.is_member,
+    is_owner: normalizedImmediate.is_owner ?? prev.is_owner,
+  }));
+
+  // Cache remains valid
+  setIsMemberCached(true);
+
+  try {
+    // 🔄 Re-fetch the latest data from backend to update genres etc.
+    const refreshed = await getGroupDetails(id);
+    const freshGroup = refreshed?.group ?? refreshed;
+
+    // Normalize the refreshed data the same way
+    const normalizedFresh = (() => {
+      const n = { ...freshGroup };
+      if (currentUserId && Array.isArray(freshGroup?.members)) {
+        const me = freshGroup.members.find(
+          (m) => Number(m.id) === Number(currentUserId)
+        );
+        n.role = n.role ?? me?.role ?? null;
+        n.is_member = n.is_member ?? Boolean(me);
+        n.is_owner =
+          n.is_owner ?? Number(freshGroup.owner_id) === Number(currentUserId);
+      } else {
+        n.is_owner =
+          n.is_owner ?? Number(freshGroup?.owner_id) === Number(currentUserId);
+      }
+      return n;
+    })();
+
+    // Final merge
+    setGroup((prev) => ({
+      ...prev,
+      ...normalizedFresh,
+      role: normalizedFresh.role ?? prev.role,
+      is_member: normalizedFresh.is_member ?? prev.is_member,
+      is_owner: normalizedFresh.is_owner ?? prev.is_owner,
+      genres: normalizedFresh.genres ?? prev.genres,
+    }));
+  } catch (err) {
+    console.error("Failed to refresh group details after update:", err);
+  }
+
+  // If truly downgraded to non-member (rare), clear data
+  const notMember =
+    !(
+      normalizedImmediate.role === "member" ||
+      normalizedImmediate.role === "moderator" ||
+      normalizedImmediate.role === "owner"
+    ) &&
+    !normalizedImmediate.is_member &&
+    !normalizedImmediate.is_owner;
+
+  if (notMember) {
+    setFavorites([]);
+    setReviews([]);
+  }
+};
+
 
   const handleGroupDeleted = () => {
     navigate("/groups");
@@ -275,13 +401,15 @@ if (isMemberLike) {
     group?.is_owner === true ||
     (currentUserId != null && Number(currentUserId) === Number(group?.owner_id));
 
-  const isMember =
-   isMemberCached ||
-    group?.role === "member" ||
-    group?.role === "moderator" ||
-    group?.role === "owner" ||
-    group?.is_member === true ||
-    isOwner;
+  // 🧠 Membership: cache always wins over temporary undefined states
+const isMember =
+  isMemberCached ||
+  group?.role === "member" ||
+  group?.role === "moderator" ||
+  group?.role === "owner" ||
+  group?.is_member === true ||
+  group?.is_owner === true ||
+  isOwner;
 
   const themeMap = {
     1: "theme-blue",
@@ -524,15 +652,6 @@ if (isMemberLike) {
             </>
           )}
         </section>
-      )}
-
-      {/* Management Box */}
-      {Boolean(currentUserId) && (
-        <GroupManagementBox
-          group={group}
-          onGroupUpdated={handleGroupUpdated}
-          onGroupDeleted={handleGroupDeleted}
-        />
       )}
     </div>
   );
