@@ -142,30 +142,46 @@ onGroupUpdated?.({
     }
   };
 
-  const handlePromote = async (userId, targetRole) => {
-    if (!groupId || !userId) return;
-    setBusyId(`role-${userId}`);
-    try {
-      await updateMemberRole(groupId, userId, targetRole);
-      pushToast?.(
-        targetRole === "moderator"
-          ? "Member promoted to moderator."
-          : "Moderator demoted to member.",
-        "success"
-      );
-      await refreshData();
-    } catch (error) {
-      console.error("Failed to update role:", error);
-      pushToast?.(
-        error?.response?.data?.error ||
-          error?.message ||
-          "Failed to update role.",
-        "error"
-      );
-    } finally {
-      setBusyId(null);
-    }
-  };
+const handlePromote = async (userId) => {
+  if (!groupId || !userId) return;
+  setBusyId(`role-${userId}`);
+  try {
+    await updateMemberRole(groupId, userId, "moderator");
+    pushToast?.("Member promoted to moderator.", "success");
+    await refreshData();
+  } catch (error) {
+    console.error("Failed to promote member:", error);
+    pushToast?.(
+      error?.response?.data?.error ||
+        error?.message ||
+        "Failed to promote member.",
+      "error"
+    );
+  } finally {
+    setBusyId(null);
+  }
+};
+
+const handleDemote = async (userId) => {
+  if (!groupId || !userId) return;
+  setBusyId(`role-${userId}`);
+  try {
+    await updateMemberRole(groupId, userId, "member");
+    pushToast?.("Moderator demoted to member.", "success");
+    await refreshData();
+  } catch (error) {
+    console.error("Failed to demote member:", error);
+    pushToast?.(
+      error?.response?.data?.error ||
+        error?.message ||
+        "Failed to demote member.",
+      "error"
+    );
+  } finally {
+    setBusyId(null);
+  }
+};
+
 
   const handleApprove = async (userId) => {
     if (!groupId || !userId) return;
@@ -284,15 +300,24 @@ onGroupUpdated?.({
 
       {/* existing management buttons below */}
       {canPromoteMember && (
-        <button className="promote-btn" onClick={() => handlePromote(id)}>
-          Promote
-        </button>
-      )}
-      {canDemote && (
-        <button className="demote-btn" onClick={() => handleDemote(id)}>
-          Demote
-        </button>
-      )}
+  <button
+    className="promote-btn"
+    disabled={busyId === `role-${id}`}
+    onClick={() => handlePromote(id)}
+  >
+    Promote
+  </button>
+)}
+{canDemote && (
+  <button
+    className="demote-btn"
+    disabled={busyId === `role-${id}`}
+    onClick={() => handleDemote(id)}
+  >
+    Demote
+  </button>
+)}
+
       {canRemove && (
         <button className="remove-btn" onClick={() => handleRemove(id)}>
           Remove
