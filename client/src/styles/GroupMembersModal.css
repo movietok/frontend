@@ -1,3 +1,7 @@
+/* ==========================
+   GROUP MEMBERS MODAL STYLES
+   ========================== */
+
 .group-members-modal__backdrop {
   position: fixed;
   inset: 0;
@@ -18,40 +22,47 @@
   flex-direction: column;
   box-shadow: 0 20px 45px rgba(15, 23, 42, 0.25);
   overflow: hidden;
+  position: relative; /* for absolute X positioning */
 }
 
+/* ---------- HEADER ---------- */
 .group-members-modal__header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center; /* center the title visually */
   padding: 1rem 1.5rem;
   border-bottom: 1px solid rgba(15, 23, 42, 0.08);
   background: #f8fafc;
+  position: relative;
 }
 
 .group-members-modal__header h2 {
   font-size: 1.125rem;
   font-weight: 600;
   margin: 0;
+  color: #0f172a;
 }
 
+/* ---------- CLOSE BUTTON ---------- */
 .close-btn {
+  position: absolute;
+  top: 8px;        /* was 14px */
+  right: 18px;
   background: none;
   border: none;
-  color: #777;
-  font-size: 1.6rem;
+  color: #ef4444;
+  font-size: 1.8rem;
   cursor: pointer;
-  transition: color 0.2s ease;
-  position: absolute;
-  top: 16px;
-  right: 20px;
   line-height: 1;
+  transition: transform 0.15s ease, color 0.15s ease;
 }
 
 .close-btn:hover {
-  color: #fff;
+  transform: scale(1.1);
+  color: #b91c1c;
 }
 
+/* ---------- TABS ---------- */
 .group-members-modal__tabs {
   display: flex;
   gap: 0.5rem;
@@ -80,11 +91,13 @@
   color: #fff;
 }
 
+/* ---------- CONTENT ---------- */
 .group-members-modal__content {
   padding: 1rem 1.5rem 1.5rem;
   overflow-y: auto;
 }
 
+/* ---------- LIST ---------- */
 .group-members-modal__list {
   list-style: none;
   margin: 0;
@@ -117,6 +130,7 @@
   color: #475569;
 }
 
+/* ---------- ROLE BADGES ---------- */
 .role {
   padding: 0.15rem 0.6rem;
   border-radius: 9999px;
@@ -145,6 +159,7 @@
   color: #7c3aed;
 }
 
+/* ---------- ACTION BUTTONS ---------- */
 .group-members-modal__actions {
   display: flex;
   flex-wrap: wrap;
@@ -202,12 +217,14 @@
   box-shadow: none;
 }
 
+/* ---------- EMPTY STATE ---------- */
 .group-members-modal__empty {
   text-align: center;
   color: #6b7280;
   padding: 2rem 0;
 }
 
+/* ---------- MOBILE ---------- */
 @media (max-width: 640px) {
   .group-members-modal {
     width: 100%;
