@@ -21,7 +21,7 @@ export default function WatchlistPage() {
   if (error) return <div className="favorites-error">Error loading watchlist.</div>;
 
   return (
-    <div className="favorites-container max-w-6xl mx-auto px-6 py-8">
+    <div className="favorites-container">
       <h2 className="watchlist-header">
         <span className="watchlist-eye">👁</span>
         <span className="watchlist-text">Your Watchlist {user.username}</span>
