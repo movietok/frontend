@@ -76,7 +76,14 @@ export default function GroupMembersModal({
     const data = await getGroupDetails(groupId);
     const g = data?.group ?? data;
     setMembers(normalizeMembers(g));
-    onGroupUpdated?.(g);
+    // Preserve membership info for main page
+onGroupUpdated?.({
+  ...group,
+  ...g,
+  role: g.role ?? group.role,
+  is_member: g.is_member ?? group.is_member,
+  is_owner: g.is_owner ?? group.is_owner,
+});
 
     if (showRequestsTab) {
       try {
