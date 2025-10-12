@@ -333,44 +333,58 @@ const handleDemote = async (userId) => {
             ) : (
               <ul className="group-members-modal__list">
                 {pending.map((req) => {
-                  const userId = req.user_id ?? req.userId ?? req.id;
-                  const username =
-                    req.username ?? req.user_name ?? req.name ?? "Unknown";
-                  const requestedAt = req.requested_at || req.joined_at;
-                  const requested = requestedAt
-                    ? new Date(requestedAt).toLocaleString()
-                    : null;
+  const userId = req.user_id ?? req.userId ?? req.id;
+  const username = req.username ?? req.user_name ?? req.name ?? "Unknown";
+  const requestedAt = req.requested_at || req.joined_at;
+  const requested = requestedAt
+    ? new Date(requestedAt).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      })
+    : null;
 
-                  return (
-                    <li key={userId} className="group-members-modal__row">
-                      <div>
-                        <div className="group-members-modal__name">
-                          {username}
-                        </div>
-                        <div className="group-members-modal__meta">
-                          <span className="role role-pending">Pending</span>
-                          {requested && <span>Requested {requested}</span>}
-                        </div>
-                      </div>
-                      <div className="group-members-modal__actions">
-                        <button
-                          onClick={() => handleApprove(userId)}
-                          disabled={busyId === `approve-${userId}`}
-                          className="btn-primary"
-                        >
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => handleDecline(userId)}
-                          disabled={busyId === `decline-${userId}`}
-                          className="btn-danger"
-                        >
-                          Decline
-                        </button>
-                      </div>
-                    </li>
-                  );
-                })}
+  return (
+    <div key={userId} className="member-row">
+      <div className="member-info">
+        <Link
+          to={`/profile/${userId}`}
+          className="member-link"
+          onClick={onClose}
+        >
+          {username}
+        </Link>
+        <div>
+          <span className="member-role pending">Pending</span>
+          {requested && (
+            <span className="member-joined">Requested: {requested}</span>
+          )}
+        </div>
+      </div>
+
+      <div className="member-actions">
+        <button
+          className="promote-btn"
+          onClick={() => handleApprove(userId)}
+          disabled={busyId === `approve-${userId}`}
+        >
+          Approve
+        </button>
+        <button
+          className="remove-btn"
+          onClick={() => handleDecline(userId)}
+          disabled={busyId === `decline-${userId}`}
+        >
+          Decline
+        </button>
+      </div>
+    </div>
+  );
+})}
+
               </ul>
             )
           ) : (

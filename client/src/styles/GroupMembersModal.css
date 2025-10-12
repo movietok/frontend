@@ -133,6 +133,12 @@
 }
 .close-btn:hover { color: #fff; }
 
+.member-role.pending {
+  background: rgba(255, 255, 120, 0.12);
+  color: #e2d16b;
+}
+
+
 /* Mobile tweak: a bit taller if needed */
 @media (max-width: 560px) {
   .group-members-modal { max-height: 85vh; width: 95vw; }
