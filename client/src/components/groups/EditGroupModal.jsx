@@ -16,29 +16,29 @@ export default function EditGroupModal({ group, onClose, onSave }) {
   const [name, setName] = useState(group.name || "");
   const [description, setDescription] = useState(group.description || "");
   const [visibility, setVisibility] = useState(group.visibility || "public");
+  const [posterUrl, setPosterUrl] = useState(group.poster_url || ""); // NEW
 
   // === Themes ===
-  const [themes, setThemes] = useState([]); // [{ id, name, theme }]
+  const [themes, setThemes] = useState([]);
   const [themeId, setThemeId] = useState(
     group.theme_id == null ? "" : String(group.theme_id)
   );
 
   // === Genres ===
-  const [genres, setGenres] = useState([]); // [{ id:"28", name:"Action" }, ...]
-  const [selectedGenres, setSelectedGenres] = useState([]); // ["28","99"]
+  const [genres, setGenres] = useState([]);
+  const [selectedGenres, setSelectedGenres] = useState([]);
 
   const groupId = useMemo(
     () => group?.id || group?.gID || group?.group?.id,
     [group]
   );
 
-  // === Popup and timeout management ===
+  // === Popup management ===
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
   const [popupType, setPopupType] = useState("info");
   const timeoutRef = useRef(null);
 
-  // === Cleanup timeout on unmount ===
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
@@ -79,7 +79,6 @@ export default function EditGroupModal({ group, onClose, onSave }) {
       .catch(console.error);
   }, [group]);
 
-  // === Genre toggling ===
   const toggleGenre = (gid) => {
     const idStr = String(gid);
     setSelectedGenres((prev) =>
@@ -87,10 +86,9 @@ export default function EditGroupModal({ group, onClose, onSave }) {
     );
   };
 
-  // === Form submission ===
+  // === Submit handler ===
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const updates = {};
     const safeTrim = (s) => (typeof s === "string" ? s.trim() : s);
 
@@ -119,6 +117,11 @@ export default function EditGroupModal({ group, onClose, onSave }) {
         : Number(themeId);
     if (newTheme !== oldTheme) updates.theme_id = newTheme;
 
+    // poster_url (NEW)
+    const newPoster = safeTrim(posterUrl);
+    const oldPoster = safeTrim(group.poster_url ?? "");
+    if (newPoster !== oldPoster) updates.poster_url = newPoster;
+
     // tags
     const numericTags = selectedGenres
       .map((id) => Number(id))
@@ -143,8 +146,6 @@ export default function EditGroupModal({ group, onClose, onSave }) {
 
     try {
       const updated = await updateGroup(groupId, updates);
-
-      // ✅ Clear any old timer before starting new
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
       setPopupMessage("Group updated successfully!");
@@ -154,21 +155,16 @@ export default function EditGroupModal({ group, onClose, onSave }) {
       onSave?.(updated?.group ?? updated);
       onClose();
 
-      // ✅ Start fresh popup timer
       timeoutRef.current = setTimeout(() => {
         setShowPopup(false);
         timeoutRef.current = null;
       }, 2000);
     } catch (err) {
-      const status = err?.response?.status;
-      const data = err?.response?.data;
-      console.error("Update failed:", status, data, err?.message);
       const msg =
-        data?.error ||
-        data?.message ||
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
         err?.message ||
         "Failed to update group.";
-
       setPopupMessage(msg);
       setPopupType("error");
       setShowPopup(true);
@@ -203,6 +199,38 @@ export default function EditGroupModal({ group, onClose, onSave }) {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Group description"
             />
+          </div>
+
+          {/* === Group Image URL === */}
+          <div>
+            <label>Group Image URL</label>
+            <input
+              type="url"
+              name="poster_url"
+              value={posterUrl}
+              onChange={(e) => setPosterUrl(e.target.value)}
+              placeholder="https://example.com/image.jpg"
+            />
+            {posterUrl && (
+              <div className="image-preview">
+                <img
+                  src={posterUrl}
+                  alt="Group preview"
+                  style={{
+                    width: "120px",
+                    height: "120px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                    marginTop: "8px",
+                    border: "1px solid #555",
+                  }}
+                  onError={(e) => {
+                    e.target.src =
+                      "https://via.placeholder.com/120x120?text=Invalid+URL";
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           {/* === Theme === */}
