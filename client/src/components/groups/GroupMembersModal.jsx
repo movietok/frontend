@@ -42,12 +42,12 @@ export default function GroupMembersModal({
   const [activeTab, setActiveTab] = useState("members");
   const [busyId, setBusyId] = useState(null);
 
-  const isOwner = viewerRole === "owner";
-  const isModerator = viewerRole === "moderator";
+  const visibility = group?.visibility ?? "public";
+  const normalizedViewerRole = (viewerRole || "").toLowerCase();
+  const isOwner = normalizedViewerRole === "owner";
+  const isModerator = normalizedViewerRole === "moderator";
   const canManageMembers = isOwner || isModerator;
-  const visibility = group?.visibility ?? 'public';
-  const canManageRequests = canManageMembers && visibility !== 'public';
-  const canPromote = isOwner;
+  const canManageRequests = canManageMembers && visibility !== "public";
   const showRequestsTab = canManageRequests;
 
   useEffect(() => {
@@ -60,7 +60,9 @@ export default function GroupMembersModal({
       } catch (error) {
         console.error("Failed to load members:", error);
         pushToast?.(
-          error?.response?.data?.error || error?.message || "Failed to load members.",
+          error?.response?.data?.error ||
+            error?.message ||
+            "Failed to load members.",
           "error"
         );
       } finally {
@@ -83,7 +85,9 @@ export default function GroupMembersModal({
       } catch (error) {
         console.error("Failed to load pending requests:", error);
         pushToast?.(
-          error?.response?.data?.error || error?.message || "Failed to load pending requests.",
+          error?.response?.data?.error ||
+            error?.message ||
+            "Failed to load pending requests.",
           "error"
         );
         setPending([]);
@@ -94,8 +98,8 @@ export default function GroupMembersModal({
   }
 
   useEffect(() => {
-    if (!showRequestsTab && activeTab === 'requests') {
-      setActiveTab('members');
+    if (!showRequestsTab && activeTab === "requests") {
+      setActiveTab("members");
     }
   }, [showRequestsTab, activeTab]);
 
@@ -120,7 +124,9 @@ export default function GroupMembersModal({
     } catch (error) {
       console.error("Failed to remove member:", error);
       pushToast?.(
-        error?.response?.data?.error || error?.message || "Failed to remove member.",
+        error?.response?.data?.error ||
+          error?.message ||
+          "Failed to remove member.",
         "error"
       );
     } finally {
@@ -143,7 +149,9 @@ export default function GroupMembersModal({
     } catch (error) {
       console.error("Failed to update role:", error);
       pushToast?.(
-        error?.response?.data?.error || error?.message || "Failed to update role.",
+        error?.response?.data?.error ||
+          error?.message ||
+          "Failed to update role.",
         "error"
       );
     } finally {
@@ -161,7 +169,9 @@ export default function GroupMembersModal({
     } catch (error) {
       console.error("Failed to approve request:", error);
       pushToast?.(
-        error?.response?.data?.error || error?.message || "Failed to approve request.",
+        error?.response?.data?.error ||
+          error?.message ||
+          "Failed to approve request.",
         "error"
       );
     } finally {
@@ -179,7 +189,9 @@ export default function GroupMembersModal({
     } catch (error) {
       console.error("Failed to decline request:", error);
       pushToast?.(
-        error?.response?.data?.error || error?.message || "Failed to decline request.",
+        error?.response?.data?.error ||
+          error?.message ||
+          "Failed to decline request.",
         "error"
       );
     } finally {
@@ -200,8 +212,9 @@ export default function GroupMembersModal({
       >
         <header className="group-members-modal__header">
           <h2 id="group-members-title">Group Members</h2>
+          {/* Fixed close button */}
           <button className="close-btn" onClick={closeModal} aria-label="Close">
-            �
+            ×
           </button>
         </header>
 
@@ -236,15 +249,25 @@ export default function GroupMembersModal({
                   const joined = joined_at
                     ? new Date(joined_at).toLocaleDateString()
                     : "";
-                  const isSelf = currentUserId && Number(currentUserId) === Number(id);
-                  const canRemove = canManageMembers && !isSelf && role !== "owner";
-                  const canDemote = canPromote && role === "moderator";
-                  const canPromoteMember = canPromote && role === "member";
+                  const isSelf =
+                    currentUserId && Number(currentUserId) === Number(id);
+
+                  // 🔹 Corrected permission logic
+                  const canRemove =
+                    (isOwner ||
+                      (isModerator && role === "member")) &&
+                    !isSelf &&
+                    role !== "owner";
+
+                  const canDemote = isOwner && role === "moderator";
+                  const canPromoteMember = isOwner && role === "member";
 
                   return (
                     <li key={id} className="group-members-modal__row">
                       <div>
-                        <div className="group-members-modal__name">{username}</div>
+                        <div className="group-members-modal__name">
+                          {username}
+                        </div>
                         <div className="group-members-modal__meta">
                           <span className={`role role-${role}`}>{label}</span>
                           {joined && <span>Joined {joined}</span>}
@@ -292,7 +315,8 @@ export default function GroupMembersModal({
               <ul className="group-members-modal__list">
                 {pending.map((req) => {
                   const userId = req.user_id ?? req.userId ?? req.id;
-                  const username = req.username ?? req.user_name ?? req.name ?? "Unknown";
+                  const username =
+                    req.username ?? req.user_name ?? req.name ?? "Unknown";
                   const requestedAt = req.requested_at || req.joined_at;
                   const requested = requestedAt
                     ? new Date(requestedAt).toLocaleString()
@@ -301,7 +325,9 @@ export default function GroupMembersModal({
                   return (
                     <li key={userId} className="group-members-modal__row">
                       <div>
-                        <div className="group-members-modal__name">{username}</div>
+                        <div className="group-members-modal__name">
+                          {username}
+                        </div>
                         <div className="group-members-modal__meta">
                           <span className="role role-pending">Pending</span>
                           {requested && <span>Requested {requested}</span>}
@@ -329,11 +355,12 @@ export default function GroupMembersModal({
               </ul>
             )
           ) : (
-            <p className="group-members-modal__empty">This group does not require approvals.</p>
+            <p className="group-members-modal__empty">
+              This group does not require approvals.
+            </p>
           )}
         </section>
       </div>
     </div>
   );
 }
-

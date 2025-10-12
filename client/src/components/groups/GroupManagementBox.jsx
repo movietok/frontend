@@ -12,7 +12,7 @@ import {
   withdrawJoinRequest,
 } from "../../services/groupService";
 
-// Lightweight membership cache (per group/user) to persist "pending" or "member" between reloads
+// Lightweight membership cache (per group/user)
 const membershipCache = {
   key(groupId, userId) {
     return `mt.membership:${String(groupId)}:${String(userId)}`;
@@ -83,32 +83,43 @@ export default function GroupManagementBox({ group, onGroupUpdated, onGroupDelet
   const getGroupId = () => group?.id ?? group?.gID ?? group?.group?.id;
   const gid = getGroupId();
 
-  // Normalize basic flags
+  // Basic owner/member booleans
   const normalizedIsOwner =
     Boolean(group?.is_owner) ||
     (currentUserId != null && Number(currentUserId) === Number(group?.owner_id));
-  const normalizedIsMember = Boolean(group?.is_member);
 
-  // Determine effective role (priority: force owner > override > backend role > fallback)
-  let effectiveRole = group?.role ?? null;
+  const roleFromGroup = (group?.role || "").toLowerCase();
+  const hasMembersList = Array.isArray(group?.members) && group.members.length >= 0; // empty array is still authoritative
+  const viewerMember = hasMembersList
+    ? group.members.find((m) => Number(m.id) === Number(currentUserId))
+    : null;
+  const roleFromMembers = (viewerMember?.role || "").toLowerCase();
 
-  // If we are owner by id comparison, force owner role and clear caches/overrides
+  // ---- Effective role computation (authoritative members list when present) ----
+  let effectiveRole = null;
+
   if (normalizedIsOwner) {
     effectiveRole = "owner";
-    if (roleOverride !== "owner") setRoleOverride("owner");
-    if (gid && currentUserId) membershipCache.set(gid, currentUserId, "member"); // owner is implicitly member for UI gating
+  } else if (roleFromGroup) {
+    // backend explicitly gave our role (member/mod/owner/pending)
+    effectiveRole = roleFromGroup;
+  } else if (hasMembersList) {
+    // members list present: trust it
+    if (roleFromMembers) {
+      effectiveRole = roleFromMembers;           // "member" | "moderator"
+    } else {
+      // not in list => hard non-member, clear local state
+      effectiveRole = null;
+      if (gid && currentUserId) membershipCache.clear(gid, currentUserId);
+      if (roleOverride) setRoleOverride(null);
+    }
   } else if (roleOverride) {
-    effectiveRole = roleOverride;
-  } else if (!effectiveRole) {
-    // fallback to is_member (may be set even if role is missing)
-    if (normalizedIsMember) effectiveRole = "member";
-  }
-
-  // If still empty, fall back to cached "pending" or "member"
-  if (!effectiveRole && gid && currentUserId) {
-    const cached = membershipCache.get(gid, currentUserId);
-    if (cached === "pending") effectiveRole = "pending";
-    else if (cached === "member") effectiveRole = "member";
+    effectiveRole = roleOverride;                // UI override while backend sparse
+  } else if (group?.is_member) {
+    effectiveRole = "member";                    // legacy boolean
+  } else {
+    // backend is sparse (no role, no members list): we MAY reconcile using user's groups API
+    effectiveRole = null;
   }
 
   const isOwner = effectiveRole === "owner";
@@ -122,53 +133,60 @@ export default function GroupManagementBox({ group, onGroupUpdated, onGroupDelet
     }
   }, [showMembersModal, isMember, isOwner, isModerator]);
 
-  // Reconcile on mount/when group changes if backend is sparse
+  // Reconcile when backend is sparse ONLY (no role and no members list)
   useEffect(() => {
     let cancelled = false;
+
     async function reconcile() {
       if (!gid || !currentUserId) return;
 
-      // If backend provided an explicit role (and we're not forcing owner), trust it and sync cache
-      if (group?.role && !normalizedIsOwner) {
+      // If members list exists, treat it as authoritative; don't second-guess with user groups.
+      if (hasMembersList) return;
+
+      // If backend provided explicit role (and we're not owner), sync cache and stop.
+      if (roleFromGroup && !normalizedIsOwner) {
         if (!cancelled) {
           setRoleOverride(null);
-          if (group.role === "pending") membershipCache.set(gid, currentUserId, "pending");
-          else if (["member", "moderator", "owner"].includes(group.role)) {
+          const r = roleFromGroup;
+          if (r === "pending") membershipCache.set(gid, currentUserId, "pending");
+          else if (["member", "moderator", "owner"].includes(r)) {
             membershipCache.set(gid, currentUserId, "member");
+          } else {
+            membershipCache.clear(gid, currentUserId);
           }
         }
         return;
       }
 
-      // If cache says pending and we're not a member, reflect it
-      const cached = membershipCache.get(gid, currentUserId);
-      if (!isMember && cached === "pending" && !cancelled) {
-        setRoleOverride("pending");
-        return;
-      }
+      // Sparse backend: consult user's groups as a fallback
+      try {
+        const list = await getUserGroupsAPI(currentUserId);
+        const inGroup =
+          Array.isArray(list) &&
+          list.some((g) => Number(g.id ?? g.gID ?? g.group_id) === Number(gid));
 
-      // Authoritative check via user's groups for membership (if not owner)
-      if (!normalizedIsOwner) {
-        try {
-          const list = await getUserGroupsAPI(currentUserId);
-          const inGroup =
-            Array.isArray(list) &&
-            list.some((g) => Number(g.id ?? g.gID ?? g.group_id) === Number(gid));
-          if (!cancelled && inGroup) {
-            setRoleOverride("member");
-            membershipCache.set(gid, currentUserId, "member");
-          }
-        } catch {
-          // ignore best-effort errors
+        if (!cancelled && inGroup) {
+          setRoleOverride("member");
+          membershipCache.set(gid, currentUserId, "member");
+        } else if (!cancelled) {
+          setRoleOverride(null);
+          membershipCache.clear(gid, currentUserId);
+        }
+      } catch {
+        if (!cancelled) {
+          // On error, prefer conservative non-member if nothing else says otherwise
+          setRoleOverride(null);
+          membershipCache.clear(gid, currentUserId);
         }
       }
     }
+
     reconcile();
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gid, group?.role, group?.is_member, group?.owner_id, currentUserId]);
+  }, [gid, currentUserId, hasMembersList, roleFromGroup, normalizedIsOwner]);
 
   // Confirm helpers
   const openConfirm = (message, confirmText, onConfirm) => {
@@ -183,107 +201,109 @@ export default function GroupManagementBox({ group, onGroupUpdated, onGroupDelet
 
   // Actions
   const handleJoinOrRequest = async () => {
-  if (!isLoggedIn) { pushToast("You must be logged in to join groups.", "info"); return; }
-  if (!gid)        { pushToast("Cannot determine group ID.", "error"); return; }
+    if (!isLoggedIn) { pushToast("You must be logged in to join groups.", "info"); return; }
+    if (!gid)        { pushToast("Cannot determine group ID.", "error"); return; }
 
-  // If we previously withdrew, make sure no stale cache blocks new request
-  if (currentUserId) membershipCache.clear(gid, currentUserId);
+    // If we previously withdrew, make sure no stale cache blocks new request
+    if (currentUserId) membershipCache.clear(gid, currentUserId);
 
-  // If pending, don't re-hit backend
-  const p = membershipCache.get(gid, currentUserId);
-  if (p === "pending") {
-    setRoleOverride("pending");
-    pushToast("Join request is already pending.", "info");
-    return;
-  }
-
-  setLoadingAction(true);
-  try {
-    if (visibility === "public") {
-      await joinGroup(gid);
-      onGroupUpdated?.({ ...group, role: "member", is_member: true });
-      setRoleOverride("member");
-      membershipCache.set(gid, currentUserId, "member");
-      pushToast("You have joined the group.", "success");
-    } else {
-      await requestToJoinGroup(gid);
-      onGroupUpdated?.({ ...group, role: "pending" });
+    // If pending, don't re-hit backend
+    const p = membershipCache.get(gid, currentUserId);
+    if (p === "pending") {
       setRoleOverride("pending");
-      membershipCache.set(gid, currentUserId, "pending");
-      pushToast("Join request sent. Please wait for approval.", "success");
-    }
-  } catch (err) {
-    const status = err?.response?.status;
-    const message =
-      err?.response?.data?.error ||
-      err?.message ||
-      "Failed to join or request to join group.";
-
-    if (
-      status &&
-      (status === 400 || status === 409) &&
-      typeof message === "string" &&
-      message.toLowerCase().includes("pending")
-    ) {
-      onGroupUpdated?.({ ...group, role: "pending" });
-      setRoleOverride("pending");
-      if (currentUserId) membershipCache.set(gid, currentUserId, "pending");
       pushToast("Join request is already pending.", "info");
-    } else if (typeof message === "string" && message.toLowerCase().includes("already a member")) {
-      onGroupUpdated?.({ ...group, role: "member", is_member: true });
-      setRoleOverride("member");
-      if (currentUserId) membershipCache.set(gid, currentUserId, "member");
-      pushToast("You are already a member of this group.", "info");
-    } else if (typeof message === "string" && message.toLowerCase().includes("already the owner")) {
-      onGroupUpdated?.({ ...group, role: "owner", is_owner: true });
-      setRoleOverride("owner");
-      if (currentUserId) membershipCache.set(gid, currentUserId, "member");
-      pushToast("You already own this group.", "info");
-    } else {
-      pushToast(message, "error");
+      return;
     }
-  } finally {
-    setLoadingAction(false);
-  }
-};
 
-
-  const handleWithdrawRequest = () => {
-  if (!gid) {
-    pushToast("Cannot determine group ID.", "error");
-    return;
-  }
-
-  openConfirm("Withdraw your join request?", "Withdraw", async () => {
     setLoadingAction(true);
     try {
-      await withdrawJoinRequest(gid);
-      // Clear pending state
-      onGroupUpdated?.({ ...group, role: null });
-      setRoleOverride(null);
-      if (currentUserId) membershipCache.clear(gid, currentUserId);
-      setShowPopup(false);
-      pushToast("Join request withdrawn.", "success");
+      if (visibility === "public") {
+        await joinGroup(gid);
+        const nextMembers = Array.isArray(group?.members)
+          ? group.members.concat([{ id: currentUserId, role: "member", username: "(you)" }])
+          : undefined;
+        onGroupUpdated?.({ ...group, role: "member", is_member: true, members: nextMembers });
+        setRoleOverride("member");
+        membershipCache.set(gid, currentUserId, "member");
+        pushToast("You have joined the group.", "success");
+      } else {
+        await requestToJoinGroup(gid);
+        onGroupUpdated?.({ ...group, role: "pending" });
+        setRoleOverride("pending");
+        membershipCache.set(gid, currentUserId, "pending");
+        pushToast("Join request sent. Please wait for approval.", "success");
+      }
     } catch (err) {
-      // If backend says 404 / not found, we still clear local state to unblock the UI
-      const code = err?.response?.status;
-      if (code === 404 || code === 410) {
+      const status = err?.response?.status;
+      const message =
+        err?.response?.data?.error ||
+        err?.message ||
+        "Failed to join or request to join group.";
+
+      if (
+        status &&
+        (status === 400 || status === 409) &&
+        typeof message === "string" &&
+        message.toLowerCase().includes("pending")
+      ) {
+        onGroupUpdated?.({ ...group, role: "pending" });
+        setRoleOverride("pending");
+        if (currentUserId) membershipCache.set(gid, currentUserId, "pending");
+        pushToast("Join request is already pending.", "info");
+      } else if (typeof message === "string" && message.toLowerCase().includes("already a member")) {
+        const nextMembers = Array.isArray(group?.members)
+          ? group.members.concat([{ id: currentUserId, role: "member", username: "(you)" }])
+          : undefined;
+        onGroupUpdated?.({ ...group, role: "member", is_member: true, members: nextMembers });
+        setRoleOverride("member");
+        if (currentUserId) membershipCache.set(gid, currentUserId, "member");
+        pushToast("You are already a member of this group.", "info");
+      } else if (typeof message === "string" && message.toLowerCase().includes("already the owner")) {
+        onGroupUpdated?.({ ...group, role: "owner", is_owner: true });
+        setRoleOverride("owner");
+        if (currentUserId) membershipCache.set(gid, currentUserId, "member");
+        pushToast("You already own this group.", "info");
+      } else {
+        pushToast(message, "error");
+      }
+    } finally {
+      setLoadingAction(false);
+    }
+  };
+
+  const handleWithdrawRequest = () => {
+    if (!gid) {
+      pushToast("Cannot determine group ID.", "error");
+      return;
+    }
+
+    openConfirm("Withdraw your join request?", "Withdraw", async () => {
+      setLoadingAction(true);
+      try {
+        await withdrawJoinRequest(gid);
         onGroupUpdated?.({ ...group, role: null });
         setRoleOverride(null);
         if (currentUserId) membershipCache.clear(gid, currentUserId);
         setShowPopup(false);
         pushToast("Join request withdrawn.", "success");
-        return;
+      } catch (err) {
+        const code = err?.response?.status;
+        if (code === 404 || code === 410) {
+          onGroupUpdated?.({ ...group, role: null });
+          setRoleOverride(null);
+          if (currentUserId) membershipCache.clear(gid, currentUserId);
+          setShowPopup(false);
+          pushToast("Join request withdrawn.", "success");
+          return;
+        }
+        const msg = err?.response?.data?.error || err?.message || "Failed to withdraw request.";
+        setShowPopup(false);
+        pushToast(msg, "error");
+      } finally {
+        setLoadingAction(false);
       }
-      const msg = err?.response?.data?.error || err?.message || "Failed to withdraw request.";
-      setShowPopup(false);
-      pushToast(msg, "error");
-    } finally {
-      setLoadingAction(false);
-    }
-  });
-};
-
+    });
+  };
 
   const handleLeave = () => {
     if (!gid) {
@@ -294,7 +314,19 @@ export default function GroupManagementBox({ group, onGroupUpdated, onGroupDelet
       setLoadingAction(true);
       try {
         await leaveGroup(gid);
-        onGroupUpdated?.({ ...group, role: null, is_member: false });
+
+        // Remove self from the authoritative members list in parent state
+        const filteredMembers = Array.isArray(group?.members)
+          ? group.members.filter((m) => Number(m.id) !== Number(currentUserId))
+          : group?.members;
+
+        onGroupUpdated?.({
+          ...group,
+          role: null,
+          is_member: false,
+          members: filteredMembers,
+        });
+
         setRoleOverride(null);
         membershipCache.clear(gid, currentUserId);
         setShowPopup(false);
@@ -383,16 +415,6 @@ export default function GroupManagementBox({ group, onGroupUpdated, onGroupDelet
             className="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700"
           >
             View Members
-          </button>
-        )}
-
-        {/* Moderator can Edit */}
-        {isModerator && (
-          <button
-            onClick={() => setShowEditModal(true)}
-            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            Edit Group
           </button>
         )}
 

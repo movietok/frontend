@@ -36,12 +36,20 @@
 }
 
 .close-btn {
-  background: transparent;
+  background: none;
   border: none;
-  font-size: 1.5rem;
-  line-height: 1;
+  color: #777;
+  font-size: 1.6rem;
   cursor: pointer;
-  color: #1f2937;
+  transition: color 0.2s ease;
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: #fff;
 }
 
 .group-members-modal__tabs {
