@@ -656,3 +656,13 @@
   flex-direction: column;
   justify-content: space-between;
 }
+
+.favorites-title, .reviews-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #f1f1f1;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.4rem;
+  text-align: center;
+}

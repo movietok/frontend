@@ -324,68 +324,67 @@ const handlePrevFavPage = () => {
       {/* Group Favorites */}
       {isMember && (
         <section className="favorites-section">
-          <h2>Group Favorites</h2>
-          {favorites.length === 0 ? (
-            <p className="empty-text">No movies yet in favorites.</p>
-          ) : (
-            <>
-            <div className="favorites-container">
-            <div className="favorites-grid">
-  {currentFavorites.map((movie) => (
-    <div key={movie.tmdb_id} className="fav-card-wrapper">
-      <Link to={`/movie/${movie.tmdb_id}`} className="fav-card-link">
-        <div className="fav-card hover-reveal">
-          <img
-            src={movie.poster_url || "https://via.placeholder.com/150x225"}
-            alt={movie.original_title}
-          />
-          <div className="fav-info hover-title">
-            <p className="fav-title">{movie.original_title}</p>
+  {favorites.length === 0 ? (
+    <p className="empty-text">No movies yet in favorites.</p>
+  ) : (
+    <div className="favorites-container">
+      <h2 className="favorites-title">Group Favorites</h2>
+
+      <div className="favorites-grid">
+        {currentFavorites.map((movie) => (
+          <div key={movie.tmdb_id} className="fav-card-wrapper">
+            <Link to={`/movie/${movie.tmdb_id}`} className="fav-card-link">
+              <div className="fav-card hover-reveal">
+                <img
+                  src={movie.poster_url || "https://via.placeholder.com/150x225"}
+                  alt={movie.original_title}
+                />
+                <div className="fav-info hover-title">
+                  <p className="fav-title">{movie.original_title}</p>
+                </div>
+              </div>
+            </Link>
+
+            {isOwner && (
+              <button
+                className="remove-fav-btn"
+                onClick={() => handleRemoveFavorite(movie.tmdb_id)}
+                disabled={removing}
+                title="Remove from favorites"
+              >
+                ✖
+              </button>
+            )}
           </div>
-        </div>
-      </Link>
+        ))}
+      </div>
 
-      {isOwner && (
+      <div className="fav-pagination">
         <button
-          className="remove-fav-btn"
-          onClick={() => handleRemoveFavorite(movie.tmdb_id)}
-          disabled={removing}
-          title="Remove from favorites"
+          className="pagination-btn"
+          onClick={handlePrevFavPage}
+          disabled={favPage === 1}
         >
-          ✖
+          ← Prev
         </button>
-      )}
+
+        <button
+          className="pagination-btn"
+          onClick={handleNextFavPage}
+          disabled={indexOfLastFav >= favorites.length}
+        >
+          Next →
+        </button>
+      </div>
     </div>
-  ))}
-</div>
-
-<div className="fav-pagination">
-  <button
-    className="pagination-btn"
-    onClick={handlePrevFavPage}
-    disabled={favPage === 1}
-  >
-    ← Prev
-  </button>
-
-  <button
-    className="pagination-btn"
-    onClick={handleNextFavPage}
-    disabled={indexOfLastFav >= favorites.length}
-  >
-    Next →
-  </button>
-</div>
-</div>
-</>
-          )}
-        </section>
+  )}
+</section>
       )}
 
       {/* Group Reviews / Activity */}
       {isMember && (
         <section className="reviews-section">
-          <h2>Group Activity</h2>
+          <h2 className="reviews-title">Group Activity</h2>
           {reviews.length === 0 ? (
             <p className="empty-text">No reviews yet from group members.</p>
           ) : (
