@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { getGroupDetails } from "../../services/groups";
+import { Link } from "react-router-dom";
 import {
   getPendingRequests,
   removeMember,
@@ -251,68 +252,55 @@ onGroupUpdated?.({
             ) : (
               <ul className="group-members-modal__list">
                 {members.map((member) => {
-                  const { id, username, role, joined_at } = member;
-                  const label = roleLabels[role] || role;
-                  const joined = joined_at
-                    ? new Date(joined_at).toLocaleDateString()
-                    : "";
-                  const isSelf =
-                    currentUserId && Number(currentUserId) === Number(id);
+  const { id, username, role, joined_at } = member;
+  const label = roleLabels[role] || role;
+  const joined = joined_at
+    ? new Date(joined_at).toLocaleDateString()
+    : "";
+  const isSelf =
+    currentUserId && Number(currentUserId) === Number(id);
 
-                  // 🔹 Corrected permission logic
-                  const canRemove =
-                    (isOwner ||
-                      (isModerator && role === "member")) &&
-                    !isSelf &&
-                    role !== "owner";
+  const canRemove =
+    (isOwner || (isModerator && role === "member")) &&
+    !isSelf &&
+    role !== "owner";
 
-                  const canDemote = isOwner && role === "moderator";
-                  const canPromoteMember = isOwner && role === "member";
+  const canDemote = isOwner && role === "moderator";
+  const canPromoteMember = isOwner && role === "member";
 
-                  return (
-                    <li key={id} className="group-members-modal__row">
-                      <div>
-                        <div className="group-members-modal__name">
-                          {username}
-                        </div>
-                        <div className="group-members-modal__meta">
-                          <span className={`role role-${role}`}>{label}</span>
-                          {joined && <span>Joined {joined}</span>}
-                        </div>
-                      </div>
+  return (
+    <div key={id} className="member-row">
+      {/* ⬇️ Replace the plain username with a clickable Link */}
+      <Link
+        to={`/profile/${id}`}
+        className="member-link"
+        onClick={onClose} // optional: close modal when clicked
+      >
+        {username}
+      </Link>
 
-                      <div className="group-members-modal__actions">
-                        {canPromoteMember && (
-                          <button
-                            onClick={() => handlePromote(id, "moderator")}
-                            disabled={busyId === `role-${id}`}
-                            className="btn-secondary"
-                          >
-                            Promote to Moderator
-                          </button>
-                        )}
-                        {canDemote && (
-                          <button
-                            onClick={() => handlePromote(id, "member")}
-                            disabled={busyId === `role-${id}`}
-                            className="btn-secondary"
-                          >
-                            Demote to Member
-                          </button>
-                        )}
-                        {canRemove && (
-                          <button
-                            onClick={() => handleRemove(id)}
-                            disabled={busyId === `remove-${id}`}
-                            className="btn-danger"
-                          >
-                            Remove
-                          </button>
-                        )}
-                      </div>
-                    </li>
-                  );
-                })}
+      <span className="member-role"> – {label}</span>
+      <span className="member-joined">Joined: {joined}</span>
+
+      {/* existing management buttons below */}
+      {canPromoteMember && (
+        <button className="promote-btn" onClick={() => handlePromote(id)}>
+          Promote
+        </button>
+      )}
+      {canDemote && (
+        <button className="demote-btn" onClick={() => handleDemote(id)}>
+          Demote
+        </button>
+      )}
+      {canRemove && (
+        <button className="remove-btn" onClick={() => handleRemove(id)}>
+          Remove
+        </button>
+      )}
+    </div>
+  );
+})}
               </ul>
             )
           ) : showRequestsTab ? (

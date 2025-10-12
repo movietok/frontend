@@ -6,6 +6,7 @@ import { getGroupReviews } from "../services/reviews";
 import GroupManagementBox from "../components/groups/GroupManagementBox";
 import ReviewCard from "../components/ReviewCard";
 import CopyLinkButton from "../components/CopyLinkButton";
+import fallbackImg from "../images/fallback.png"; 
 import "../styles/GroupDetailsPage.css";
 
 function GroupDetailsPage() {
@@ -422,11 +423,13 @@ const isMember =
     <div className={`group-details-page ${themeMap[group?.theme_id] || ""}`}>
       {/* Header */}
 <div className="group-header">
-  <img
-    src={group.poster_url || "https://via.placeholder.com/200x300?text=No+Image"}
-    alt={group.name}
-    className="group-poster"
-  />
+
+<img
+  src={group.poster_url || fallbackImg}
+  alt={group.name}
+  className="group-poster"
+/>
+
 
   <div className="group-info">
     <div className="group-title-row">

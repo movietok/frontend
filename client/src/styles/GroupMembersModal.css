@@ -241,3 +241,26 @@
     justify-content: flex-start;
   }
 }
+
+.member-link {
+  color: #7fc9ff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.member-link:hover {
+  color: #a9e2ff;
+  text-decoration: underline;
+}
+
+.member-role {
+  color: #aaa;
+  margin-left: 0.4rem;
+}
+
+.member-joined {
+  color: #888;
+  margin-left: 0.8rem;
+  font-size: 0.85rem;
+}
