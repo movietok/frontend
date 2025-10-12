@@ -7,6 +7,7 @@ import GroupManagementBox from "../components/groups/GroupManagementBox";
 import ReviewCard from "../components/ReviewCard";
 import CopyLinkButton from "../components/CopyLinkButton";
 import fallbackImg from "../images/fallback.png"; 
+import OnsitePopup from "../components/Popups/OnsitePopup";
 import "../styles/GroupDetailsPage.css";
 
 function GroupDetailsPage() {
@@ -398,19 +399,31 @@ useEffect(() => {
     navigate("/groups");
   };
 
-  const handleRemoveFavorite = async (tmdb_id) => {
-    if (!window.confirm("Remove this movie from group favorites?")) return;
-    setRemoving(true);
-    try {
-      await removeFavorite(tmdb_id, 3, id);
-      setFavorites((prev) => prev.filter((m) => m.tmdb_id !== tmdb_id));
-    } catch (err) {
-      console.error("Error removing favorite:", err);
-      alert("Failed to remove movie from favorites");
-    } finally {
-      setRemoving(false);
-    }
-  };
+ // --- Group Favorite Removal (with OnsitePopup) ---
+const [showRemovePopup, setShowRemovePopup] = useState(false);
+const [targetFavorite, setTargetFavorite] = useState(null);
+
+const confirmRemoveFavorite = (tmdb_id) => {
+  setTargetFavorite(tmdb_id);
+  setShowRemovePopup(true);
+};
+
+const handleConfirmRemove = async () => {
+  if (!targetFavorite) return;
+  setRemoving(true);
+  try {
+    await removeFavorite(targetFavorite, 3, id);
+    setFavorites((prev) => prev.filter((m) => m.tmdb_id !== targetFavorite));
+  } catch (err) {
+    console.error("Error removing favorite:", err);
+    alert("Failed to remove movie from favorites");
+  } finally {
+    setRemoving(false);
+    setShowRemovePopup(false);
+    setTargetFavorite(null);
+  }
+};
+
 
   if (loading) return <p>Loading...</p>;
   if (!group) return <p>Group not found</p>;
@@ -592,7 +605,7 @@ const themeMap = {
                 {isOwner && (
                   <button
                     className="remove-fav-btn"
-                    onClick={() => handleRemoveFavorite(movie.tmdb_id)}
+                    onClick={() => confirmRemoveFavorite(movie.tmdb_id)}
                     disabled={removing}
                     title="Remove from favorites"
                   >
@@ -686,6 +699,18 @@ const themeMap = {
   <p className="empty-text restricted">
     This group’s favorites and activity are visible to members only.
   </p>
+)}
+
+{showRemovePopup && (
+  <OnsitePopup
+    message="Remove this movie from group favorites?"
+    type="confirm"
+    onConfirm={handleConfirmRemove}
+    onCancel={() => {
+      setShowRemovePopup(false);
+      setTargetFavorite(null);
+    }}
+  />
 )}
 
 </div>
