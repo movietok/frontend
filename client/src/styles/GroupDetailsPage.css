@@ -1043,3 +1043,49 @@
   margin: 2rem 0;
   font-style: italic;
 }
+
+/* ===============================
+   FIX: SECTION BOXES OVERFLOWING PAGE
+   =============================== */
+
+/* Restore proper containment within purple page padding */
+.group-details-page {
+  padding: 2rem 4rem; /* keep nice horizontal breathing room */
+  box-sizing: border-box;
+}
+
+/* Make all major content boxes respect page padding */
+.about-section-wide,
+.favorites-section,
+.reviews-section {
+  max-width: 100%;
+  background: linear-gradient(180deg, #1b1b1b 0%, #121212 100%);
+  border: 1px solid #2c2c2c;
+  border-radius: 12px;
+  padding: 1.8rem 1.5rem;
+  margin: 2rem auto; /* centers within purple background */
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  width: calc(100% - 4rem); /* keeps equal purple borders on sides */
+}
+
+/* Ensure the favorites inner container no longer overrides parent width */
+.favorites-container {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  width: 100%;
+}
+
+/* Align section titles consistently */
+.about-title,
+.favorites-title,
+.reviews-title {
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #f1f1f1;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.4rem;
+}
