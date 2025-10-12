@@ -254,53 +254,90 @@ useEffect(() => {
 }, [group]);
 
   // Refetch when role changes
-  useEffect(() => {
-    if (!group) return;
+  // Refetch or clear when membership changes
+useEffect(() => {
+  if (!group) return;
 
-    const becameMember =
-      group.role === "member" ||
-      group.role === "moderator" ||
-      group.role === "owner" ||
-      group.is_member === true ||
-      group.is_owner === true;
+  const isMemberNow =
+    group.role === "member" ||
+    group.role === "moderator" ||
+    group.role === "owner" ||
+    group.is_member === true ||
+    group.is_owner === true;
 
-    if (becameMember) {
-      let cancelled = false;
-      (async () => {
-        try {
-          await loadMemberData(
-            id,
-            (vals) => { if (!cancelled) setFavorites(vals); },
-            (vals) => { if (!cancelled) setReviews(vals); }
-          );
-        } catch (e) {
-          console.error("Error loading member data:", e);
-        }
-      })();
-      return () => { cancelled = true; };
-    } else {
-      setFavorites([]);
-      setReviews([]);
-    }
-  }, [group?.role, group?.is_member, group?.is_owner, id]);
+  if (isMemberNow) {
+    // ✅ User is a member or higher — load data
+    let cancelled = false;
+    (async () => {
+      try {
+        await loadMemberData(
+          id,
+          (vals) => { if (!cancelled) setFavorites(vals); },
+          (vals) => { if (!cancelled) setReviews(vals); }
+        );
+      } catch (e) {
+        console.error("Error loading member data:", e);
+      }
+    })();
+    return () => { cancelled = true; };
+  } else {
+    // 🚫 User left or got removed — fully clear data and membership cache
+    setIsMemberCached(false);
+    setFavorites([]);
+    setReviews([]);
+    setGroup((prev) => ({
+      ...prev,
+      is_member: false,
+      role: "none",
+    }));
+  }
+}, [group?.role, group?.is_member, group?.is_owner, id]);
+
 
  const handleGroupUpdated = async (updatedGroup) => {
-  // The object Edit Group Modal sends back
-  const g = updatedGroup?.group ?? updatedGroup;
+  // Accept both { group: {...} } or plain group object
+  const gRaw = updatedGroup?.group ?? updatedGroup ?? {};
+  const roleStr = String(gRaw.role ?? "").toLowerCase();
 
-  // 🧩 Normalize immediate update (the modal may omit members[] and flags)
+  // Check if current user is removed / left / pending
+  const removedFromMembersArray =
+    Array.isArray(gRaw.members) &&
+    currentUserId != null &&
+    !gRaw.members.some((m) => Number(m.id) === Number(currentUserId));
+
+  const leaving =
+    gRaw.is_member === false ||
+    roleStr === "none" ||
+    roleStr === "pending" ||
+    removedFromMembersArray;
+
+  if (leaving) {
+    // 🚨 Instantly clear membership and member-only data
+    setIsMemberCached(false);
+    setFavorites([]);
+    setReviews([]);
+    setGroup((prev) => ({
+      ...prev,
+      ...gRaw,
+      is_member: false,
+      role: "none",
+    }));
+    return; // stop here — don’t re-fetch
+  }
+
+  // ---------- Existing normal update logic ----------
   const normalizedImmediate = (() => {
-    const n = { ...g };
+    const n = { ...gRaw };
     if (currentUserId) {
       n.is_owner =
         n.is_owner ??
-        Number(n.owner_id) === Number(currentUserId) ??
+        (Number(n.owner_id) === Number(currentUserId)) ??
         false;
       n.is_member =
         n.is_member ??
         (Array.isArray(n.members)
           ? n.members.some((m) => Number(m.id) === Number(currentUserId))
-          : true); // assume still member after editing
+          : true);
       n.role =
         n.role ??
         (Array.isArray(n.members)
@@ -310,7 +347,6 @@ useEffect(() => {
     return n;
   })();
 
-  // Merge the immediate normalized object so UI doesn’t flicker
   setGroup((prev) => ({
     ...prev,
     ...normalizedImmediate,
@@ -320,15 +356,12 @@ useEffect(() => {
     is_owner: normalizedImmediate.is_owner ?? prev.is_owner,
   }));
 
-  // Cache remains valid
   setIsMemberCached(true);
 
   try {
-    // 🔄 Re-fetch the latest data from backend to update genres etc.
     const refreshed = await getGroupDetails(id);
     const freshGroup = refreshed?.group ?? refreshed;
 
-    // Normalize the refreshed data the same way
     const normalizedFresh = (() => {
       const n = { ...freshGroup };
       if (currentUserId && Array.isArray(freshGroup?.members)) {
@@ -346,7 +379,6 @@ useEffect(() => {
       return n;
     })();
 
-    // Final merge
     setGroup((prev) => ({
       ...prev,
       ...normalizedFresh,
@@ -358,22 +390,8 @@ useEffect(() => {
   } catch (err) {
     console.error("Failed to refresh group details after update:", err);
   }
-
-  // If truly downgraded to non-member (rare), clear data
-  const notMember =
-    !(
-      normalizedImmediate.role === "member" ||
-      normalizedImmediate.role === "moderator" ||
-      normalizedImmediate.role === "owner"
-    ) &&
-    !normalizedImmediate.is_member &&
-    !normalizedImmediate.is_owner;
-
-  if (notMember) {
-    setFavorites([]);
-    setReviews([]);
-  }
 };
+
 
 
   const handleGroupDeleted = () => {
