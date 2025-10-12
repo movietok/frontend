@@ -39,10 +39,34 @@ function GroupDetailsPage() {
     }
   };
 
+  const [favPage, setFavPage] = useState(1);
+const favoritesPerPage = 10;
+
+const indexOfLastFav = favPage * favoritesPerPage;
+const indexOfFirstFav = indexOfLastFav - favoritesPerPage;
+const currentFavorites = favorites.slice(indexOfFirstFav, indexOfLastFav);
+
+const handleNextFavPage = () => {
+  if (indexOfLastFav < favorites.length) {
+    setFavPage((prev) => prev + 1);
+  }
+};
+
+const handlePrevFavPage = () => {
+  if (favPage > 1) {
+    setFavPage((prev) => prev - 1);
+  }
+};
+
   // Reset to first page when review count changes
   useEffect(() => {
     setCurrentPage(1);
   }, [reviews.length]);
+
+  useEffect(() => {
+  setFavPage(1);
+}, [favorites.length]);
+
 
   console.log("Rendered group object:", group);
 
@@ -304,35 +328,56 @@ function GroupDetailsPage() {
           {favorites.length === 0 ? (
             <p className="empty-text">No movies yet in favorites.</p>
           ) : (
+            <>
+            <div className="favorites-container">
             <div className="favorites-grid">
-              {favorites.map((movie) => (
-                <div key={movie.tmdb_id} className="fav-card-wrapper">
-                  <Link to={`/movie/${movie.tmdb_id}`} className="fav-card-link">
-                    <div className="fav-card">
-                      <img
-                        src={movie.poster_url || "https://via.placeholder.com/150x225"}
-                        alt={movie.original_title}
-                      />
-                      <div className="fav-info">
-                        <p className="fav-title">{movie.original_title}</p>
-                        <span className="fav-year">{movie.release_year}</span>
-                      </div>
-                    </div>
-                  </Link>
+  {currentFavorites.map((movie) => (
+    <div key={movie.tmdb_id} className="fav-card-wrapper">
+      <Link to={`/movie/${movie.tmdb_id}`} className="fav-card-link">
+        <div className="fav-card hover-reveal">
+          <img
+            src={movie.poster_url || "https://via.placeholder.com/150x225"}
+            alt={movie.original_title}
+          />
+          <div className="fav-info hover-title">
+            <p className="fav-title">{movie.original_title}</p>
+          </div>
+        </div>
+      </Link>
 
-                  {isOwner && (
-                    <button
-                      className="remove-fav-btn"
-                      onClick={() => handleRemoveFavorite(movie.tmdb_id)}
-                      disabled={removing}
-                      title="Remove from favorites"
-                    >
-                      ✖
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
+      {isOwner && (
+        <button
+          className="remove-fav-btn"
+          onClick={() => handleRemoveFavorite(movie.tmdb_id)}
+          disabled={removing}
+          title="Remove from favorites"
+        >
+          ✖
+        </button>
+      )}
+    </div>
+  ))}
+</div>
+
+<div className="fav-pagination">
+  <button
+    className="pagination-btn"
+    onClick={handlePrevFavPage}
+    disabled={favPage === 1}
+  >
+    ← Prev
+  </button>
+
+  <button
+    className="pagination-btn"
+    onClick={handleNextFavPage}
+    disabled={indexOfLastFav >= favorites.length}
+  >
+    Next →
+  </button>
+</div>
+</div>
+</>
           )}
         </section>
       )}
@@ -370,7 +415,7 @@ function GroupDetailsPage() {
                   onClick={handlePrevPage}
                   disabled={currentPage === 1}
                 >
-                  ← Previous
+                  ← Prev
                 </button>
 
                 <button
