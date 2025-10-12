@@ -12,9 +12,10 @@
   height: var(--navbar-height);
   z-index: 1000;
   background-color: #335355;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
+  gap: 2rem;
   padding: 0 2rem;
   box-sizing: border-box;
 }
@@ -28,11 +29,11 @@
 
 /* Search bar */
 .search-form {
-  flex: 1;
   max-width: 400px;
-  margin: 0 2rem;
+  margin: 0 auto;
   display: flex;
   justify-content: center;
+  width: 100%;
 }
 
 
