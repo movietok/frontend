@@ -65,6 +65,9 @@ export default function Login() {
         setModalMessage(res.data?.message || "Login failed")
         setHideOkButton(false) // ✅ show OK button for manual dismissal
         setShowModal(true)
+        
+        // 🎵 Rickroll on login fail
+        window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank')
       }
     } catch (err) {
       console.error('Login error:', err)
@@ -73,6 +76,9 @@ export default function Login() {
       setModalMessage(errorMessage)
       setHideOkButton(false) // ✅ show OK button for manual dismissal
       setShowModal(true)
+      
+      // 🎵 Rickroll on login fail
+      window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank')
     }
   }
 
