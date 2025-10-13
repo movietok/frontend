@@ -178,9 +178,6 @@ function HomePage() {
 
   return (
     <div className="homepage-container">
-      <div className="logo-container">
-        <img src={logo} alt="Movietok Logo" className="homepage-logo" />
-      </div>
 
       <main className="homepage-main">
         <PopularMovies movies={movies} />
