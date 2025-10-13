@@ -12,6 +12,7 @@ export default function Login() {
   const [modalTitle, setModalTitle] = useState("")
   const [modalMessage, setModalMessage] = useState("")
   const [hideOkButton, setHideOkButton] = useState(false) // ✅ new state to control OK button visibility
+  const [showRickroll, setShowRickroll] = useState(false) // 🎵 Rickroll popup state
   const navigate = useNavigate()
   const { login } = useAuth()
 
@@ -66,8 +67,8 @@ export default function Login() {
         setHideOkButton(false) // ✅ show OK button for manual dismissal
         setShowModal(true)
         
-        // 🎵 Rickroll on login fail
-        window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank')
+        // 🎵 Rickroll popup on login fail
+        setShowRickroll(true)
       }
     } catch (err) {
       console.error('Login error:', err)
@@ -77,8 +78,8 @@ export default function Login() {
       setHideOkButton(false) // ✅ show OK button for manual dismissal
       setShowModal(true)
       
-      // 🎵 Rickroll on login fail
-      window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank')
+      // 🎵 Rickroll popup on login fail
+      setShowRickroll(true)
     }
   }
 
@@ -127,6 +128,70 @@ export default function Login() {
         onOk={handleOk}
         hideOkButton={true} // ✅ pass prop to control button visibility
       />
+
+      {/* 🎵 Rickroll Video Popup */}
+      {showRickroll && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 9999,
+            padding: '20px'
+          }}
+          onClick={() => setShowRickroll(false)}
+        >
+          <div
+            style={{
+              position: 'relative',
+              width: '100%',
+              maxWidth: '800px',
+              aspectRatio: '16/9'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowRickroll(false)}
+              style={{
+                position: 'absolute',
+                top: '-40px',
+                right: '0',
+                background: '#ff4d4d',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                padding: '8px 16px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                zIndex: 10000
+              }}
+            >
+              ✕ Close
+            </button>
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=20-DC-TrCWvsH-mF&autoplay=1&start=3"
+              title="YouTube video player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+              style={{
+                borderRadius: '8px',
+                boxShadow: '0 4px 20px rgba(255, 77, 77, 0.5)'
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
