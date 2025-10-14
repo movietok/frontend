@@ -68,7 +68,7 @@ function HomePage() {
       discoverMovies({ page: 1 })
         .then((data) => {
           // data.results is already normalized by TMDBService
-          const movies = Array.isArray(data?.results) ? data.results.slice(0, 20) : []
+          const movies = Array.isArray(data?.results) ? data.results.slice(0, 100) : []
           setMovies(movies)
           
           // Cache the data
@@ -113,7 +113,7 @@ function HomePage() {
           
           if (response?.success && Array.isArray(response.results)) {
             // Format for NowPlayingMovies component
-            const formatted = response.results.slice(0, 10).map(movie => ({
+            const formatted = response.results.slice(0, 100).map(movie => ({
               id: movie.id,
               tmdbId: movie.id,
               finnkinoId: movie.f_id,

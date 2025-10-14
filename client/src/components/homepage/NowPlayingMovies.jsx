@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Carousel from "../Carousel";
+import errorlogo from "../../images/404_n.png";
 
 function NowPlayingMovies({ movies }) {
   return (
@@ -15,7 +16,7 @@ function NowPlayingMovies({ movies }) {
         renderItem={(movie) => {
           const movieLink = movie.tmdbId ? `/movie/${movie.tmdbId}` : "#";
           const posterSrc =
-            movie.image || "https://via.placeholder.com/200x300?text=No+Image";
+            movie.image || errorlogo;
 
           return (
             <Link to={movieLink} className="movie-card">
@@ -23,8 +24,7 @@ function NowPlayingMovies({ movies }) {
                 src={posterSrc}
                 alt={movie.title}
                 onError={(e) => {
-                  e.target.src =
-                    "https://via.placeholder.com/200x300?text=No+Image";
+                  e.target.src = errorlogo;
                 }}
               />
               <div className="movie-overlay">
