@@ -29,8 +29,6 @@ function NowPlayingMovies({ movies }) {
               />
               <div className="movie-overlay">
                 <h4>{movie.title}</h4>
-                <p>⭐ {movie.rating ? movie.rating.toFixed(1) : "N/A"}</p>
-                {movie.year && <p>{movie.year}</p>}
               </div>
             </Link>
           );

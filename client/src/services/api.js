@@ -52,6 +52,7 @@ export const favoritesAPI = axios.create({
 
 //  Movie & schedule API methods
 // Hae teatterialueet
+/*
 export const fetchAreas = async () => {
   const res = await api.get("/theatres")
   return res.data.theatreAreas // backend palauttaa theatreAreas
@@ -72,6 +73,7 @@ export const fetchMovies = async () => {
   const res = await api.get("/events") 
   return res.data.events
 }
+  */
 
 // Hae elokuvia hakusanalla
 export const searchMovies = async (query) => {

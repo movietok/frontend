@@ -9,9 +9,7 @@ import PopularGroups from "../components/homepage/PopularGroups";
 import MostActiveUsers from "../components/homepage/MostActiveUsers";
 import PopularUsers from "../components/homepage/PopularUsers";
 
-import { discoverMovies } from "../services/tmdb"; // use same endpoint as BrowsePage
-import { fetchNowPlayingEvents, enrichShowsWithTMDB } from "../services/finnkinoApi";
-import { searchMovieByTitleYear } from "../services/tmdb";
+import { discoverMovies, getNowInTheaters } from "../services/tmdb"; // use same endpoint as BrowsePage
 import { getPopularGroups } from "../services/groups";
 import {
   getRecentReviews,
@@ -83,66 +81,67 @@ function HomePage() {
         .catch(console.error)
     }
 
-    // Fetch Now Playing from Finnkino and enrich with TMDB
-    const CACHE_KEY = 'finnkino_now_playing'
+    // Fetch Now Playing from backend (Finnkino + TMDB enriched)
+    const NOW_PLAYING_CACHE_KEY = 'now_playing_movies'
     
     // Check cache first
-    const cachedData = sessionStorage.getItem(CACHE_KEY)
-    if (cachedData) {
+    const cachedNowPlaying = sessionStorage.getItem(NOW_PLAYING_CACHE_KEY)
+    if (cachedNowPlaying) {
       try {
-        const { data, timestamp } = JSON.parse(cachedData)
+        const { data, timestamp } = JSON.parse(cachedNowPlaying)
         const isExpired = Date.now() - timestamp > CACHE_DURATION
         
         if (!isExpired && Array.isArray(data) && data.length > 0) {
-          console.log('✅ Using cached Finnkino data:', data.length, 'movies')
+          console.log('✅ Using cached Now Playing data:', data.length, 'movies')
           setFinnkino(data)
-          setReviews(mockReviews);
-          setGroups(mockGroups);
-          setActiveUsers(mockActiveUsers);
-          setPopularUsers(mockPopularUsers);
-          return
+        } else {
+          fetchNowPlayingMovies()
         }
       } catch (error) {
-        console.warn('⚠️ Failed to parse cached data:', error)
+        console.warn('⚠️ Failed to parse cached Now Playing data:', error)
+        fetchNowPlayingMovies()
       }
+    } else {
+      fetchNowPlayingMovies()
     }
     
-    // Fetch fresh data if no valid cache
-    console.log('🔄 Fetching fresh Finnkino data...')
-    fetchNowPlayingEvents()
-      .then(async (events) => {
-        console.log('🎬 Fetched Finnkino events:', events.length);
-        
-        // Enrich with TMDB data (limit to first 10)
-        const limitedEvents = events.slice(0, 10)
-        const enriched = await enrichShowsWithTMDB(limitedEvents, searchMovieByTitleYear);
-        
-        // Format for NowPlayingMovies component
-        const formatted = enriched.map(event => ({
-          id: event.tmdbId || event.id,
-          tmdbId: event.tmdbId,
-          finnkinoId: event.id,
-          title: event.originalTitle || event.title,
-          image: event.posterPath || event.images?.eventMediumImagePortrait || '',
-          rating: event.voteAverage || null,
-          year: event.productionYear,
-          overview: event.overview
-        }));
-        
-        console.log('✅ Formatted Now Playing movies:', formatted.length);
-        
-        // Cache the data
-        sessionStorage.setItem(CACHE_KEY, JSON.stringify({
-          data: formatted,
-          timestamp: Date.now()
-        }))
-        
-        setFinnkino(formatted);
-      })
-      .catch((error) => {
-        console.error('❌ Error fetching Finnkino events:', error);
-        setFinnkino(mockFinnkino); // Fallback to mock data
-      });
+    function fetchNowPlayingMovies() {
+      console.log('🔄 Fetching fresh Now Playing movies...')
+      getNowInTheaters()
+        .then((response) => {
+          console.log('🎬 Fetched Now Playing:', response);
+          
+          if (response?.success && Array.isArray(response.results)) {
+            // Format for NowPlayingMovies component
+            const formatted = response.results.slice(0, 10).map(movie => ({
+              id: movie.id,
+              tmdbId: movie.id,
+              finnkinoId: movie.f_id,
+              title: movie.originalTitle,
+              image: movie.posterPath || 'https://via.placeholder.com/200x300?text=No+Poster',
+              year: movie.releaseYear,
+              overview: movie.overview || ''
+            }));
+            
+            console.log('✅ Formatted Now Playing movies:', formatted.length);
+            
+            // Cache the data
+            sessionStorage.setItem(NOW_PLAYING_CACHE_KEY, JSON.stringify({
+              data: formatted,
+              timestamp: Date.now()
+            }))
+            
+            setFinnkino(formatted);
+          } else {
+            console.warn('⚠️ Unexpected response format:', response)
+            setFinnkino(mockFinnkino);
+          }
+        })
+        .catch((error) => {
+          console.error('❌ Error fetching Now Playing movies:', error);
+          setFinnkino(mockFinnkino); // Fallback to mock data
+        });
+    }
 
 
     // Recent Reviews
