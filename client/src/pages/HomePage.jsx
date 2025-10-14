@@ -113,7 +113,7 @@ function HomePage() {
           
           if (response?.success && Array.isArray(response.results)) {
             // Format for NowPlayingMovies component
-            const formatted = response.results.slice(0, 10).map(movie => ({
+            const formatted = response.results.slice(0, 100).map(movie => ({
               id: movie.id,
               tmdbId: movie.id,
               finnkinoId: movie.f_id,
