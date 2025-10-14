@@ -97,7 +97,24 @@
 
 @media (max-width: 640px) {
   .browse-page {
-    --browse-grid-cols: 1;
+    --browse-grid-cols: 2;
     padding-block: 1.5rem;
+  }
+
+  .mt-movies-wrap {
+    --browse-gap-x: 20px;
+    --browse-gap-y: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .browse-page {
+    --browse-grid-cols: 2;
+  }
+}
+
+@media (max-width: 360px) {
+  .browse-page {
+    --browse-grid-cols: 1;
   }
 }
