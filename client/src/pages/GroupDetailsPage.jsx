@@ -578,7 +578,7 @@ const themeMap = {
 
           <div className="favorites-grid">
             {currentFavorites.map((movie) => (
-              <div key={movie.tmdb_id} className="fav-card-wrapper">
+              <div key={movie.tmdb_id} className="favorites-grid-card">
                 <Link to={`/movie/${movie.tmdb_id}`} className="fav-card-link">
                   <div className="fav-card hover-reveal">
                     <img
