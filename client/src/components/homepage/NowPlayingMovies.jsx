@@ -15,7 +15,7 @@ function NowPlayingMovies({ movies }) {
         renderItem={(movie) => {
           const movieLink = movie.tmdbId ? `/movie/${movie.tmdbId}` : "#";
           const posterSrc =
-            movie.image || "https://via.placeholder.com/200x300?text=No+Image";
+            movie.image || "/images/404.png";
 
           return (
             <Link to={movieLink} className="movie-card">
@@ -23,8 +23,7 @@ function NowPlayingMovies({ movies }) {
                 src={posterSrc}
                 alt={movie.title}
                 onError={(e) => {
-                  e.target.src =
-                    "https://via.placeholder.com/200x300?text=No+Image";
+                  e.target.src = "/images/404.png";
                 }}
               />
               <div className="movie-overlay">

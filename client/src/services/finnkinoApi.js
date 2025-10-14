@@ -5,9 +5,8 @@ const FINNKINO_BASE_URL = 'https://www.finnkino.fi/xml'
 
 // Theatre areas list
 const THEATRE_AREAS = [
-  { id: '1029', name: 'Valitse alue/teatteri' },
-  { id: '1014', name: 'Pääkaupunkiseutu (pl. Espoo)' },
-  { id: '1012', name: 'Espoo: liput beta.finnkino.fi-sivustolta' },
+  { id: '1029', name: 'Select Area/Ttheatre' },
+  { id: '1014', name: 'Pääkaupunkiseutu (ex. Espoo)' },
   { id: '1002', name: 'Helsinki' },
   { id: '1045', name: 'Helsinki: ITIS' },
   { id: '1031', name: 'Helsinki: KINOPALATSI' },
