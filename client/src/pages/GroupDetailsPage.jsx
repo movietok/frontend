@@ -21,7 +21,6 @@ function GroupDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [removing, setRemoving] = useState(false);
   const [showFullAbout, setShowFullAbout] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [showAllGenres, setShowAllGenres] = useState(false);
 
 
@@ -473,21 +472,11 @@ const themeMap = {
 
   <div className="group-info">
     <div className="group-title-row">
-  <h1 className="group-title">
-    {group.name}
-    <button
-      className={`copylink-btn-inline ${copied ? "copied" : ""}`}
-      onClick={() => {
-        navigator.clipboard.writeText(window.location.href);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 1500);
-      }}
-      title="Copy group link"
-    >
-      {copied ? "✓" : "🔗"}
-    </button>
-  </h1>
-</div>
+      <h1 className="group-title">
+        {group.name}
+        <CopyLinkButton label="🔗" className="copylink-btn-inline" title="Copy Group Link" />
+      </h1>
+    </div>
 
     {group.genre_tags && (
       <p className="group-genres">{group.genre_tags.join(", ")}</p>

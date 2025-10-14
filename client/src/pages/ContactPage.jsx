@@ -7,24 +7,28 @@ export default function ContactPage() {
         <h1 className="contact-title">Contact Us</h1>
 
         <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin in
-          faucibus nulla, non porttitor leo. Aenean laoreet, augue nec mollis
-          congue, lorem ligula interdum lorem, nec tincidunt arcu nisl non justo.
+          We're here to help! Whether you have questions about MovieTok, need technical support,
+          or want to suggest new features, our team is ready to assist. Choose the most appropriate
+          contact method below for the fastest response.
         </p>
 
         <ul className="contact-list">
           <li>
-            <strong>Lorem Department – Dolor</strong><br />
-            <a href="mail" className="contact-link">lorem ipsum.com</a>
+            <strong>Technical Support</strong><br />
+            <span className="contact-link">support@movietok.com</span>
           </li>
           <li>
-            <strong>Ipsum Division – Sit Amet</strong><br />
-            <a href="mail" className="contact-link">ipsum dolor.com</a>
+            <strong>Business & Partnerships</strong><br />
+            <span className="contact-link">partnerships@movietok.com</span>
+          </li>
+          <li>
+            <strong>Feature Suggestions</strong><br />
+            <span className="contact-link">feedback@movietok.com</span>
           </li>
         </ul>
 
         <p className="contact-footer">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit 🎬
+          Follow us on social media for the latest updates and movie discussions! 🎬
         </p>
       </div>
     </div>
