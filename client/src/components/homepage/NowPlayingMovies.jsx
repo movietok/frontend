@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Carousel from "../Carousel";
-import errorlogo from "../images/404.png"
+import errorlogo from "../images/404_n.png";
 
 function NowPlayingMovies({ movies }) {
   return (
