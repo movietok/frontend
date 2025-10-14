@@ -52,3 +52,14 @@ export async function searchMovieByTitleYear(originalTitle, year, finnkinoEventI
     return null;
   }
 }
+
+// Fetch Now Playing movies from backend (Finnkino + TMDB enriched)
+export async function getNowInTheaters() {
+  try {
+    const res = await axios.get(`${API_BASE}/tmdb/in-theaters`);
+    return res.data;
+  } catch (error) {
+    console.error('Error fetching Now In Theaters:', error);
+    return { success: false, results: [] };
+  }
+}
