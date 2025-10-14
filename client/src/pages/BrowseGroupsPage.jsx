@@ -124,31 +124,18 @@ function BrowseGroupsPage() {
     setTotalPages(Math.max(1, Math.ceil(source.length / itemsPerPage)));
   }, [groups, searchResults, isSearchMode]);
 
-  // Sidebar + content layout
-  const layoutStyle = {
-    display: "grid",
-    gridTemplateColumns: "260px 1fr",
-    columnGap: "3rem",
-    alignItems: "start",
-  };
-  const sidebarStyle = {
-    position: "sticky",
-    top: "96px",
-    width: "260px",
-  };
-
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
-      <div style={layoutStyle}>
+    <div className="browse-groups-page">
+      <div className="browse-groups-layout">
         {/* Sidebar */}
-        <aside style={sidebarStyle}>
+        <aside className="browse-groups-sidebar">
           <GenreSelector
             genres={genres}
             selectedGenres={selectedGenresDraft}
             onToggle={toggleGenre}
           />
 
-          <div className="space-y-2" style={{ marginTop: "20px" }}>
+          <div className="browse-groups-actions">
             <button
               onClick={applySearch}
               className="w-full px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
@@ -178,16 +165,10 @@ function BrowseGroupsPage() {
         </aside>
 
         {/* Groups */}
-        <main style={{ minWidth: 0 }}>
+        <main className="browse-groups-content">
           {isSearchMode && (
-            <div style={{ marginBottom: "2rem" }}>
-              <h2
-                style={{
-                  fontSize: "1.5rem",
-                  marginBottom: "1rem",
-                  color: "#333",
-                }}
-              >
+            <div className="browse-groups-meta">
+              <h2>
                 Results for: "{query}" ({searchResults.length} found)
               </h2>
             </div>
@@ -198,9 +179,7 @@ function BrowseGroupsPage() {
           ) : (
             <>
               {visibleGroups.length === 0 ? (
-                <div
-                  style={{ textAlign: "center", padding: "2rem", color: "#666" }}
-                >
+                <div className="browse-groups-empty">
                   <p>No results found.</p>
                 </div>
               ) : (
@@ -213,7 +192,7 @@ function BrowseGroupsPage() {
                 </div>
               )}
 
-              <div style={{ height: 48 }} />
+              <div className="browse-groups-pagination-spacer" />
 
               {/* Pagination */}
               {totalPages > 1 && (

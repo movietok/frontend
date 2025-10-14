@@ -113,22 +113,10 @@ function BrowsePage() {
     setAppliedGenres([]);
   };
 
-  const layoutStyle = {
-    display: "grid",
-    gridTemplateColumns: "260px 1fr",
-    columnGap: "3rem",
-    alignItems: "start",
-  };
-  const sidebarStyle = {
-    position: "sticky",
-    top: "96px",
-    width: "260px",
-  };
-
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
-      <div style={layoutStyle}>
-        <aside style={sidebarStyle}>
+    <div className="browse-page">
+      <div className="browse-layout">
+        <aside className="browse-sidebar">
           <GenreSelector
             genres={genres}
             selectedGenres={selectedGenresDraft}
@@ -136,7 +124,7 @@ function BrowsePage() {
           />
 
           {/* Added breathing room between genres and buttons */}
-          <div className="space-y-2" style={{ marginTop: "20px" }}>
+          <div className="space-y-2 mt-5">
             <button
               onClick={applySearch}
               className="w-full px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
@@ -155,16 +143,10 @@ function BrowsePage() {
           </div>
         </aside>
 
-        <main style={{ minWidth: 0 }}>
+        <main className="browse-content">
           {isSearchMode && (
-            <div style={{ marginBottom: "2rem" }}>
-              <h2
-                style={{
-                  fontSize: "1.5rem",
-                  marginBottom: "1rem",
-                  color: "#333",
-                }}
-              >
+            <div className="browse-search-meta">
+              <h2>
                 Hakutulokset haulle: "{query}" ({searchResults.length} tulosta)
               </h2>
             </div>
@@ -175,9 +157,7 @@ function BrowsePage() {
           ) : (
             <>
               {isSearchMode && searchResults.length === 0 ? (
-                <div
-                  style={{ textAlign: "center", padding: "2rem", color: "#666" }}
-                >
+                <div className="browse-empty-state">
                   <p>Ei tuloksia haulle "{query}"</p>
                 </div>
               ) : (
@@ -190,12 +170,8 @@ function BrowsePage() {
                       };
 
                     return (
-  <div
-    className="movie-hover-wrapper mt-movie-tile group"
-    key={`${movie.id}-${page}`} // unique key fix
-    style={{ position: "relative" }}
-  >
-    <MovieCard movie={movie} />
+                      <div className="movie-hover-wrapper mt-movie-tile group" key={`${movie.id}-${page}`}>
+                        <MovieCard movie={movie} />
 
 
                         {(!user || !statusLoading) && (
@@ -230,7 +206,7 @@ function BrowsePage() {
                 </div>
               )}
 
-              <div style={{ height: 48 }} />
+              <div className="browse-pagination-spacer" />
 
               {!isSearchMode && (
                 <div className="flex justify-center gap-3 pb-8">

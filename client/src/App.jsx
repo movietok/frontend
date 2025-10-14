@@ -21,53 +21,47 @@ import FaqPage from "./pages/FaqPage"
 import TermsPage from "./pages/TermsPage"
 import ContactPage from "./pages/ContactPage"
 import WatchlistPage from "./pages/WatchlistPage"
+import ResponsiveContainer from "./components/layout/ResponsiveContainer"
+import "./App.css"
 
 function App() {
   return (
     <AuthProvider>
-    <BrowserRouter>
-      <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-        <Navbar />
+      <BrowserRouter>
+        <div className="app-shell">
+          <Navbar />
 
-          <main
-          style={{
-            flex: 1,
-            maxWidth: "1280px",
-            margin: "0 auto",
-            paddingTop: "80px", // Lisää tilaa Navbarille
-            paddingLeft: "2rem",
-            paddingRight: "2rem", 
-            paddingBottom: "2rem",
-          }}
-        >
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/homepage" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/favorites/:userId" element={<FavoritesPage />} />
-            <Route path="/search" element={<SearchResultsPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/profile/:userId" element={<ProfilePage />} />  
-            <Route path="/schedule" element={<ShowTimesPage />} />
-            <Route path="/reviews" element={<ReviewsPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/browse" element={<BrowsePage key="browse" />} />   
-            <Route path="/groups" element={<BrowseGroupsPage />} />       
-            <Route path="/movie/:id" element={<MovieDetailsPage />} />
-            <Route path="/groups/:id" element={<GroupDetailsPage />} />
-            <Route path="/groups/create" element={<CreateGroupPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/faq" element={<FaqPage />} />
-            <Route path="/terms" element={<TermsPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/watchlist" element={<WatchlistPage />} />
-          </Routes>
-        </main>
+          <main className="app-main">
+            <ResponsiveContainer>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/homepage" element={<HomePage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/favorites/:userId" element={<FavoritesPage />} />
+                <Route path="/search" element={<SearchResultsPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/profile/:userId" element={<ProfilePage />} />
+                <Route path="/schedule" element={<ShowTimesPage />} />
+                <Route path="/reviews" element={<ReviewsPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/browse" element={<BrowsePage key="browse" />} />
+                <Route path="/groups" element={<BrowseGroupsPage />} />
+                <Route path="/movie/:id" element={<MovieDetailsPage />} />
+                <Route path="/groups/:id" element={<GroupDetailsPage />} />
+                <Route path="/groups/create" element={<CreateGroupPage />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/faq" element={<FaqPage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/watchlist" element={<WatchlistPage />} />
+              </Routes>
+            </ResponsiveContainer>
+          </main>
 
-        <Footer />
-      </div>
-    </BrowserRouter>
+          <Footer />
+        </div>
+      </BrowserRouter>
     </AuthProvider>
   )
 }

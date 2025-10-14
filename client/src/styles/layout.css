@@ -1,0 +1,73 @@
+:root {
+  --container-width-default: 1120px;
+  --container-width-wide: 1360px;
+  --container-width-narrow: 920px;
+}
+
+.responsive-container {
+  --container-max-width: var(--container-width-default);
+  width: min(100%, var(--container-max-width));
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(1rem, 4vw, 2.5rem);
+  padding-right: clamp(1rem, 4vw, 2.5rem);
+  box-sizing: border-box;
+}
+
+.responsive-container--wide {
+  --container-max-width: var(--container-width-wide);
+}
+
+.responsive-container--narrow {
+  --container-max-width: var(--container-width-narrow);
+}
+
+@media (max-width: 1024px) {
+  .responsive-container {
+    padding-left: clamp(0.75rem, 4vw, 1.75rem);
+    padding-right: clamp(0.75rem, 4vw, 1.75rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .responsive-container {
+    padding-left: clamp(0.75rem, 6vw, 1.25rem);
+    padding-right: clamp(0.75rem, 6vw, 1.25rem);
+  }
+}
+
+.responsive-grid {
+  display: grid;
+  gap: var(--grid-gap, 1.5rem);
+  grid-template-columns: repeat(auto-fit, minmax(var(--grid-min, 220px), 1fr));
+}
+
+.stack-sm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.stack-md {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.stack-lg {
+  display: flex;
+  flex-direction: column;
+  gap: 2.25rem;
+}
+
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .hide-desktop {
+    display: none !important;
+  }
+}

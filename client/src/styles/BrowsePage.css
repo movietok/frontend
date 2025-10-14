@@ -1,46 +1,103 @@
-:root {
-  --mt-grid-cols: 4;
-  --mt-gap-x: 28px;
-  --mt-gap-y: 36px;
+.browse-page {
+  --browse-grid-cols: 4;
+  --browse-gap-x: 28px;
+  --browse-gap-y: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 4vw, 3rem);
+  padding-block: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.browse-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: clamp(2rem, 4vw, 3rem);
+  align-items: flex-start;
+}
+
+.browse-sidebar {
+  position: sticky;
+  top: calc(var(--navbar-offset, 80px) + 16px);
+  max-width: 260px;
+  width: 100%;
+  align-self: start;
+}
+
+.browse-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.browse-search-meta h2 {
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.browse-empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.browse-pagination-spacer {
+  height: 3rem;
 }
 
 .mt-movies-wrap {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--mt-gap-y) var(--mt-gap-x);
+  gap: var(--browse-gap-y) var(--browse-gap-x);
   align-items: flex-start;
   width: 100%;
 }
 
-/* 🎞️ Each movie tile */
 .mt-movie-tile {
   flex: 0 0 calc(
-    (100% - (var(--mt-grid-cols) - 1) * var(--mt-gap-x)) / var(--mt-grid-cols)
+    (100% - (var(--browse-grid-cols) - 1) * var(--browse-gap-x)) / var(--browse-grid-cols)
   );
   display: flex;
   min-width: 0;
 }
 
-/* 🃏 Movie card fills tile */
 .mt-movie-tile > .movie-card {
   width: 100%;
 }
 
-/* 📱 Responsive breakpoints */
+.movie-hover-wrapper {
+  position: relative;
+}
+
 @media (max-width: 1280px) {
-  :root {
-    --mt-grid-cols: 3;
+  .browse-page {
+    --browse-grid-cols: 3;
+  }
+
+  .browse-layout {
+    grid-template-columns: 220px 1fr;
   }
 }
 
 @media (max-width: 900px) {
-  :root {
-    --mt-grid-cols: 2;
+  .browse-page {
+    --browse-grid-cols: 2;
+  }
+
+  .browse-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .browse-sidebar {
+    position: static;
+    max-width: none;
   }
 }
 
 @media (max-width: 640px) {
-  :root {
-    --mt-grid-cols: 1;
+  .browse-page {
+    --browse-grid-cols: 1;
+    padding-block: 1.5rem;
   }
 }
