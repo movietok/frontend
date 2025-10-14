@@ -4,46 +4,42 @@ export default function AboutPage() {
   return (
     <div className="about-page">
       <div className="about-container">
-        <h1 className="about-title">About This Project</h1>
+        <h1 className="about-title">About MovieTok</h1>
 
         <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam dictum, urna nec
-          hendrerit ultrices, justo mauris tincidunt sapien, non vehicula lorem leo in neque.
-          Aliquam erat volutpat. Sed facilisis, nulla sed convallis egestas, justo odio bibendum
-          eros, vel ultricies massa turpis a neque.
+          MovieTok is a social platform for movie enthusiasts, created by students at Oulu University 
+          of Applied Sciences. We bring together movie information and showtimes with community features 
+          to create a space where Finnish movie fans can discover films and connect with fellow enthusiasts.
         </p>
 
         <p>
-          Vivamus ac ex nec ipsum vulputate convallis. Integer at odio nec lacus eleifend porta.
-          Proin faucibus, justo sit amet gravida vulputate, nunc erat aliquet est, et faucibus
-          libero ipsum nec erat. In hac habitasse platea dictumst.
-        </p>
-
-        <ul className="about-list">
-          <li><strong>Lorem Ipsum API</strong> – sed ut perspiciatis unde omnis iste natus error</li>
-          <li><strong>Dolor Sit API</strong> – ut enim ad minima veniam, quis nostrum exercitationem</li>
-        </ul>
-
-        <h2 className="about-subtitle">Our Team</h2>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur sodales ligula in
-          libero. Sed dignissim lacinia nunc, vitae fermentum arcu efficitur non.
+          By combining Finnkino theater showtimes with detailed movie information and social features, 
+          MovieTok helps you stay up-to-date with current releases, find showtimes at your local 
+          theaters, and share your movie experiences with others. Join discussions about the latest 
+          releases or discover new films through our community's recommendations.
         </p>
 
         <ul className="about-list">
-          <li><strong>Lorem Ipsum</strong> – lorem ipsum dolor sit amet</li>
-          <li><strong>Dolor Sit</strong> – consectetur adipiscing elit</li>
-          <li><strong>Amet Consectetur</strong> – sed do eiusmod tempor incididunt ut labore</li>
-          <li><strong>Adipiscing Elit</strong> – ut enim ad minim veniam, quis nostrud exercitation</li>
+          <li><strong>Movie Information</strong> – Details, ratings, and cast information for films</li>
+          <li><strong>Theater Showtimes</strong> – Current showtimes from Finnkino theaters</li>
         </ul>
 
+        <h2 className="about-subtitle">The MovieTok Experience</h2>
         <p>
-          Mauris non tempor quam, et lacinia sapien. Integer nec ante non orci consectetur tempor.
-          Donec ac odio tempor orci dapibus ultrices in iaculis nunc.
+          Movies are better when shared with others. That's why we've created features that make it 
+          easy to connect with other movie enthusiasts, organize viewing parties, and share your 
+          thoughts about the films you love.
         </p>
+
+        <ul className="about-list">
+          <li><strong>Community Features</strong> – Join discussions about your favorite films</li>
+          <li><strong>Group System</strong> – Create and join movie interest groups</li>
+          <li><strong>Review System</strong> – Share your thoughts on films you've watched</li>
+          <li><strong>Favorites</strong> – Keep track of movies you love</li>
+        </ul>
 
         <p className="about-footer">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit 🎬
+          MovieTok unites movie fans 🎬
         </p>
       </div>
     </div>
