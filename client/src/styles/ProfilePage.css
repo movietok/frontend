@@ -177,6 +177,23 @@
   border-bottom: none;
 }
 
+.profile-container .reviews-section {
+  width: 100%;
+  max-width: none;
+  background: #111416;
+  border: 1px solid #1f2a30;
+  border-radius: 14px;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  margin: clamp(1.5rem, 4vw, 2.5rem) auto;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.profile-container .reviews-section .section-title {
+  display: block;
+  text-align: center;
+  letter-spacing: 0.2em;
+}
+
 /* Review Grid */
 .review-grid {
   display: grid;
@@ -263,6 +280,11 @@
     margin: calc(var(--navbar-offset, 80px) + 16px) 1rem 24px;
     padding: clamp(1.25rem, 5vw, 1.75rem);
     border-radius: 12px;
+  }
+
+  .profile-container .reviews-section {
+    padding: clamp(1.25rem, 6vw, 1.75rem);
+    margin: clamp(1.5rem, 6vw, 2.25rem) auto;
   }
 
   .profile-header {
