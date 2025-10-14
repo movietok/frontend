@@ -25,9 +25,10 @@
 
 /* Header stays fixed height at top */
 .group-members-modal__header {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 0.9rem 1.1rem;
   border-bottom: 1px solid #2a2a2a;
 }
@@ -123,15 +124,34 @@
 .remove-btn:hover  { background: rgba(255,100,100,.12); }
 
 /* Close button */
-.close-btn {
-  background: transparent;
-  border: none;
-  color: #cfcfcf;
-  font-size: 1.2rem;
-  line-height: 1;
-  cursor: pointer;
+.group-members-modal .close-btn {
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  background: transparent !important;
+  border: none !important;
+  color: #777 !important;
+  font-size: 20px !important;
+  width: 24px !important;
+  height: 24px !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  border-radius: 12px !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  min-width: 24px !important;
+  max-width: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  margin: 0 !important;
 }
-.close-btn:hover { color: #fff; }
+
+.group-members-modal .close-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+}
 
 .member-role.pending {
   background: rgba(255, 255, 120, 0.12);
