@@ -4,20 +4,21 @@
 
 .movie-details-page {
   color: #fff;
-  max-width: 1200px;
+  width: min(100%, 1100px);
   margin: 0 auto;
-  padding: 2rem;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
 }
 
 /* ===== Header Section ===== */
 .movie-header {
   display: flex;
-  gap: 2rem;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
   align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .movie-poster {
-  width: 260px;
+  width: min(260px, 55vw);
   height: auto;
   object-fit: contain;
   border-radius: 8px;
@@ -26,10 +27,11 @@
 
 .movie-info {
   flex: 1;
+  min-width: min(320px, 100%);
 }
 
 .movie-title {
-  font-size: 2rem;
+  font-size: clamp(1.8rem, 5vw, 2.4rem);
   font-weight: bold;
   text-align: left;   
 }
@@ -42,13 +44,13 @@
 
 .movie-meta {
   margin-top: 0.5rem;
-  font-size: 0.95rem;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
   color: #bbb;
 }
 
 .movie-genres {
   margin-top: 0.25rem;
-  font-size: 0.95rem;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
 }
 
 .trailer-btn {
@@ -78,6 +80,7 @@
   display: flex;
   align-items: baseline;   /* keeps text baseline alignment */
   gap: 0.6rem;
+  flex-wrap: wrap;
 }
 
 /* When the copy button is used next to the title */
@@ -111,7 +114,7 @@
   border-radius: 6px;
   width: 30px;            /* slightly smaller width */
   height: 30px;           /* ✅ tighter vertical match to text height */
-  font-size: 0.95rem;     /* scales down emoji nicely */
+  font-size: clamp(0.9rem, 2.5vw, 1rem);     /* scales down emoji nicely */
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -129,8 +132,8 @@
 /* ===== Overview + Facts ===== */
 .overview-facts {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 2rem;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 4vw, 2.5rem);
   margin-top: 2rem;
 }
 
@@ -148,18 +151,19 @@
 .person-card {
   text-align: center;
   color: #ddd;
+  width: min(150px, 45vw);
 }
 
 .person-card img {
   width: 100%;
-  height: 200px;
+  height: clamp(180px, 55vw, 220px);
   object-fit: cover;
   border-radius: 8px;
 }
 
 .no-image {
   width: 100%;
-  height: 200px;
+  height: clamp(180px, 55vw, 220px);
   background: #444;
   display: flex;
   align-items: center;
@@ -183,7 +187,7 @@
 .reviews-section {
   margin-top: 3rem;
   background: #1a1a1a;
-  padding: 1.5rem;
+  padding: clamp(1.25rem, 4vw, 1.75rem);
   border-radius: 10px;
 }
 
@@ -202,21 +206,13 @@
 .reviews-section {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: clamp(1.25rem, 4vw, 1.75rem);
 }
 
 .reviews-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-  align-items: center;
-}
-
-/* Make review boxes fit nicely inside the frame */
-.reviews-section > * {
-  align-self: center;
-  width: 95%;
-  max-width: 1000px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(1.25rem, 4vw, 1.75rem);
 }
 
 /* ===== Write Review Bubble ===== */
@@ -254,6 +250,7 @@
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  flex-wrap: wrap;
   margin-top: 1rem;
 }
 
@@ -263,7 +260,7 @@
   border: 1px solid #333;
   border-radius: 8px;
   padding: 0.6rem 1rem;
-  font-size: 0.95rem;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
   appearance: none;
   cursor: pointer;
   transition: all 0.25s ease;
@@ -400,3 +397,45 @@
   background: #3a3a3a !important;
   transform: scale(1.07);
 }
+
+@media (max-width: 900px) {
+  .overview-facts {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .movie-header {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .movie-info {
+    min-width: 100%;
+  }
+
+  .movie-title-row {
+    justify-content: center;
+  }
+
+  .trailer-btn {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .movie-details-page {
+    padding: clamp(1.25rem, 6vw, 1.6rem);
+  }
+
+  .person-card {
+    width: min(160px, 65vw);
+  }
+
+  .person-card img,
+  .no-image {
+    height: clamp(180px, 75vw, 220px);
+  }
+}
+
