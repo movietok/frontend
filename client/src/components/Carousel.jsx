@@ -5,6 +5,16 @@ function Carousel({ items, renderItem, cardWidth = 220 }) {
   const carouselRef = useRef(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
+  const [cardSize, setCardSize] = useState(cardWidth)
+
+  const computeCardWidth = () => {
+    if (typeof window === "undefined") return cardWidth
+    const vw = window.innerWidth
+    if (vw <= 420) return Math.max(120, Math.min(cardWidth, vw * 0.48))
+    if (vw <= 768) return Math.min(cardWidth, vw * 0.36)
+    if (vw <= 1024) return Math.min(cardWidth, 200)
+    return cardWidth
+  }
 
   const checkForScrollPosition = () => {
     const node = carouselRef.current
@@ -15,7 +25,7 @@ function Carousel({ items, renderItem, cardWidth = 220 }) {
 
   const scrollCarousel = (direction) => {
     if (!carouselRef.current) return
-    const scrollAmount = direction === "left" ? -cardWidth * 2 : cardWidth * 2
+    const scrollAmount = direction === "left" ? -cardSize * 1.8 : cardSize * 1.8
     carouselRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" })
   }
 
@@ -37,6 +47,17 @@ function Carousel({ items, renderItem, cardWidth = 220 }) {
     return () => cancelAnimationFrame(id)
   }, [items])
 
+  useEffect(() => {
+    const updateCardSize = () => {
+      if (typeof window === "undefined") return
+      setCardSize(computeCardWidth())
+      checkForScrollPosition()
+    }
+    updateCardSize()
+    window.addEventListener("resize", updateCardSize)
+    return () => window.removeEventListener("resize", updateCardSize)
+  }, [cardWidth])
+
   return (
     <div
       className={`carousel-container ${!canScrollLeft ? "at-start" : ""} ${
@@ -56,7 +77,7 @@ function Carousel({ items, renderItem, cardWidth = 220 }) {
           <div
             key={item.id}
             className="carousel-card-wrapper"
-            style={{ width: cardWidth }}
+            style={{ width: cardSize }}
           >
             {renderItem(item)}
           </div>

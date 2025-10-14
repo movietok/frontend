@@ -10,9 +10,12 @@
 
 .homepage-main {
   flex: 1;
-  max-width: 1200px;
+  width: min(100%, 1100px);
   margin: 0 auto;
-  padding: 2rem;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 5vw, 3rem);
 }
 
 /* ====================
@@ -33,13 +36,13 @@
 ==================== */
 .section-header {
   text-align: center;
-  margin: 2rem 0 1.5rem 0;
-  padding-bottom: 1rem;
+  margin: clamp(1.5rem, 4vw, 2.5rem) 0 clamp(1rem, 3vw, 1.5rem);
+  padding-bottom: clamp(0.75rem, 2vw, 1rem);
   border-bottom: 3px solid transparent;
 }
 
 .section-header h2 {
-  font-size: 2rem;
+  font-size: clamp(1.6rem, 4vw, 2rem);
   margin-bottom: 0.3rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -49,7 +52,7 @@
 
 .section-header p {
   color: #aaa;
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 2.8vw, 1rem);
   font-weight: 300;
   margin: 0;
 }
@@ -78,8 +81,8 @@
 ==================== */
 .movie-card {
   position: relative;
-  width: 200px;
-  height: 300px;
+  width: min(200px, 60vw);
+  height: calc(min(200px, 60vw) * 1.45);
   background: #222;
   border: 1px solid #444;
   border-radius: 8px;
@@ -231,7 +234,7 @@
    Group Cards
 ==================== */
 .group-card {
-  width: 220px;
+  width: min(220px, 65vw);
   height: 160px;
   background: #2d2d2d;
   border: 1px solid #555;
@@ -265,7 +268,7 @@
    User Cards
 ==================== */
 .user-card {
-  width: 200px;
+  width: min(200px, 60vw);
   height: 140px;
   background: #303030;
   border: 1px solid #555;
@@ -363,24 +366,29 @@
    Responsiveness
 ==================== */
 @media (max-width: 1024px) {
-  .review-card {
-    width: 220px;
-    height: auto;
+  .homepage-main {
+    padding: clamp(1.25rem, 4vw, 2rem);
   }
+
+  .section-header h2 {
+    font-size: 1.75rem;
+  }
+
   .group-card {
-    width: 180px;
+    width: min(200px, 55vw);
     height: auto;
   }
+
   .user-card {
-    width: 160px;
+    width: min(180px, 50vw);
     height: auto;
   }
 }
 
 @media (max-width: 768px) {
   .movie-card {
-    width: 150px;
-    height: 220px;
+    width: min(150px, 55vw);
+    height: calc(min(150px, 55vw) * 1.45);
   }
   .review-card,
   .group-card,
@@ -393,5 +401,30 @@
   }
   .carousel-btn.right {
     right: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .homepage-main {
+    padding: clamp(1rem, 6vw, 1.4rem);
+  }
+
+  .logo-container {
+    margin: 1.5rem 0;
+  }
+
+  .section-header {
+    margin: 1.5rem 0 1rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .movie-card {
+    width: min(140px, 70vw);
+    height: calc(min(140px, 70vw) * 1.45);
+  }
+
+  .group-card,
+  .user-card {
+    width: min(200px, 70vw);
   }
 }
