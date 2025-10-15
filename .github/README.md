@@ -344,9 +344,9 @@ The application is fully responsive and works seamlessly across:
 
 ## 🤝 Contributors
 
-@vem882
-@saintcernunnos
-@VeikkaKosk
+- [@vem882](https://github.com/vem882)
+- [@saintcernunnos](https://github.com/saintcernunnos)
+- [@VeikkaKosk](https://github.com/VeikkaKosk)
 
 ## 📄 License
 
