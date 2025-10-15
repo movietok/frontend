@@ -78,10 +78,8 @@ export default function Navbar() {
         <Link to="/groups" className="navbar-link">Groups</Link>
         <Link to="/browse" className="navbar-link">Browse</Link>
 
-        {!isLoggedIn ? (
+        {!isLoggedIn && (
           <Link to="/login" className="navbar-link desktop-login">Login</Link>
-        ) : (
-          <button onClick={handleLogout} className="logout-button">Logout</button>
         )}
         
         <div className={`navbar-menu-wrapper ${!isLoggedIn ? 'hide-on-desktop' : ''}`}>
