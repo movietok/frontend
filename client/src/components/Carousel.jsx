@@ -24,10 +24,17 @@ function Carousel({ items, renderItem, cardWidth = 220 }) {
   }
 
   const scrollCarousel = (direction) => {
-    if (!carouselRef.current) return
-    const scrollAmount = direction === "left" ? -cardSize * 1.8 : cardSize * 1.8
-    carouselRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" })
-  }
+  if (!carouselRef.current) return
+
+  // Adjust scroll step based on screen width
+  const isMobile = window.innerWidth < 768
+  const multiplier = isMobile ? 1.0 : 1.8
+  const scrollAmount =
+    direction === "left" ? -cardSize * multiplier : cardSize * multiplier
+
+  carouselRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" })
+}
+
 
   useEffect(() => {
     const node = carouselRef.current
