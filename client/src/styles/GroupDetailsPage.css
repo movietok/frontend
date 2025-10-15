@@ -130,36 +130,44 @@
 
 .favorites-container {
   --group-fav-cols: 5;
-  --group-fav-gap-x: 24px;
-  --group-fav-gap-y: 28px;
+  --group-fav-gap-x: 20px;
+  --group-fav-gap-y: 24px;
+  --group-fav-card-max: 160px;
+  --favorites-container-padding: clamp(1.5rem, 4vw, 2rem);
   background: linear-gradient(180deg, #1b1b1b 0%, #121212 100%);
   border: 1px solid #2c2c2c;
   border-radius: 12px;
-  padding: clamp(1.5rem, 4vw, 2rem);
-  margin-top: 1.2rem;
+  padding: var(--favorites-container-padding);
+  margin: 1.2rem auto 0;
+  width: fit-content;
+  max-width: 100%;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   gap: clamp(1.25rem, 4vw, 1.75rem);
+  align-items: center;
 }
 
 .favorites-grid {
   display: flex;
   flex-wrap: wrap;
   gap: var(--group-fav-gap-y) var(--group-fav-gap-x);
-  width: 100%;
-  align-items: flex-start;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  justify-content: center;
 }
+
 
 .favorites-grid-card {
   position: relative;
-  flex: 0 0 calc(
-    (100% - (var(--group-fav-cols) - 1) * var(--group-fav-gap-x)) / var(--group-fav-cols)
-  );
-  min-width: 0;
+  flex: 0 0 auto;
+  width: min(var(--group-fav-card-max), 70vw);
   display: flex;
   justify-content: center;
 }
+
+
 
 .fav-card-link {
   text-decoration: none;
@@ -176,6 +184,7 @@
   border: 1px solid #333;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
+
 
 .fav-card:hover {
   transform: translateY(-4px);
@@ -1058,6 +1067,7 @@
 
   .favorites-container {
     --group-fav-cols: 3;
+    --group-fav-card-max: 160px;
   }
 }
 
@@ -1079,8 +1089,9 @@
 
   .favorites-container {
     --group-fav-cols: 2;
-    --group-fav-gap-x: 20px;
-    --group-fav-gap-y: 24px;
+    --group-fav-gap-x: 18px;
+    --group-fav-gap-y: 22px;
+    --group-fav-card-max: 150px;
   }
 }
 
@@ -1096,11 +1107,21 @@
 
   .favorites-container {
     --group-fav-cols: 2;
+    --group-fav-gap-x: 18px;
+    --group-fav-gap-y: 22px;
+    --group-fav-card-max: 140px;
   }
 }
 
 @media (max-width: 420px) {
   .favorites-container {
     --group-fav-cols: 1;
+    --group-fav-gap-x: 16px;
+    --group-fav-gap-y: 20px;
+    --group-fav-card-max: 130px;
   }
 }
+
+
+
+
