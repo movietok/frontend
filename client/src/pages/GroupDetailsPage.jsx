@@ -433,7 +433,17 @@ const handleConfirmRemove = async () => {
   (currentUserId != null && Number(currentUserId) === Number(group?.owner_id));
 
   // 🧠 Membership: cache always wins over temporary undefined states
-const role = (group?.role || "").toLowerCase();
+const deriveRole = () => {
+  const raw = String(group?.role ?? "").trim();
+  if (currentUserId && Array.isArray(group?.members)) {
+    const me = group.members.find((m) => Number(m.id) === Number(currentUserId));
+    const memberRole = String(me?.role ?? "").trim();
+    if (memberRole) return memberRole;
+  }
+  return raw;
+};
+
+const role = deriveRole().toLowerCase();
 const isPending = role === "pending";
 
 const isMember =
@@ -447,8 +457,10 @@ const isMember =
     isOwner
   );
 
+const canManageFavorites = isOwner || role === "moderator";
+
 const canViewPrivateContent =
-  isMember || isOwner || role === "moderator";
+  isMember || canManageFavorites;
 
 const themeMap = {
   1: "theme-blue",
@@ -591,7 +603,7 @@ const themeMap = {
                   </div>
                 </Link>
 
-                {isOwner && (
+                {canManageFavorites && (
                   <button
                     className="remove-fav-btn"
                     onClick={() => confirmRemoveFavorite(movie.tmdb_id)}
