@@ -1,15 +1,13 @@
 :root {
-  --profile-max-width: 1200px;
-  --profile-padding: 32px 40px;
+  --profile-max-width: 960px;
+  --profile-padding: clamp(1.5rem, 3vw, 2.5rem);
   --profile-gap: 2rem;
 }
 
 /* Container */
 .profile-container {
-  width: 80vw;
-  max-width: var(--profile-max-width);
-  min-width: 280px;
-  margin: 40px auto;
+  width: min(100%, var(--profile-max-width));
+  margin: calc(var(--navbar-offset, 80px) + clamp(16px, 3vw, 32px)) auto clamp(24px, 6vw, 48px);
   background: #181a1b;
   color: #fff;
   border-radius: 12px;
@@ -23,10 +21,8 @@
   display: flex;
   align-items: flex-start;
   margin-bottom: 24px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
+  flex-wrap: wrap;
+  gap: 24px;
 }
 
 .profile-avatar img {
@@ -40,6 +36,7 @@
 /* Main */
 .profile-main {
   flex: 1;
+  min-width: 0;
 }
 
 .profile-username-row {
@@ -102,6 +99,7 @@
   border-bottom: 1px solid #222;
   padding-bottom: 8px;
   align-items: center;
+  justify-content: center;
   flex-wrap: wrap;
 }
 
@@ -145,6 +143,7 @@
 /* Content */
 .profile-content {
   margin-top: 32px;
+  overflow-wrap: anywhere;
 }
 
 .section-title {
@@ -178,10 +177,27 @@
   border-bottom: none;
 }
 
+.profile-container .reviews-section {
+  width: 100%;
+  max-width: none;
+  background: #111416;
+  border: 1px solid #1f2a30;
+  border-radius: 14px;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  margin: clamp(1.5rem, 4vw, 2.5rem) auto;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.profile-container .reviews-section .section-title {
+  display: block;
+  text-align: center;
+  letter-spacing: 0.2em;
+}
+
 /* Review Grid */
 .review-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: var(--profile-gap);
   margin-top: 1.5rem;
   word-break: break-word;
@@ -222,8 +238,8 @@
 /* Responsive: Tablet */
 @media (max-width: 900px) {
   .profile-container {
-    width: 95vw;
-    padding: 24px 10px;
+    width: calc(100% - 2.5rem);
+    padding: clamp(1.5rem, 4vw, 2rem);
   }
 
   .profile-header {
@@ -260,11 +276,15 @@
 /* Responsive: Mobile */
 @media (max-width: 600px) {
   .profile-container {
-    width: 100vw;
-    padding: 10px 2vw;
-    margin: 0;
-    border-radius: 0;
-    padding-top: 14rem;
+    width: calc(100% - 2rem);
+    margin: calc(var(--navbar-offset, 80px) + 16px) 1rem 24px;
+    padding: clamp(1.25rem, 5vw, 1.75rem);
+    border-radius: 12px;
+  }
+
+  .profile-container .reviews-section {
+    padding: clamp(1.25rem, 6vw, 1.75rem);
+    margin: clamp(1.5rem, 6vw, 2.25rem) auto;
   }
 
   .profile-header {

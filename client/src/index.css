@@ -93,3 +93,9 @@ button:focus-visible {
   }
 }
 
+@media (min-width: 1400px) {
+  body {
+    font-size: 0.95rem;
+  }
+}
+

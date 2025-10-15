@@ -6,11 +6,20 @@
   align-items: center;      
 }
 
-main {
-  padding-top: 80px;
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
+
+.app-main {
+  flex: 1;
+  padding-top: var(--navbar-offset, 80px);
+  padding-bottom: clamp(2rem, 4vw, 3rem);
+}
+
 @media (max-width: 480px) {
-  main {
+  .app-main {
     padding-top: 60px;
   }
 }

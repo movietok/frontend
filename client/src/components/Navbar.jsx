@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import searchIcon from "../images/searchimage.png"
 import movieTokLogo from "../images/movietoknbg.png"
-import UniversalModal from "./Popups/UniversalModal" 
+import UniversalModal from "./Popups/UniversalModal"
 
 import "../styles/navbar.css"
 
@@ -23,14 +23,15 @@ export default function Navbar() {
     }
   }
 
-  // Close burger menu when clicking outside
   useEffect(() => {
     if (!menuOpen) return
+
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setMenuOpen(false)
       }
     }
+
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [menuOpen])
@@ -53,7 +54,7 @@ export default function Navbar() {
 
   return (
     <header className="navbar-header">
-      <Link to="/homepage" style={{ display: "flex", alignItems: "center" }}>
+      <Link to="/homepage" className="navbar-logo-link">
         <img src={movieTokLogo} alt="MovieTok logo" className="navbar-logo" />
       </Link>
 
@@ -72,6 +73,11 @@ export default function Navbar() {
       </form>
 
       <nav className="navbar-nav">
+        {!isLoggedIn && (
+          <Link to="/login" className="navbar-signin-link">
+            Sign In
+          </Link>
+        )}
         <Link to="/homepage" className="navbar-link">Home</Link>
         <Link to="/schedule" className="navbar-link">Showtimes</Link>
         <Link to="/groups" className="navbar-link">Groups</Link>
@@ -82,12 +88,20 @@ export default function Navbar() {
         ) : (
           <>
             <button onClick={handleLogout} className="logout-button">Logout</button>
-            <div style={{ position: "relative" }}>
-              <button onClick={() => setMenuOpen(!menuOpen)} className="burger-button">☰</button>
+            <div className="navbar-menu-wrapper">
+              <button
+                type="button"
+                onClick={() => setMenuOpen((open) => !open)}
+                className="burger-button"
+                aria-expanded={menuOpen}
+                aria-controls="navbar-menu"
+                aria-label="Toggle navigation menu"
+              >
+                ☰
+              </button>
 
               {menuOpen && (
-                <div className="burger-menu" ref={menuRef}>
-                  {/* Mobile: Show navigation links in burger menu */}
+                <div className="burger-menu" ref={menuRef} id="navbar-menu">
                   <div className="mobile-nav-links">
                     <Link to="/homepage" className="navbar-link" onClick={() => setMenuOpen(false)}>Home</Link><br />
                     <Link to="/schedule" className="navbar-link" onClick={() => setMenuOpen(false)}>Showtimes</Link><br />
@@ -95,11 +109,11 @@ export default function Navbar() {
                     <Link to="/browse" className="navbar-link" onClick={() => setMenuOpen(false)}>Browse</Link><br />
                     <br />
                   </div>
-                  {/* User menu items (always visible in burger) */}
                   <Link to={`/profile/${user?.id || ""}`} className="navbar-link" onClick={() => setMenuOpen(false)}>Profile</Link><br />
                   <Link to="/settings" className="navbar-link" onClick={() => setMenuOpen(false)}>Settings</Link><br />
                   <Link to={`/favorites/${user?.id}`} className="navbar-link" onClick={() => setMenuOpen(false)}>Favorites</Link><br />
-                  <Link to="/watchlist" className="navbar-link" onClick={() => setMenuOpen(false)}>Watchlist</Link>
+                  <Link to="/watchlist" className="navbar-link" onClick={() => setMenuOpen(false)}>Watchlist</Link><br />
+                  <button type="button" className="navbar-link logout-menu-link" onClick={() => { setMenuOpen(false); handleLogout() }}>Logout</button>
                 </div>
               )}
             </div>

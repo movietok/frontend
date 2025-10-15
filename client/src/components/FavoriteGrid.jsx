@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import MovieActionsBar from "./MovieActionBar";
 import "../styles/FavoritesGrid.css";
+import "../styles/ResponsiveMovieGrid.css";
 
 export default function FavoriteGrid({ favorites, type = 2, userId, limit = 4, watchlist = [] }) {
   if (!favorites || favorites.length === 0) {
@@ -25,9 +26,9 @@ export default function FavoriteGrid({ favorites, type = 2, userId, limit = 4, w
 
   return (
     <div>
-      <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 gap-4">
+      <div className="favorites-grid responsive-movie-grid">
         {enhanced.map((fav) => (
-          <div key={fav.tmdb_id} className="movie-hover-wrapper group">
+          <div key={fav.tmdb_id} className="favorites-grid-item responsive-movie-grid__item movie-hover-wrapper group">
             <Link to={`/movie/${fav.tmdb_id}`}>
               <div className="movie-card rounded-xl overflow-hidden shadow-xl transform transition hover:scale-105 hover:shadow-2xl">
                 {fav.poster_url ? (

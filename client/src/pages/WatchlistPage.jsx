@@ -3,6 +3,7 @@ import { useFavorites } from "../hooks/useFavorites";
 import { useAuth } from "../context/AuthContext";
 import MovieActionBar from "../components/MovieActionBar";
 import "../styles/FavoritesPage.css";
+import "../styles/ResponsiveMovieGrid.css";
 
 export default function WatchlistPage() {
   const { user, isLoggedIn } = useAuth();
@@ -30,9 +31,9 @@ export default function WatchlistPage() {
       {watchlist.length === 0 ? (
         <p className="text-gray-400">Your watchlist is empty. 👀</p>
       ) : (
-        <div className="favorites-grid">
+        <div className="favorites-grid responsive-movie-grid">
           {watchlist.map((movie) => (
-            <div key={movie.tmdb_id} className="movie-hover-wrapper group">
+            <div key={movie.tmdb_id} className="favorites-grid-item responsive-movie-grid__item movie-hover-wrapper group">
               <Link to={`/movie/${movie.tmdb_id}`}>
                 <div className="movie-card rounded-xl overflow-hidden shadow-xl transform transition hover:scale-105 hover:shadow-2xl">
                   {movie.poster_url ? (

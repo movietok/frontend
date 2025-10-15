@@ -101,7 +101,7 @@
 
 /* Empty room size */
 :root {
-  --carousel-edge-space: 5px;
+  --carousel-edge-space: clamp(4px, 2vw, 16px);
 }
 
 /* Add spacers at both ends of the slider track */
@@ -109,4 +109,46 @@
 .carousel-slider::after {
   content: "";
   flex: 0 0 var(--carousel-edge-space);
+}
+
+@media (max-width: 900px) {
+  .carousel-container {
+    padding: 0 24px;
+  }
+
+  .carousel-container::before,
+  .carousel-container::after {
+    width: 24px;
+  }
+
+  .carousel-btn {
+    font-size: 1.6rem;
+    padding: 0.35rem 0.75rem;
+  }
+
+  .carousel-slider {
+    gap: 0.6rem;
+    padding: 0.85rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel-container {
+    padding: 0 16px;
+  }
+
+  .carousel-container::before,
+  .carousel-container::after {
+    width: 16px;
+  }
+
+  .carousel-btn {
+    font-size: 1.4rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .carousel-slider {
+    gap: 0.5rem;
+    padding: 0.75rem 0;
+  }
 }
