@@ -342,9 +342,11 @@ The application is fully responsive and works seamlessly across:
 - Protected routes
 - XSS protection
 
-## 🤝 Contributing
+## 🤝 Contributors
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+- [@vem882](https://github.com/vem882)
+- [@saintcernunnos](https://github.com/saintcernunnos)
+- [@VeikkaKosk](https://github.com/VeikkaKosk)
 
 ## 📄 License
 
