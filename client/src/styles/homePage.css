@@ -213,6 +213,25 @@
   hyphens: auto;               /* optional, lets browsers hyphenate words */
 }
 
+/* --- Ensure uniform card sizing across carousel --- */
+.recent-reviews .review-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 240px;                 /* consistent height */
+  overflow: hidden;
+}
+
+.recent-reviews .review-text {
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;         /* limit visible lines */
+  -webkit-box-orient: vertical;
+}
+
+
 .review-btn {
   align-self: flex-start;
   padding: 0.4rem 0.8rem;
@@ -390,7 +409,6 @@
     width: min(150px, 55vw);
     height: calc(min(150px, 55vw) * 1.45);
   }
-  .review-card,
   .group-card,
   .user-card {
     width: 100%;
@@ -403,6 +421,24 @@
     right: 0;
   }
 }
+
+@media (max-width: 768px) {
+  .recent-reviews .review-card {
+    width: 100%;
+    height: 260px;               /* slightly taller for narrower width */
+  }
+
+  .review-card:not(.recent-reviews .review-card),
+  .group-card,
+  .user-card {
+    width: 100%;
+    height: auto;
+  }
+
+  .carousel-btn.left { left: 0; }
+  .carousel-btn.right { right: 0; }
+}
+
 
 @media (max-width: 520px) {
   .homepage-main {
