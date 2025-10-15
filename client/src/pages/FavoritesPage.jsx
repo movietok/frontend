@@ -3,6 +3,7 @@ import { useFavorites } from "../hooks/useFavorites";
 import { useProfile } from "../hooks/useProfile";
 import MovieActionBar from "../components/MovieActionBar";
 import "../styles/FavoritesPage.css";
+import "../styles/ResponsiveMovieGrid.css";
 
 export default function FavoritesPage() {
   const { userId } = useParams(); 
@@ -31,9 +32,9 @@ export default function FavoritesPage() {
       {favorites.length === 0 ? (
         <p className="text-gray-400">This user has no favorite movies yet. ⭐</p>
       ) : (
-        <div className="favorites-grid">
+        <div className="favorites-grid responsive-movie-grid">
           {favorites.map((fav) => (
-           <div key={fav.tmdb_id} className="movie-hover-wrapper group">
+           <div key={fav.tmdb_id} className="favorites-grid-item responsive-movie-grid__item movie-hover-wrapper group">
             <Link to={`/movie/${fav.tmdb_id}`}>
               <div className="movie-card rounded-xl overflow-hidden shadow-xl transform transition hover:scale-105 hover:shadow-2xl">
                 {fav.poster_url ? (
