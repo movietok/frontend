@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import { authAPI } from "../services/api"
@@ -11,9 +11,10 @@ export default function Login() {
   const [showModal, setShowModal] = useState(false)
   const [modalTitle, setModalTitle] = useState("")
   const [modalMessage, setModalMessage] = useState("")
-  const [hideOkButton, setHideOkButton] = useState(false) // ✅ new state to control OK button visibility
+  const [hideOkButton, setHideOkButton] = useState(false)
   const navigate = useNavigate()
   const { login } = useAuth()
+  const autoCloseTimerRef = useRef(null)
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -48,22 +49,14 @@ export default function Login() {
         
         // Call login with both token and userData
         login(token, userData)
-        
         setModalTitle("Login Successful!")
         setModalMessage("You have logged in successfully. Redirecting to homepage.")
-        setHideOkButton(true) // ✅ hide OK button during auto-close
+        setHideOkButton(true)
         setShowModal(true)
-
-        // ✅ Auto-close modal after 2 seconds and navigate
-        setTimeout(() => {
-          setShowModal(false)
-          navigate("/")
-        }, 2000)
-
       } else {
         setModalTitle("Login Failed")
         setModalMessage(res.data?.message || "Login failed")
-        setHideOkButton(false) // ✅ show OK button for manual dismissal
+        setHideOkButton(false)
         setShowModal(true)
       }
     } catch (err) {
@@ -71,7 +64,7 @@ export default function Login() {
       const errorMessage = err.response?.data?.message || err.message || "Something went wrong"
       setModalTitle("Login Failed")
       setModalMessage(errorMessage)
-      setHideOkButton(false) // ✅ show OK button for manual dismissal
+      setHideOkButton(false)
       setShowModal(true)
     }
   }
@@ -82,6 +75,30 @@ export default function Login() {
       navigate("/")
     }
   }
+
+  useEffect(() => {
+    if (!showModal) return undefined
+
+    if (modalTitle === "Login Successful!" || modalTitle === "Login Failed") {
+      if (autoCloseTimerRef.current) {
+        clearTimeout(autoCloseTimerRef.current)
+      }
+      autoCloseTimerRef.current = setTimeout(() => {
+        setShowModal(false)
+        autoCloseTimerRef.current = null
+        if (modalTitle === "Login Successful!") {
+          navigate("/")
+        }
+      }, 2000)
+    }
+
+    return () => {
+      if (autoCloseTimerRef.current) {
+        clearTimeout(autoCloseTimerRef.current)
+        autoCloseTimerRef.current = null
+      }
+    }
+  }, [showModal, modalTitle, navigate])
 
   return (
     <div className="login-page">
@@ -119,7 +136,7 @@ export default function Login() {
         title={modalTitle}
         message={modalMessage}
         onOk={handleOk}
-        hideOkButton={true} // ✅ pass prop to control button visibility
+        hideOkButton={hideOkButton}
       />
     </div>
   )
