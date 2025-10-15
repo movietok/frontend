@@ -46,7 +46,7 @@ function GroupDetailsPage() {
   };
 
   const [favPage, setFavPage] = useState(1);
-const favoritesPerPage = 10;
+const favoritesPerPage = 8;
 
 const indexOfLastFav = favPage * favoritesPerPage;
 const indexOfFirstFav = indexOfLastFav - favoritesPerPage;
