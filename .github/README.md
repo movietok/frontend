@@ -1,140 +1,351 @@
-# GitHub Actions Deployment
+# MovieTok Frontend
 
-This repository contains GitHub Actions workflows for automated deployment of the MovieTok application using a self-hosted runner.
+MovieTok Frontend is a modern, feature-rich web application built with React and Vite. It serves as the client interface for the MovieTok platform — a social movie discovery hub where users can browse films, write reviews, create groups, and share recommendations.
 
-## Workflows
+## 🎬 Features
 
-### 1. `deploy.yml` - Production Deployment
-- **Triggers**: Push to `main` branch, manual dispatch
-- **Jobs**: 
-  - Deploy Frontend
-  - Deploy Backend
-  - Health Check
-- **Features**: 
-  - Deploys to production environment
-  - Runs health checks after deployment
-  - Manual deployment with selective service options
+### Movie Discovery
+- Browse popular and now playing movies
+  ```jsx
+  // Uses TMDB API integration through a custom service
+  const movies = await getPopularMovies(page);
+  const nowPlaying = await getNowPlayingMovies();
+  ```
+- Advanced movie search functionality with filters
+  ```jsx
+  // Supports genre filtering through URL parameters
+  const movies = await discoverMovies({ 
+    withGenres: selectedGenres,
+    page: currentPage 
+  });
+  ```
+- Detailed movie information via TMDB integration
+  ```jsx
+  // Fetches comprehensive movie data
+  const details = await getMovieDetails(movieId);
+  ```
+- Local theater showtimes through Finnkino API
+  ```jsx
+  // Custom hook for real-time theater data
+  const { showtimes, loading } = useFinnkinoShowTimes();
+  ```
 
-### 2. `deploy-dev.yml` - Development Deployment
-- **Triggers**: Push to `develop`/`dev` branches, manual dispatch
-- **Jobs**: Deploy to development environment
-- **Features**: Uses development environment variables
+### User Features
+- Authentication System
+  ```jsx
+  // Uses JWT tokens with Context API
+  const AuthContext = createContext();
+  // Stores tokens securely
+  localStorage.setItem("token", jwt);
+  // Protected route wrapper
+  const PrivateRoute = ({ children }) => {
+    return isLoggedIn ? children : <Navigate to="/login" />;
+  };
+  ```
+- Profile Management
+  ```jsx
+  // Custom hook for profile operations
+  const { profile, loading } = useProfile(userId);
+  // Handles user data and preferences
+  const updateProfile = async (data) => {
+    await updateUserProfile(userId, data);
+  };
+  ```
 
-### 3. `rollback.yml` - Rollback Deployment
-- **Triggers**: Manual dispatch only
-- **Features**: 
-  - Rollback frontend or backend services
-  - Requires confirmation ("ROLLBACK" input)
-  - Safety checks and validation
+### Social Features
+#### Groups
+- Group Management System
+  ```jsx
+  // Service for group operations
+  export const createGroup = async (groupData) => {
+    const token = requireToken();
+    const res = await groupAPI.post("", groupData);
+    return res.data.group;
+  };
+  ```
+- Custom Hook for Group Data
+  ```jsx
+  // Real-time group management
+  const { userGroups, groupsLoading } = useUserGroups(userId);
+  ```
+- Member Management
+  ```jsx
+  // Handles member operations
+  const addMember = async (groupId, userId) => {
+    await groupAPI.post(`/${groupId}/members`, { userId });
+  };
+  ```
 
-### 4. `health-check.yml` - System Monitoring
-- **Triggers**: Every 30 minutes, manual dispatch
-- **Features**: 
-  - Frontend/backend health checks
-  - System resource monitoring
-  - Automated alerts for issues
+#### Reviews
+- Review System Implementation
+  ```jsx
+  // Normalized review structure
+  const normalizeReview = (r) => ({
+    id: r?.id,
+    movieId: r?.movie_id,
+    rating: Number(r?.rating ?? 0),
+    content: r?.content
+  });
+  ```
+- Interactive Rating System
+  ```jsx
+  // Handles review creation with ratings
+  const createReview = async ({ movieId, rating, comment }) => {
+    await api.post("/reviews", { 
+      movieId, 
+      rating, 
+      content: comment 
+    });
+  };
+  ```
 
-## Prerequisites
+#### Lists & Collections
+- Favorites Management
+  ```jsx
+  // Custom hook for favorites
+  const { favorites, add, remove } = useFavorites(userId, type);
+  // Real-time favorite status tracking
+  const { isFavorite } = useFavoriteStatuses(movieId);
+  ```
+- Watchlist System
+  ```jsx
+  // Similar to favorites but with watch status
+  const toggleWatchlist = async (movieId) => {
+    const updated = await updateWatchStatus(movieId);
+    setWatchlist(prev => [...prev, updated]);
+  };
+  ```
 
-### GitHub Secrets
-Configure these in your repository settings:
+### Interactive Components
+- Universal Modal System
+  ```jsx
+  // Reusable modal component
+  const UniversalModal = ({ isOpen, onClose, children }) => {
+    if (!isOpen) return null;
+    return createPortal(
+      <div className="modal-overlay">{children}</div>,
+      document.body
+    );
+  };
+  ```
+- Notification System
+  ```jsx
+  // Auto-dismiss toast notifications
+  const { showToast } = usePopup();
+  showToast("Operation successful", "success", 3000);
+  ```
+- Responsive Component Design
+  ```jsx
+  // Tailwind CSS responsive classes
+  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+  ```
 
+## 🛠️ Technical Implementation
+
+### State Management
+- Context API for Global State
+  ```jsx
+  // Centralized authentication state management
+  const AuthContext = createContext();
+  export function AuthProvider({ children }) {
+    const [isLoggedIn, setIsLoggedIn] = useState(
+      !!localStorage.getItem("token")
+    );
+    // ... authentication logic
+  }
+  ```
+
+- Custom Hooks Architecture
+  1. Favorites Management (`useFavorites`)
+     ```jsx
+     const useFavorites = (userId, type) => {
+       const [favorites, setFavorites] = useState([]);
+       // Real-time favorites sync with backend
+       useEffect(() => {
+         getUserFavorites(userId, type)
+           .then(data => setFavorites(data));
+       }, [userId, type]);
+       // ... CRUD operations
+     };
+     ```
+
+  2. Group Management (`useUserGroups`)
+     ```jsx
+     const useUserGroups = (userId) => {
+       const [userGroups, setUserGroups] = useState([]);
+       // Automatic error handling and loading states
+       const [groupsLoading, setGroupsLoading] = useState(true);
+       const [groupsError, setGroupsError] = useState(null);
+       // ... group synchronization logic
+     };
+     ```
+
+  3. Notification System (`usePopup`)
+     ```jsx
+     const usePopup = () => {
+       const [showPopup, setShowPopup] = useState(false);
+       const [popupMessage, setPopupMessage] = useState("");
+       
+       // Reusable popup component with type support
+       const PopupComponent = showPopup ? (
+         <OnsitePopup
+           message={popupMessage}
+           type={popupType}
+           onConfirm={() => setShowPopup(false)}
+         />
+       ) : null;
+       // ... popup trigger logic
+     };
+     ```
+
+### API Integration Architecture
+- Modular API Service Structure
+  ```javascript
+  // Separate axios instances for different domains
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  
+  export const api = axios.create({
+    baseURL: `${API_BASE_URL}/`,
+  });
+  
+  export const authAPI = axios.create({
+    baseURL: `${API_BASE_URL}/v1/users`,
+  });
+  
+  export const groupAPI = axios.create({
+    baseURL: `${API_BASE_URL}/groups`,
+  });
+  ```
+
+- External API Integration
+  1. TMDB API Service
+     ```javascript
+     // Centralized movie data fetching
+     export async function getMovieDetails(id) {
+       const res = await axios.get(`${API_BASE}/tmdb/${id}`);
+       return res.data;
+     }
+     
+     // Genre-based discovery
+     export async function discoverMovies({ withGenres, page }) {
+       const params = new URLSearchParams();
+       if (withGenres.length > 0) {
+         params.append("with_genres", withGenres.join(","));
+       }
+       // ... discovery logic
+     }
+     ```
+
+  2. Finnkino Integration
+     ```javascript
+     // Real-time theater data
+     const useFinnkinoShowTimes = () => {
+       // Automatic data refresh
+       useEffect(() => {
+         const fetchShowTimes = async () => {
+           const data = await finnkinoApi.getShowTimes();
+           setShowTimes(data);
+         };
+         fetchShowTimes();
+         // Refresh every 5 minutes
+         const interval = setInterval(fetchShowTimes, 300000);
+         return () => clearInterval(interval);
+       }, []);
+     };
+     ```
+
+- Backend Service Integration
+  ```javascript
+  // Normalized data handling
+  const normalizeReview = (r) => ({
+    id: r?.id,
+    movieId: r?.movie_id,
+    rating: Number(r?.rating ?? 0),
+    // ... data normalization
+  });
+  
+  // Type-safe API calls
+  export async function createReview({ movieId, rating, comment }) {
+    const token = requireToken();
+    return api.post("/reviews", {
+      movieId,
+      rating,
+      content: comment
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  }
+  ```
+
+### Styling
+- CSS modules for component-specific styling
+- Responsive design
+- Tailwind CSS integration
+- Custom animations and transitions
+
+## 🚀 Getting Started
+
+1. Clone the repository
+2. Install dependencies:
+```bash
+npm install
 ```
-DEPLOY_HOST=<your-server-ip>
-DEPLOY_USER=<your-deployment-user>
-DEPLOY_PORT=<ssh-port>
-DEPLOY_KEY=<your-ssh-private-key>
+
+3. Set up environment variables:
+Create a `.env` file with:
+```env
+VITE_API_BASE_URL=your_api_base_url
 ```
 
-### Server Scripts
-Ensure these scripts exist on your server at `/home/deployer/scripts/`:
+4. Start the development server:
+```bash
+npm run dev
+```
 
-- `deploy-frontend.sh` - Frontend deployment script
-- `deploy-backend.sh` - Backend deployment script  
-- `status.sh` - System status check script
-- `show-logs.sh` - Log viewing script
+## 📦 Project Structure
 
-### Self-Hosted Runner
-1. Install GitHub Actions runner on your server
-2. Register it with your repository
-3. Ensure the runner has access to deployment scripts
-4. Configure proper permissions for the runner user
+- `/components` - Reusable UI components
+- `/context` - React Context providers
+- `/helpers` - Utility functions
+- `/hooks` - Custom React hooks
+- `/pages` - Main application pages/routes
+- `/services` - API service integrations
+- `/styles` - CSS stylesheets
 
-## Environment Configuration
+## 🔧 Available Scripts
 
-### Production
-- Frontend: Uses DEPLOY_HOST environment variable
-- Backend API: Uses DEPLOY_HOST environment variable with /api path
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
 
-### Development
-- Uses development environment variables
-- Deploys to development directories
+## 💻 Technologies
 
-## Usage
+- React
+- Vite
+- Tailwind CSS
+- Axios
+- React Router
+- ESLint
+- PostCSS
 
-### Automatic Deployment
-- Push to `main` branch → Production deployment
-- Push to `develop` branch → Development deployment
+## 📱 Responsive Design
 
-### Manual Deployment
-1. Go to Actions tab in GitHub
-2. Select "Deploy to Production" workflow
-3. Click "Run workflow"
-4. Choose services to deploy (frontend/backend/both)
+The application is fully responsive and works seamlessly across:
+- Desktop browsers
+- Tablets
+- Mobile devices
 
-### Rollback
-1. Go to Actions tab
-2. Select "Rollback Deployment" workflow
-3. Choose service to rollback
-4. Type "ROLLBACK" to confirm
+## 🔒 Security
 
-### Health Monitoring
-- Runs automatically every 30 minutes
-- Check Actions tab for health status
-- Manual trigger available
+- JWT-based authentication
+- Secure API communication
+- Protected routes
+- XSS protection
 
-## Troubleshooting
+## 🤝 Contributing
 
-### Common Issues
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-1. **Script Permission Denied**
-   ```bash
-   chmod +x /home/deployer/scripts/*.sh
-   ```
+## 📄 License
 
-2. **Node.js Version Issues**
-   - Workflows use Node.js 18
-   - Ensure compatibility with your application
-
-3. **PM2 Process Issues**
-   ```bash
-   pm2 list
-   pm2 logs movietok-backend
-   ```
-
-4. **Frontend Build Failures**
-   - Check disk space
-   - Verify npm dependencies
-   - Check environment variables
-
-### Log Locations
-- PM2 logs: `pm2 logs movietok-backend`
-- Nginx logs: `/var/log/nginx/movietok_*.log`
-- GitHub Actions logs: Repository Actions tab
-
-## Security Notes
-
-- SSH keys are stored as GitHub secrets
-- Scripts run with deployer user permissions
-- Production environment uses secure environment variables
-- No sensitive data in workflow files
-
-## Monitoring & Alerts
-
-The health check workflow monitors:
-- Frontend HTTP response (200 status)
-- Backend API availability
-- Disk space usage (alerts >80%)
-- Memory usage (alerts >85%)
-- PM2 process status
-- Nginx service status
+This project is licensed under the MIT License - see the LICENSE file for details.
