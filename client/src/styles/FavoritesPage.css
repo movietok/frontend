@@ -1,22 +1,23 @@
 /* Container for the entire favorites page */
 .favorites-container {
-  width: 80vw;
-  max-width: var(--profile-max-width);
-  min-width: 280px;
+  width: min(100%, 720px);
   margin: 40px auto;
   background: #181a1b;
   color: #fff;
   border-radius: 12px;
-  padding: var(--profile-padding);
+  padding: clamp(2rem, 5vw, 3rem);
   box-shadow: 0 2px 16px rgba(0,0,0,0.3);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
 }
 
 /* Grid layout for movie cards */
 .favorites-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 movies per row */
-  gap: 1.5rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 4vw, 1.5rem);
   margin-top: 1rem;
 }
 
