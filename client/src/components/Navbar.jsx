@@ -81,7 +81,7 @@ export default function Navbar() {
         {isLoggedIn && (
           <button onClick={handleLogout} className="logout-button">Logout</button>
         )}
-
+        
         <div className="navbar-menu-wrapper">
           <button
             type="button"
