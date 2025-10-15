@@ -73,6 +73,11 @@ export default function Navbar() {
       </form>
 
       <nav className="navbar-nav">
+        {!isLoggedIn && (
+          <Link to="/login" className="navbar-signin-link">
+            Sign In
+          </Link>
+        )}
         <Link to="/homepage" className="navbar-link">Home</Link>
         <Link to="/schedule" className="navbar-link">Showtimes</Link>
         <Link to="/groups" className="navbar-link">Groups</Link>

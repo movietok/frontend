@@ -87,6 +87,25 @@
   flex-shrink: 0;
 }
 
+.navbar-signin-link {
+  display: none;
+  padding: 0.45rem 0.9rem;
+  background: #0e1c1d;
+  border: 1px solid #6ee7f7;
+  border-radius: 999px;
+  color: #6ee7f7;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.navbar-signin-link:hover {
+  background: #143133;
+  color: #a7f7ff;
+  box-shadow: 0 0 12px rgba(110, 231, 247, 0.45);
+}
+
 .navbar-link {
   color: #fff;
   text-decoration: none;
@@ -247,6 +266,12 @@
     margin: 0 1rem;
   }
 
+  .navbar-signin-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .burger-menu {
     position: fixed;
     right: clamp(0.75rem, 4vw, 1.5rem);
@@ -273,6 +298,11 @@
   .search-form {
     max-width: 150px;
     margin: 0 0.5rem;
+  }
+
+  .navbar-signin-link {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
   }
 
   .search-bar {
