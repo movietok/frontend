@@ -240,6 +240,13 @@
   }
 }
 
+/* Hide burger menu for logged out users on desktop */
+@media (min-width: 769px) {
+  .hide-on-desktop {
+    display: none;
+  }
+}
+
 /* Mobile landscape and below */
 @media (max-width: 768px) {
   .navbar-header {
@@ -247,13 +254,19 @@
     height: var(--navbar-height);
   }
 
-  /* Hide desktop navigation links on mobile (but keep logout and burger button) */
+  /* Hide desktop navigation links on mobile (but keep burger button) */
   .navbar-nav > .navbar-link {
     display: none;
   }
 
+  .desktop-login,
   .logout-button {
     display: none;
+  }
+
+  /* Always show burger menu wrapper on mobile */
+  .hide-on-desktop {
+    display: block;
   }
 
   /* Show mobile navigation links in burger menu */

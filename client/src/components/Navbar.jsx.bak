@@ -78,11 +78,11 @@ export default function Navbar() {
         <Link to="/groups" className="navbar-link">Groups</Link>
         <Link to="/browse" className="navbar-link">Browse</Link>
 
-        {!isLoggedIn && (
-          <Link to="/login" className="navbar-link desktop-login">Login</Link>
+        {isLoggedIn && (
+          <button onClick={handleLogout} className="logout-button">Logout</button>
         )}
-        
-        <div className={`navbar-menu-wrapper ${!isLoggedIn ? 'hide-on-desktop' : ''}`}>
+
+        <div className="navbar-menu-wrapper">
           <button
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
@@ -116,7 +116,9 @@ export default function Navbar() {
               )}
             </div>
           )}
-        </div>
+            </div>
+          </>
+        )}
       </nav>
 
       <UniversalModal
